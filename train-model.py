@@ -98,8 +98,9 @@ if len(sys.argv) > 1:
     
     # Model checkpoint
     # Iteratively save the model weights after improvement
-    model_file = './models/' + COIN + '/weights-' + COIN + '-{val_loss:.4f}.hdf5'
-    ModelCheck = keras.callbacks.ModelCheckpoint(model_file, monitor='val_loss',\
+    MODEL_DIR = './models/' + COIN + '/'
+    MODEL_FILE = MODEL_DIR + 'weights-' + COIN + '-{val_loss:.4f}.hdf5'
+    ModelCheck = keras.callbacks.ModelCheckpoint(MODEL_FILE, monitor='val_loss',\
     verbose=1, save_weights_only=False, mode='min', save_best_only=True)
     
     # Early stopping to avoid unnecessary computation and save time
@@ -109,7 +110,7 @@ if len(sys.argv) > 1:
     # Compile the callbacks into a single list
     callbacks = [ModelCheck, EarlyStop]
     
-    history = model.fit(x_train, y_train, epochs=100, verbose=1,
+    history = model.fit(x_train, y_train, epochs=2, verbose=1,
               callbacks=callbacks, validation_data=(x_test, y_test), shuffle=True)
     
     # Visualize the model performance over the epochs
@@ -123,6 +124,10 @@ if len(sys.argv) > 1:
     plt.xlabel('epoch')
     plt.legend(['train', 'val'], loc='upper left')
     plt.show()
+    
+    # Save the training history
+    HISTORY_FILE = './models/' + COIN + '/history-' + COIN + '.json'
+    json.dump(hist, open(HISTORY_FILE, 'w'))
     
     # Finished
     print("[FINISHED] Successfully trained the model for", COIN)

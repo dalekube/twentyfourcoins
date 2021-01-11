@@ -26,6 +26,9 @@ from tensorflow import keras
 print("[INFO] GPU Configuration =", tf.config.list_physical_devices('GPU'))
 print("[INFO] TensorFlow version =", tf.__version__)
 
+## DEVELOPMENT ONLY
+## os.chdir('/home/dale/Downloads/GitHub/coinML')
+
 # Load the configurations
 with open('config.json') as f:
     config = json.load(f)
@@ -62,6 +65,9 @@ else:
     # Drop rows with na values and convert to float32
     df.fillna(0, inplace=True)
     df = df.astype(np.float32)
+    
+    ## DEVELOPMENT ONLY
+    ## MODEL_PATH = './models/BAT-USDC/weights-BAT-USDC-0.0005.hdf5'
     
     # Load the pre-trained model object
     assert sys.argv[2] is not None, "[ERROR] Null model file path"
