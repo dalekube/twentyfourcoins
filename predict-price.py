@@ -15,16 +15,19 @@ Example call: python3 predict-price.py BAT-USDC weights-BAT-USDC-0.0005.hdf5
 import os
 import sys
 import json
+import re
 
 import numpy as np
 import pandas as pd
 from datetime import datetime
-import tensorflow as tf
+import pickle
+
+#import tensorflow as tf
 from tensorflow import keras
 
-# Check if the GPU is available
-print("[INFO] GPU Configuration =", tf.config.list_physical_devices('GPU'))
-print("[INFO] TensorFlow version =", tf.__version__)
+## Check if the GPU is available
+#print("[INFO] GPU Configuration =", tf.config.list_physical_devices('GPU'))
+#print("[INFO] TensorFlow version =", tf.__version__)
 
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/coinML')
@@ -43,6 +46,9 @@ if len(sys.argv) != 3:
     
 else:
     
+    ## DEVELOPMENT ONLY
+    ## COIN = 'BAT-USDC'
+    
     COIN = sys.argv[1]
     assert COIN in config['SUPPORTED_COINS'], "[ERROR] " + COIN + " is not supported"
     DATA_DIR = './data/'
@@ -55,7 +61,7 @@ else:
     df = pd.read_csv(COIN_CSV, low_memory=False)
     N_DF = len(df)
     assert N_DF > 0, "[ERROR] Zero rows in the data file (.csv) for " + COIN
-    print("[INFO] Successfully read", N_DF, "records from file")
+    print("[INFO] Successfully read", '{:,}'.format(N_DF), "records from file")
     
     # Calculate rolling average features
     df.sort_values(by=['time'], inplace=True)
@@ -67,12 +73,22 @@ else:
     df = df.astype(np.float32)
     
     ## DEVELOPMENT ONLY
-    ## MODEL_PATH = './models/BAT-USDC/weights-BAT-USDC-0.0005.hdf5'
+    ## MODEL_PATH = './models/BAT-USDC/weights-BAT-USDC-0.0003.hdf5'
+    ## MODEL_PATH = './models/' + COIN + '/RF-0.0001.pkl'
     
-    # Load the pre-trained model object
+    # Load the neural network model
     assert sys.argv[2] is not None, "[ERROR] Null model file path"
     MODEL_PATH = './models/' + COIN + '/' + sys.argv[2]
-    model = keras.models.load_model(MODEL_PATH)
+    if re.match(".*\/weights.*hdf5$", MODEL_PATH):
+        print("[INFO] Loading the TensorFlow model", MODEL_PATH)
+        model = keras.models.load_model(MODEL_PATH)
+    elif re.match(".*\/RF.*pkl$", MODEL_PATH):
+        print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
+        with open(MODEL_PATH, 'rb') as f:
+            model = pickle.load(f)
+    else:
+        print("[ERROR] Model path does not align to a valid model")
+        sys.exit(0)
     
     # Make prediction with the latest observation closest to NOW()
     df['UTC_TIME'] = df.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
