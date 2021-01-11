@@ -4,10 +4,16 @@
 Collect historical coin prices for machine learning model training. Maintain
 the historical data in the 'coinML/data' directory.
 
-@author: Dale Kube
+Example call: python3 collect-data.py BAT-USDC
+
+    Parameters:
+        Coin (string): The code for a coin (e.g. BAT-USDC)
+
+@author: Dale Kube (dkube@uwalumni.com)
 """
 
 import os
+import sys
 import time
 import pandas as pd
 from datetime import datetime
@@ -26,6 +32,12 @@ DATA_DIR = './data/'
 # API Docs: https://docs.pro.coinbase.com/
 # Manage API Keys and Secrets: https://pro.coinbase.com/profile/api
 products = public_client.get_products()
+
+# Function to save the data to file during the iterations
+def save_file(df, COIN_CSV):
+    print('[INFO] Saving the data to', os.path.abspath(COIN_CSV))
+    df.drop_duplicates(subset=['time'], inplace=True)
+    df.to_csv(COIN_CSV, index=False)
 
 # Iterate over coins
 # Manage the coin-specific data in the 'coinML/data' directory
@@ -75,29 +87,36 @@ for coin in COIN_IDS:
     # Iteratively save the data after 10 dates have passed
     FILE_COUNT = 0
     N_DATES = len(datelist)
-    for d in datelist:
+    try:
         
-        print('[INFO] Collecting', coin, 'prices for date:', d)
-        d_start = d + ' 00:00:00'
-        d_end = d + ' 24:00:00'
+        for d in datelist:
+            
+            print('[INFO] Collecting', coin, 'prices for date:', d)
+            d_start = d + ' 00:00:00'
+            d_end = d + ' 24:00:00'
+        
+            # Collect the historical prices in five minute intervals
+            # https://docs.pro.coinbase.com/#get-historic-rates
+            hist = public_client.get_product_historic_rates(coin, start=d_start, end=d_end, granularity=300)
+            for h in hist:
+                new_row = pd.Series(h, index=df.columns)
+                df = df.append(new_row, ignore_index=True)
+            N_HIST = len(hist)
+            print("[INFO] Appended", N_HIST, "new price candles")
+            
+            # Iteratively save the data
+            FILE_COUNT += 1
+            if FILE_COUNT % 10 == 0 or FILE_COUNT == N_DATES:
+                save_file(df, COIN_CSV)
+            
+            # Sleep for one second to respect the API limits and avoid errors
+            time.sleep(1)
     
-        # Collect the historical prices in five minute intervals
-        # https://docs.pro.coinbase.com/#get-historic-rates
-        hist = public_client.get_product_historic_rates(coin, start=d_start, end=d_end, granularity=300)
-        for h in hist:
-            new_row = pd.Series(h, index=df.columns)
-            df = df.append(new_row, ignore_index=True)
-        N_HIST = len(hist)
-        print("[INFO] Appended", N_HIST, "new price candles")
+    except KeyboardInterrupt:
         
-        # Iteratively save the data
-        FILE_COUNT += 1
-        if FILE_COUNT % 10 == 0 or FILE_COUNT == N_DATES:
-            print('[INFO] Saving the data')
-            df.drop_duplicates(subset=['time'], inplace=True)
-            df.to_csv(COIN_CSV, index=False)
-        
-        # Sleep for one second to respect the API limits and avoid errors
-        time.sleep(1)
+        print("[INFO] Acknowledged the KeyboardInterrupt")
+        save_file(df, COIN_CSV)
+        print("[INFO] Shutting down the process.....")
+        sys.exit(0)
 
 

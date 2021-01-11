@@ -3,6 +3,12 @@
 """
 Train the model for BAT-USDC
 
+Example call: python3 predict-price.py BAT-USDC weights-BAT-USDC-0.0005.hdf5
+
+    Parameters:
+        Coin (string): The code for a coin (e.g. BAT-USDC)
+        Model Object (string): Filename for the model object to use for the inference
+
 @author: dale
 """
 
@@ -10,6 +16,7 @@ import os
 import sys
 import json
 
+import numpy as np
 import pandas as pd
 from datetime import datetime
 import tensorflow as tf
@@ -35,7 +42,7 @@ else:
     
     COIN = sys.argv[1]
     assert COIN in config['SUPPORTED_COINS'], "[ERROR] " + COIN + " is not supported"
-    DATA_DIR = './data/' + COIN
+    DATA_DIR = './data/'
     
     # Load the data for the coin
     # Print the row count when finished
@@ -47,8 +54,19 @@ else:
     assert N_DF > 0, "[ERROR] Zero rows in the data file (.csv) for " + COIN
     print("[INFO] Successfully read", N_DF, "records from file")
     
+    # Calculate rolling average features
+    df.sort_values(by=['time'], inplace=True)
+    for i in range(10, 2000, 10):
+        df['MA'+str(i)] = df['close'].rolling(window=i).mean()
+    
+    # Drop rows with na values and convert to float32
+    df.fillna(0, inplace=True)
+    df = df.astype(np.float32)
+    
     # Load the pre-trained model object
-    model = keras.models.load_model(sys.argv[2])
+    assert sys.argv[2] is not None, "[ERROR] Null model file path"
+    MODEL_PATH = './models/' + COIN + '/' + sys.argv[2]
+    model = keras.models.load_model(MODEL_PATH)
     
     # Make prediction with the latest observation closest to NOW()
     df['UTC_TIME'] = df.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
