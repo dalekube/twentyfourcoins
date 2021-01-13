@@ -48,17 +48,16 @@ else:
     
     COIN = sys.argv[1]
     assert COIN in config['SUPPORTED_COINS'], "[ERROR] " + COIN + " is not supported"
-    DATA_DIR = './data/'
     
     # Load the data for the coin
     # Print the row count when finished
-    COIN_CSV = DATA_DIR + '/' + COIN + '.csv'
-    assert COIN in config['SUPPORTED_COINS'], "[ERROR] " + COIN + " is not supported"
-    assert os.path.exists(COIN_CSV), "[ERROR] Unavailable data (.csv) for " + COIN
-    df = pd.read_csv(COIN_CSV, low_memory=False)
+    statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
+    df = pd.read_sql(statement, con)
+    del df['coin']
+    
     N_DF = len(df)
-    assert N_DF > 0, "[ERROR] Zero rows in the data file (.csv) for " + COIN
-    print("[INFO] Successfully read", '{:,}'.format(N_DF), "records from file")
+    assert N_DF > 0, "[ERROR] Zero rows in the collected data for " + COIN
+    print("[INFO] Successfully read", '{:,}'.format(N_DF), "rows from the database")
     
     # Calculate rolling average features
     df.sort_values(by=['time'], inplace=True)
@@ -87,6 +86,8 @@ else:
     df['UTC_TIME'] = df.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
     df.sort_values(by=['time'], inplace=True)
     df_predict = df.tail(1)
+    
+    p_unixtime = int(df_predict['time'])
     p_time = df_predict.pop('UTC_TIME')
     p_time = str(p_time.tolist()[0])
     p_close = float(df_predict['close'])
@@ -98,12 +99,13 @@ else:
     # Log the current price and prediction (P01)
     # VALUE1 = Latest Price
     # VALUE2 = Predicted Price
+    # VALUE3 = Unix time for the candle used for the prediction
     p_close = round(p_close,8)
     prediction = round(prediction,8)
     EXPECTED_CHANGE = round(EXPECTED_CHANGE,8)
     
     cursor = con.cursor()
-    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "P01", %s, %s)' % (p_close, prediction)
+    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "P01", %s, %s, %s)' % (p_close, prediction, p_unixtime)
     cursor.execute(statement)    
     cursor.close()
     con.commit()

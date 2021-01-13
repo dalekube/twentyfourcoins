@@ -6,19 +6,23 @@ Used to initialize the SQLite3 database from scratch.
 @author: dale
 """
 
+## DEVELOPMENT ONLY
+## import os
+## os.chdir('/home/dale/Downloads/GitHub/coinML')
 
 # Create a database object if it doesn't already exist
 from data.db_connect import db_connect
 con = db_connect('./data/db.sqlite')
+cursor = con.cursor()
 
 # Create the master 'logs' table
-cursor = con.cursor()
 statement = '\
 CREATE TABLE IF NOT EXISTS logs (\
 UTC_TIME INT NOT NULL,\
 ACTIVITY VARCHAR(3) NOT NULL,\
 VALUE1 FLOAT,\
-VALUE2 FLOAT\
+VALUE2 FLOAT,\
+VALUE3 FLOAT\
 )\
 '
 cursor.execute(statement)

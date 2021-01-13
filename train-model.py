@@ -33,26 +33,25 @@ with open('config.json') as f:
 # Evaluate the command line parameters
 # argv[1] = coin name (e.g. BAT-USDC)
 if len(sys.argv) > 1:
-
+    
     COIN = sys.argv[1]
     
     ## DEVELOPMENT ONLY
     ## COIN = 'BAT-USDC'
     
-    # Create the coin directory if necessary
-    DATA_DIR = './data/'
-    if not os.path.exists(DATA_DIR):
-        os.mkdir(DATA_DIR)
-    
     # Load the data for the coin
     # Print the row count when finished
-    COIN_CSV = DATA_DIR + COIN + '.csv'
     assert COIN in config['SUPPORTED_COINS'], "[ERROR] " + COIN + " is not supported"
-    assert os.path.exists(COIN_CSV), "[ERROR] Unavailable data (.csv) for " + COIN
-    df = pd.read_csv(COIN_CSV, low_memory=False)
+
+    # Load the data for the coin
+    # Print the row count when finished
+    statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
+    df = pd.read_sql(statement, con)
+    del df['coin']
+    
     N_DF = len(df)
-    assert N_DF > 0, "[ERROR] Zero rows in the data file (.csv) for " + COIN
-    print("[INFO] Successfully read", '{:,}'.format(N_DF), "records from file")
+    assert N_DF > 0, "[ERROR] Zero rows in the collected data for " + COIN
+    print("[INFO] Successfully read", '{:,}'.format(N_DF), "rows from the database")
     
     # Calculate rolling average features
     df.sort_values(by=['time'], inplace=True)
@@ -98,7 +97,7 @@ if len(sys.argv) > 1:
     # Log the model performance (M01)
     print('[INFO] Logging the model performance to the database')
     cursor = con.cursor()
-    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "M01", %s, NULL)' % (MAE)
+    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "M01", %s, NULL, NULL)' % (MAE)
     cursor.execute(statement)    
     cursor.close()
     con.commit()
