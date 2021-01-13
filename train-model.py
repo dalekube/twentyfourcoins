@@ -11,7 +11,6 @@ Example call: python3 train-model.py BAT-USDC
 @author: Dale Kube (dkube@uwalumni.com)
 """
 
-import os
 import sys
 import json
 import pandas as pd
@@ -24,6 +23,7 @@ from data.db_connect import db_connect
 con = db_connect('./data/db.sqlite')
 
 ## DEVELOPMENT ONLY
+## import os
 ## os.chdir('/home/dale/Downloads/GitHub/coinML')
 
 # Load the configurations
@@ -34,6 +34,7 @@ with open('config.json') as f:
 # argv[1] = coin name (e.g. BAT-USDC)
 if len(sys.argv) > 1:
     
+    assert sys.argv[1] is not None, '[ERROR] Missing coin parameter (e.g. BAT-USDC)'
     COIN = sys.argv[1]
     
     ## DEVELOPMENT ONLY

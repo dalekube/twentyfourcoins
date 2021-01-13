@@ -13,6 +13,7 @@ Example call: python3 collect-data.py BAT-USDC
 """
 
 import sys
+import json
 import time
 import pandas as pd
 from datetime import datetime
@@ -39,10 +40,23 @@ products = public_client.get_products()
 from data.db_connect import db_connect
 con = db_connect('./data/db.sqlite')
 
-# Iterate over COINs
-# Manage the COIN-specific data in the 'COINML/data' directory
-for COIN in COIN_IDS:
+# Load the configurations
+with open('config.json') as f:
+    config = json.load(f)
+
+# Evaluate the command line parameters
+# argv[1] = coin name (e.g. BAT-USDC)
+if len(sys.argv) != 2:
     
+    # Error: missing command line arguments
+    print("[ERROR] Missing command line arguments.")
+
+else:
+    
+    # Identify the specific coin
+    COIN = sys.argv[1]
+    assert COIN in config['SUPPORTED_COINS'], "[ERROR] " + COIN + " is not supported"
+        
     ## DEVELOPMENT ONLY
     ## COIN = 'BAT-USDC'
     
@@ -122,7 +136,7 @@ for COIN in COIN_IDS:
     except KeyboardInterrupt:
         
         print("[INFO] Acknowledged the KeyboardInterrupt")
-        print("[INFO] Shutting down the process.....")
+        print("[INFO] Shutting down the process")
         con.commit()
         con.close()
         sys.exit(0)
