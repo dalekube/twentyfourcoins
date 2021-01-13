@@ -22,15 +22,12 @@ import pandas as pd
 from datetime import datetime
 import pickle
 
-#import tensorflow as tf
-from tensorflow import keras
-
-## Check if the GPU is available
-#print("[INFO] GPU Configuration =", tf.config.list_physical_devices('GPU'))
-#print("[INFO] TensorFlow version =", tf.__version__)
-
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/coinML')
+
+# Create a database connection
+from data.db_connect import db_connect
+con = db_connect('./data/db.sqlite')
 
 # Load the configurations
 with open('config.json') as f:
@@ -73,16 +70,12 @@ else:
     df = df.astype(np.float32)
     
     ## DEVELOPMENT ONLY
-    ## MODEL_PATH = './models/BAT-USDC/weights-BAT-USDC-0.0003.hdf5'
-    ## MODEL_PATH = './models/' + COIN + '/RF-0.0001.pkl'
+    ## MODEL_PATH = './models/' + COIN + '/RF-0.00471387.pkl'
     
     # Load the neural network model
     assert sys.argv[2] is not None, "[ERROR] Null model file path"
     MODEL_PATH = './models/' + COIN + '/' + sys.argv[2]
-    if re.match(".*\/weights.*hdf5$", MODEL_PATH):
-        print("[INFO] Loading the TensorFlow model", MODEL_PATH)
-        model = keras.models.load_model(MODEL_PATH)
-    elif re.match(".*\/RF.*pkl$", MODEL_PATH):
+    if re.match(".*\/RF.*pkl$", MODEL_PATH):
         print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
         with open(MODEL_PATH, 'rb') as f:
             model = pickle.load(f)
@@ -99,10 +92,25 @@ else:
     p_close = float(df_predict['close'])
     p_now = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     
-    print("[INFO] Current time = " + p_now)
-    print("[INFO] Making forward-looking prediction from " + p_time)
     prediction = float(model.predict(df_predict))
-    
-    print("[INFO] Predicted price = " + str(prediction))
     EXPECTED_CHANGE = prediction-p_close
-    print("[RESULT] The price is expected to change by " + str(round(EXPECTED_CHANGE,3)) + " dollars in the next 24 hours")
+    
+    # Log the current price and prediction (P01)
+    # VALUE1 = Latest Price
+    # VALUE2 = Predicted Price
+    p_close = round(p_close,8)
+    prediction = round(prediction,8)
+    EXPECTED_CHANGE = round(EXPECTED_CHANGE,8)
+    
+    cursor = con.cursor()
+    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "P01", %s, %s)' % (p_close, prediction)
+    cursor.execute(statement)    
+    cursor.close()
+    con.commit()
+    con.close()
+    
+    print('[INFO] Making forward-looking prediction from', p_time)
+    print('[INFO] Current time =', p_now)  
+    print('[INFO] Current price =', str(p_close))
+    print('[INFO] Predicted price =', str(prediction))
+    print('[RESULT] The price is expected to change by', str(EXPECTED_CHANGE), 'dollars in the next 24 hours')
