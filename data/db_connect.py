@@ -15,7 +15,7 @@ def db_connect(db_file):
     con = None
     try:
         
-        con = sqlite3.connect(db_file, isolation_level=None)
+        con = sqlite3.connect(db_file, isolation_level=None, timeout=10)
         if os.path.exists(db_file):
             
             print("[INFO] Successfully connected to the database", db_file)
