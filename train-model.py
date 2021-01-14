@@ -18,13 +18,13 @@ import numpy as np
 from skranger.ensemble import RangerForestRegressor
 import pickle
 
-# Create a database connection
-from data.db_connect import db_connect
-con = db_connect('./data/db.sqlite')
-
 ## DEVELOPMENT ONLY
 ## import os
 ## os.chdir('/home/dale/Downloads/GitHub/coinML')
+
+# Create a database connection
+from data.db_connect import db_connect
+con = db_connect('./data/db.sqlite')
 
 # Load the configurations
 with open('config.json') as f:
@@ -51,13 +51,36 @@ if len(sys.argv) > 1:
     del df['coin']
     
     N_DF = len(df)
-    assert N_DF > 0, "[ERROR] Zero rows in the collected data for " + COIN
+    assert N_DF > 0, '[ERROR] Zero rows in the collected data for ' + COIN
     print("[INFO] Successfully read", '{:,}'.format(N_DF), "rows from the database")
+    
+#    # Append closing prices and volumes for correlative coins
+#    # Correlative data helps the model to understand confounding market trends
+#    correlations = config['MODEL_CORRELATIONS']['BAT-USDC']
+#    close_cols = []
+#    for i in correlations:
+#            # Load the data for the coin
+#            # Print the row count when finished
+#            print('[INFO] Reading historical data for correlative coin', i)
+#            statement = 'SELECT time, close, volume FROM prices WHERE coin = "%s"' % i
+#            df_cor = pd.read_sql(statement, con)
+#            N_DF_COR = len(df_cor)
+#            assert N_DF_COR > 0, '[ERROR] Missing prices for correlative coin'
+#            print('[INFO] Successfully read', '{:,}'.format(N_DF_COR), 'rows from the database')
+#            
+#            print('[INFO] Merging the correlative prices and volumes')
+#            cols_cor = [j + '-' + i for j in df_cor.columns if j != 'time']
+#            close_cols = close_cols + [cols_cor[0]]
+#            df_cor.columns = ['time'] + cols_cor
+#            df = df.merge(df_cor,on='time',how='left')
+#            assert N_DF == len(df), '[ERROR] Unintended row expansion from correlative data merger'
     
     # Calculate rolling average features
     df.sort_values(by=['time'], inplace=True)
     for i in range(10, 2000, 10):
-        df['MA'+str(i)] = df['close'].rolling(window=i).mean()
+        df['MA'+str(i)] = df['close'].rolling(window=i, min_periods=1, center=False).mean()
+#        for y in close_cols:
+#            df['MA'+str(i)+'_'+y] = df[y].rolling(window=i, min_periods=1, center=False).mean()
     
     # Drop rows with na values and convert to float32
     df.fillna(0, inplace=True)
@@ -71,7 +94,7 @@ if len(sys.argv) > 1:
     df = df[~pd.isnull(df['PRICE_24'])]
     
     # Split the training and testing data
-    # Use the latest 1,000 observations for the test split
+    # Use the latest 3,000 observations for the test split
     price_24 = df.pop('PRICE_24')
     N_TEST = 3000
     N_DF = len(df)
@@ -85,7 +108,7 @@ if len(sys.argv) > 1:
     
     # Train the random forest model
     print("[INFO] Training the RangerForestRegressor")
-    rfr = RangerForestRegressor(n_estimators=100)
+    rfr = RangerForestRegressor(n_estimators=150, oob_error=False)
     rfr.fit(x_train, y_train)
     
     # Estimate the performance upon the test data
