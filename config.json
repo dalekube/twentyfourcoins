@@ -2,5 +2,6 @@
   "SUPPORTED_COINS":["BAT-USDC","BTC-USD"],
   "MODEL_CORRELATIONS":{
     "BAT-USDC":["BTC-USD"]
-  }
+  },
+  "NUM_MOV_AVG":"1000"
 }
