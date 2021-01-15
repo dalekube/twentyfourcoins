@@ -12,9 +12,11 @@ Example call: python3 predict-price.py BAT-USDC weights-BAT-USDC-0.0005.hdf5
 @author: dale
 """
 
+import os
 import sys
 import json
 import re
+import glob
 
 import numpy as np
 import pandas as pd
@@ -22,7 +24,6 @@ from datetime import datetime
 import pickle
 
 ## DEVELOPMENT ONLY
-## import os
 ## os.chdir('/home/dale/Downloads/GitHub/coinML/functions')
 
 # Create a database connection
@@ -36,7 +37,7 @@ with open('../config.json') as f:
 # Evaluate the command line parameters
 # argv[1] = coin name (e.g. BAT-USDC)
 # argv[2] = model object name (e.g. weights-BAT-USDC-0.0022.hdf5)
-assert len(sys.argv) == 3, '[ERROR] Invalid command line arguments.'
+assert len(sys.argv) in (2,3), '[ERROR] Invalid command line arguments.'
 
 ## DEVELOPMENT ONLY
 ## COIN = 'BAT-USDC'
@@ -69,16 +70,29 @@ df = df.astype(np.float32)
 ## DEVELOPMENT ONLY
 ## MODEL_PATH = './models/' + COIN + '/RF-0.00471387.pkl'
 
-# Load the neural network model
-assert sys.argv[2] is not None, "[ERROR] Null model file path"
-MODEL_PATH = '../models/' + COIN + '/' + sys.argv[2]
-if re.match(".*\/RF.*pkl$", MODEL_PATH):
-    print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
-    with open(MODEL_PATH, 'rb') as f:
-        model = pickle.load(f)
+# Load the model
+MODEL_DIR = '../models/' + COIN + '/'
+if len(sys.argv) == 2:
+    
+    # If a specific model version is not defined,
+    # automatically identify the best model with the lowest error
+    model_files = glob.glob(MODEL_DIR + 'RF*.pkl')
+    model_errors = [i.split('-')[2] for i in model_files]
+    model_errors = [float(os.path.splitext(i)[0]) for i in model_errors]
+    model_min_error = min(model_errors)
+    best_model = [i for i in model_files if re.search(str(model_min_error), i)]
+    assert len(best_model) == 1, '[ERROR] Unable to identify a single, best model with the lowest error'
+    MODEL_PATH = best_model[0] 
+
 else:
-    print("[ERROR] Model path does not align to a valid model")
-    sys.exit(0)
+    
+    # Load the specified model version by the file name
+    MODEL_PATH = MODEL_DIR + sys.argv[2]
+    assert re.match(".*\/RF.*pkl$", MODEL_PATH), '[ERROR] Model path does not align to a valid model'
+
+print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
+with open(MODEL_PATH, 'rb') as f:
+    model = pickle.load(f)
 
 # Make prediction with the latest observation closest to NOW()
 df['time'] = df['time'].astype(int)
