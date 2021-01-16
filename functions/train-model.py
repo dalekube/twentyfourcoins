@@ -99,6 +99,7 @@ price_24 = df.pop('PRICE_24')
 N_TEST = 3000
 N_DF = len(df)
 
+print("[INFO] Training the RangerForestRegressor using a train/test split")
 print("[INFO] Training the model and evaluating the performance using the latest", '{:,}'.format(N_TEST), "candles")
 x_train = df[0:N_DF-N_TEST]
 y_train = price_24[0:N_DF-N_TEST]
@@ -107,7 +108,6 @@ x_test = df[-N_TEST:]
 y_test = price_24[-N_TEST:]
 
 # Train the random forest model
-print("[INFO] Training the RangerForestRegressor")
 rfr = RangerForestRegressor(n_estimators=150, oob_error=False)
 rfr.fit(x_train, y_train)
 
@@ -117,7 +117,7 @@ predictions = rfr.predict(x_test)
 # Mean Absolute Error
 MAE = np.mean(abs(predictions - y_test))
 MAE = '{:.8f}'.format(MAE)
-print('[INFO] RangerForestRegressor MAE =', MAE)
+print('[INFO] RangerForestRegressor MAE =', '${:,.4f}'.format(MAE))
 
 # Mean Absolute Percentage Error
 MAPE = np.mean(abs((predictions - y_test)/y_test))
@@ -132,6 +132,13 @@ cursor.execute(statement)
 cursor.close()
 con.commit()
 con.close()
+
+# Re-train the model using the full data set
+print('[INFO] Re-training the model using the full data set for best performance')
+
+# Train the random forest model
+rfr = RangerForestRegressor(n_estimators=150, oob_error=False)
+rfr.fit(df, price_24)
 
 # Create the model directory if it doesn't already exist
 MODEL_DIR = '../models/' + COIN
