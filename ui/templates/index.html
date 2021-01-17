@@ -1,4 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
-<div>This is the home page</div>
+  <div style="display:flex;align-items:top;">
+    <div>
+      <div class="smartBlock">
+      <label>Update the data from the Coinbase API</label>
+      <div style="margin-bottom:10px"><i class="fas fa-sync"></i></div>
+      <button class="mainButton" id="updateData" onclick="getPriceHistory()">Update Data</button>
+      </div>
+      <div class="smartBlock">
+        <label>Get Current Price Predictions</label>
+        <div style="margin-bottom:10px"><i class="fas fa-dollar-sign"></i></div>
+        {% for COIN in SUPPORTED_COINS %}
+        <button class="mainButton" id="getPrice{{COIN}}" value="{{COIN}}" onclick="pricePrediction(this)">{{COIN}}</button>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <div id="pricePredictionBox" class="block" style="display:none;">
+        <div id="predict_coin" style="font-size:20px;font-weight:bold;"></div>
+        <br>
+        <div id="predict_time"></div>
+        <div id="predict_now"></div>
+        <div id="predict_close"></div>
+        <div id="predict_prediction"></div>
+        <br>
+        <b><div id="predict_change"></div></b>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}
