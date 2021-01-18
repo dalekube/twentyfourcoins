@@ -1,10 +1,15 @@
 
+:root {
+  --primary_color: #4488EE;
+  --secondary_color: #FF5C39;
+}
+
 .smartBlock {
   border-radius:5px;
   padding:10px;
   border:thin darkgrey solid;
   margin:15px;
-  background:#4488EE;
+  background: var(--primary_color);
   width:200px;
   text-align:center;
   display:flex;
@@ -20,7 +25,7 @@ i {
 }
 
 .block {
-  background: #4488EE;
+  background: var(--primary_color);
   padding:20px;
   margin:15px;
   border-radius:5px;
@@ -35,18 +40,18 @@ i {
   padding:5px;
   border:none;
   outline:none;
-  box-shadow: 0 3px #ff5c39;
+  box-shadow: 0 3px var(--secondary_color);
 }
 
 .mainButton:hover {
-  background-color: #ff5c39;
+  background-color: var(--secondary_color);
   box-shadow: 0 3px darkgrey;
   outline:none;
   border:none;
 }
 
 .mainButton:active {
-  background-color: #ff5c39;
+  background-color: var(--secondary_color);
   border:none;
   outline:none;
   transform: translateY(2px);
@@ -55,7 +60,7 @@ i {
 
 .expectedPriceChange {
   
-  background:#ff5c39;
+  background: var(--secondary_color);
   color:white;
   padding:10px;
   border-radius:5px;
@@ -72,7 +77,7 @@ i {
 .loadingSpinner {
   border: 8px solid #f3f3f3;
   border-radius: 50%;
-  border-top: 8px solid #ff5c39;
+  border-top: 8px solid var(--secondary_color);
   width: 30px;
   height: 30px;
   -webkit-animation: spin 2s linear infinite; /* Safari */
@@ -101,7 +106,7 @@ i {
 }
 
 .passcodeAccepted {
-  background:#ff5c39;
+  background: var(--secondary_color);
 }
 
 .passcodeDenied {
