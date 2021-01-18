@@ -11,7 +11,10 @@ import sqlite3
 from sqlite3 import Error
 
 def db_connect(db_file):
-    """ create a database connection """
+    '''create a database connection
+    
+    ::param str db_file: path to the SQLite3 database with the filename and extension
+    '''
     con = None
     try:
         

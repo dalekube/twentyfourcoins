@@ -49,12 +49,12 @@ def price_history():
     return response
 
 # Collect price prediction
-@app.route('/price_prediction/', methods=['POST'])
+@app.route('/price_prediction', methods=['POST'])
 def price_prediction():
     '''Get the price prediction for a specific coin
     '''
-    COIN = request.get_json()
-    print(COIN['COIN'])
-    response = predict_price(config, COIN['COIN'])     
+    
+    COIN = request.get_json()['COIN']
+    response = predict_price(config, COIN)     
     return jsonify(response)
     

@@ -14,6 +14,11 @@
   color:white;
 }
 
+i {
+  margin:10px;
+  font-size:30px;
+}
+
 .block {
   background: #4488EE;
   padding:20px;
@@ -25,7 +30,7 @@
 }
 
 .mainButton {
-  margin-top:15px;
+  margin-top:10px;
   padding:5px;
   border:none;
   outline:none;
@@ -47,19 +52,20 @@
   box-shadow: 0 3px #122a13;
 }
 
-.loading {
-  
-  margin-left:50px;
-
-}
-
-.loadingSuccess {
+.expectedPriceChange {
   
   background:#ff5c39;
   color:white;
   padding:10px;
   border-radius:5px;
+  text-align:center;
   
+}
+
+.loading {
+  
+  margin-left:50px;
+
 }
 
 .loadingSpinner {

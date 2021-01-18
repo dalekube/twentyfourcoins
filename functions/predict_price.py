@@ -13,11 +13,9 @@ Example call: python3 predict-price.py BAT-USDC weights-BAT-USDC-0.0005.hdf5
 """
 
 import os
-import sys
 import re
-import glob
 import json
-
+import glob
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -28,6 +26,13 @@ from functions.db_connect import db_connect
 ## os.chdir('/home/dale/Downloads/GitHub/coinML/functions')
 
 def predict_price(config, COIN):
+    '''Predict the 24-hour, forward-looking price for a specified coin
+    
+    ::param dict config: dictionary with the platform configurations
+    ::param str COIN: the name of the coin (e.g. "BAT-USDC")
+    ::param RandomForestRegressor model: the pre-trained model to use for the predictions
+    ::param float model_min_error: the mean absolute error for the model
+    '''
     
     ## DEVELOPMENT ONLY
     ## COIN = 'BAT-USDC'
@@ -57,32 +62,23 @@ def predict_price(config, COIN):
     df.fillna(0, inplace=True)
     df = df.astype(np.float32)
     
-    ## DEVELOPMENT ONLY
-    ## MODEL_PATH = './models/' + COIN + '/RF-0.00471387.pkl'
-    
-    # Load the model
+    # Load the best model
     MODEL_DIR = '../models/' + COIN + '/'
-    if len(sys.argv) == 2:
-        
-        # If a specific model version is not defined,
-        # automatically identify the best model with the lowest error
-        model_files = glob.glob(MODEL_DIR + 'RF*.pkl')
+    
+    # If a specific model version is not defined,
+    # automatically identify the best model with the lowest error
+    model_files = glob.glob(MODEL_DIR + 'RF*.pkl')
+    if len(model_files) > 0:
         model_errors = [i.split('-')[2] for i in model_files]
         model_errors = [float(os.path.splitext(i)[0]) for i in model_errors]
         model_min_error = min(model_errors)
         best_model = [i for i in model_files if re.search(str(model_min_error), i)]
-        assert len(best_model) == 1, '[ERROR] Unable to identify a single, best model with the lowest error'
+        assert len(best_model) == 1, '[ERROR] Unable to identify a model with the lowest error for ' + COIN
         MODEL_PATH = best_model[0] 
-    
-    else:
         
-        # Load the specified model version by the file name
-        MODEL_PATH = MODEL_DIR + sys.argv[2]
-        assert re.match(".*\/RF.*pkl$", MODEL_PATH), '[ERROR] Model path does not align to a valid model'
-    
-    print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
-    with open(MODEL_PATH, 'rb') as f:
-        model = pickle.load(f)
+        print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
+        with open(MODEL_PATH, 'rb') as f:
+            model = pickle.load(f)
     
     # Make prediction with the latest observation closest to NOW()
     df['time'] = df['time'].astype(int)
@@ -112,7 +108,6 @@ def predict_price(config, COIN):
     cursor.execute(statement)    
     cursor.close()
     con.commit()
-    con.close()
     
     print('[INFO] Making forward-looking prediction from', predict_time)
     print('[INFO] Current time =', predict_now)  
@@ -120,11 +115,30 @@ def predict_price(config, COIN):
     print('[INFO] Predicted price =', str(prediction))
     print('[FINISHED] The price is expected to change by', str(expected_change), 'dollars in the next 24 hours')
     
+    # Query the database for the logged performance statistics
+    statement = 'SELECT * FROM logs WHERE ACTIVITY="M01" AND VALUE1=%s AND META1="%s"' % (model_min_error, COIN)
+    model_stats = pd.read_sql(statement, con)
+    con.close()
+    assert len(model_stats) > 0, '[ERROR] Did not identify any statistics in the logs'
+    model_stats = model_stats.sort_values(by=['UTC_TIME'], ascending=False)
+    model_stats = model_stats.iloc[0,:]
+    training_time = str(datetime.utcfromtimestamp(model_stats['UTC_TIME']))
+    
+    # Print the performance statistics
+    print('[INFO] Model statistics for', COIN)
+    print('[INFO] Model trained at', training_time)
+    print('[INFO] Mean Absolute Error (MAE) =', '${:,.4f}'.format(model_min_error))
+    print('[INFO] Mean Absolute Percentage Error (MAPE) =', '{:.2%}'.format(model_stats['VALUE2']))
+    print('[FINISHED] Successfully returned the model performance statistics')
+    
     return json.dumps({
             'predict_time':predict_time,
             'predict_now':predict_now,
             'predict_close':'$ {:,.4f}'.format(predict_close),
             'prediction':'$ {:,.4f}'.format(prediction),
-            'expected_change':'$ {:,.4f}'.format(expected_change)
+            'expected_change':'$ {:,.4f}'.format(expected_change),
+            'stats_training_time': training_time,
+            'stats_mae': '$ {:,.4f}'.format(model_min_error),
+            'stats_mape': '{:.2%}'.format(model_stats['VALUE2'])
             })
 

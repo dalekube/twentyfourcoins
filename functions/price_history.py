@@ -21,6 +21,10 @@ from functions.db_connect import db_connect
 
 # Function to collect prices for a single coin
 def collect_prices(config):
+    '''Update the historical prices in the database for all supported coins.
+    
+    ::param dict config: dictionary with the platform configurations
+    '''
     
     print("[INFO] Establishing the Coinbase API connection")
     public_client = cbpro.PublicClient()
