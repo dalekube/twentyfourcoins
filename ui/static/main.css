@@ -90,3 +90,22 @@ i {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.passcodeStatus {
+  color:white;
+  padding:10px;
+  border-radius:5px;
+  text-align:center;
+  width:150px;
+  margin-top:15px;
+}
+
+.passcodeAccepted {
+  background:#ff5c39;
+}
+
+.passcodeDenied {
+  background:darkred;
+}
+
+

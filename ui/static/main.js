@@ -5,6 +5,26 @@ function pageUnlocked(){
   
   $("#locked").hide();
   $("#unlocked").show();
+  $("#passcodeStatus").html("Passcode Accepted").removeClass().addClass("passcodeStatus passcodeAccepted").show();
+  setTimeout(function(){
+    if ($(".passcodeAccepted").is(":visible")) {
+      $("#passcodeStatus").empty().hide();
+    }
+  }, 5000);
+  
+}
+
+function invalidPasscode(){
+  
+  $("#locked").show();
+  $("#unlocked").hide();
+  $("#pricePredictionBox").empty().hide();
+  $("#passcodeStatus").html("Passcode Denied").removeClass().addClass("passcodeStatus passcodeDenied").show();
+  setTimeout(function(){
+    if ($(".passcodeDenied").is(":visible")) {
+      $("#passcodeStatus").empty().hide();
+    }
+  }, 5000);
   
 }
 
@@ -16,7 +36,8 @@ $(document).on("click","#enterPasscode",function(){
       type:"POST",
       data: JSON.stringify({passcode: $("#passcode").val()}),
       contentType:"application/json",
-      success: pageUnlocked
+      success: pageUnlocked,
+      error: invalidPasscode
   });
   
 });

@@ -31,7 +31,7 @@ from functions.predict_price import predict_price
 # Update the historical prices in the database upon startup
 # Always work with the latest price candles
 print('[INFO] Updating the historical prices in the database')
-#collect_prices(config)
+collect_prices(config)
 
 # Home page
 @app.route('/', methods=['GET'])
