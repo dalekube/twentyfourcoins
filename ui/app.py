@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Web application.
+Web application for TwentyFourCoins
 
 @author: Dale Kube (dkube@uwalumni.com)
 """
@@ -19,7 +19,6 @@ app = Flask(__name__, static_url_path='')
 fa = FontAwesome(app)
 master_password = config['MASTER_PASSWORD']
 app.secret_key = master_password
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 valid_passcode = False
 
 # Create a database connection
@@ -29,13 +28,18 @@ sys.path.append('..')
 from functions.price_history import collect_prices
 from functions.predict_price import predict_price
 
+# Update the historical prices in the database upon startup
+# Always work with the latest price candles
+print('[INFO] Updating the historical prices in the database')
+#collect_prices(config)
+
 # Home page
 @app.route('/', methods=['GET'])
 def index():
     
     return render_template(
             'index.html',
-            SUPPORTED_COINS = config['SUPPORTED_COINS']
+            SUPPORTED_COINS = config['SUPPORTED_COINS'].items()
             )
 
 # Validate the passcode
@@ -54,19 +58,6 @@ def validate_passcode():
         print('[ERROR] Invalid passcode')
         return jsonify(success=False), 401
 
-# Collect price history
-@app.route('/price_history', methods=['GET'])
-def price_history():
-    '''Execute the function to collect data from the Coinbase API
-    and update the 'prices' table in the SQLite3 database
-    '''
-    global valid_passcode
-    if valid_passcode:
-        response = collect_prices(config)
-        return jsonify(success=response)
-    else:
-        return jsonify(success=False), 401 
-
 # Collect price prediction
 @app.route('/price_prediction', methods=['POST'])
 def price_prediction():
@@ -79,4 +70,7 @@ def price_prediction():
         return jsonify(response)
     else:
         return jsonify(success=False), 401
-    
+
+if __name__ == '__main__':
+    context = ('cert.pem', 'key.pem')#certificate and key files
+    app.run(debug=True, ssl_context=context)

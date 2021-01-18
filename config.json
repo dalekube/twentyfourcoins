@@ -1,6 +1,12 @@
 {
-  "MASTER_PASSWORD":"Bella123",
-  "SUPPORTED_COINS":["BAT-USDC","BTC-USD","LTC-USD","ETH-USD","BCH-USD"],
+  "MASTER_PASSWORD":"Bella123$",
+  "SUPPORTED_COINS":{
+    "Basic Attention Token":"BAT-USDC",
+    "Bitcoin":"BTC-USD",
+    "Litecoin":"LTC-USD",
+    "Ethereum":"ETH-USD",
+    "Bitcoin Cash":"BCH-USD"
+    },
   "MODEL_CORRELATIONS":{
     "LTC-USD":["BTC-USD"]
   },

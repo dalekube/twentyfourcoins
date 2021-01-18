@@ -40,7 +40,7 @@ assert len(sys.argv) == 2, '[ERROR] Invalid command line arguments.'
 
 # Identify the specific coin
 COIN = sys.argv[1]
-assert COIN in config['SUPPORTED_COINS'], "[ERROR] " + COIN + " is not supported"
+assert COIN in config['SUPPORTED_COINS'].values(), "[ERROR] " + COIN + " is not supported"
 
 # Load the data for the coin
 # Print the row count when finished

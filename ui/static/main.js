@@ -25,47 +25,12 @@ function predictionSuccessful(){
   $("#loading").hide();
 }
 
-function dataUpdateSuccessful(){
-  $("#loading").hide();
-  $("#DataUpdateSuccess").show();
-  setTimeout(function(){ $("#DataUpdateSuccess").hide();}, 6000);
-}
-
 function alreadyRunning(){
   alert("Whoa, there cowboy....something is already running.");
 }
 
 function accessDenied(){
   alert("Whoa, there cowboy....you do not have access yet. You must enter a valid passcode.");
-}
-
-function getPriceHistory(){
-  
-  if ($("#unlocked").is(":visible")) {
-    
-      if ($("#loading").is(":hidden")) {
-      
-        //Show the loading icon
-        $("#loading").addClass("loadingSpinner").show();
-        
-        //Execute the function to update prices in the database
-        $.ajax({
-          url:"/price_history",
-          type:"GET",
-          contentType:"application/json",
-          success: dataUpdateSuccessful
-        });
-      
-      } else {
-        alreadyRunning();
-      }
-      
-  } else {
-    
-    accessDenied();
-    
-  }
-    
 }
 
 function pricePrediction(coin){
@@ -80,11 +45,14 @@ function pricePrediction(coin){
       //Empty the price prediction box
       $("#pricePredictionBox").hide();
       
+      const coin_name = coin.value.split(":")[0];
+      const coin_code = coin.value.split(":")[1];
+      
       //Execute the function to update prices in the database
       $.ajax({
         url: "/price_prediction",
         type: "POST",
-        data: JSON.stringify({COIN: coin.value}),
+        data: JSON.stringify({COIN: coin_code}),
         contentType:"application/json",
         success: function(data){
           parsed_data = JSON.parse(data);
@@ -103,9 +71,9 @@ function pricePrediction(coin){
           predict_time = new Date(Date.UTC(predict_year,predict_month,predict_day,predict_hours,predict_min,predict_sec)).toLocaleString();
           
           // Display the price prediction details
-          $("#predict_coin").html(coin.value);
-          $("#predict_time").html("Latest Candle Time = " + predict_time);
-          $("#predict_close").html("Latest Close Price = " + JSON.parse(JSON.stringify(parsed_data.predict_close)));
+          $("#predict_coin").html(coin_name + " (" + coin_code + ")");
+          $("#predict_time").html("Latest Actual Price Time = " + predict_time);
+          $("#predict_close").html("Latest Actual Close Price = " + JSON.parse(JSON.stringify(parsed_data.predict_close)));
           $("#predict_prediction").html("Price Prediction = " + JSON.parse(JSON.stringify(parsed_data.prediction)));
           $("#predict_change").html("Expected 24-Hour Price Change = " + JSON.parse(JSON.stringify(parsed_data.expected_change)));
           

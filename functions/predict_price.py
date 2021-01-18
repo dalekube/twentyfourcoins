@@ -38,7 +38,7 @@ def predict_price(config, COIN):
     ## COIN = 'BAT-USDC'
     
     # Identify the specific coin
-    assert COIN in config['SUPPORTED_COINS'], "[ERROR] " + COIN + " is not supported"
+    assert COIN in config['SUPPORTED_COINS'].values(), "[ERROR] " + COIN + " is not supported"
     
     # Load the data for the coin
     # Print the row count when finished

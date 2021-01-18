@@ -42,11 +42,11 @@ def collect_prices(config):
     ## os.chdir('/home/dale/Downloads/GitHub/coinML/functions')
     
     # Consider all supported coins
-    for COIN in config['SUPPORTED_COINS']:
+    for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
         
         ## DEVELOPMENT ONLY
         ## COIN = 'BAT-USDC'
-    
+        
         # Print the product details in the JSON format
         print("[INFO] Starting the iteration for " + COIN)
         
