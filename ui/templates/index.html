@@ -2,12 +2,17 @@
 {% block content %}
   <div style="display:flex;align-items:top;">
     <div>
-      <div class="smartBlock">
-      <label>Update the data from the Coinbase API</label>
-      <div><i class="fas fa-sync"></i></div>
-      <button class="mainButton" id="updateData" onclick="getPriceHistory()">Update Data</button>
+      <div class="smartBlock" id="passcodeBlock">
+        <label for="passcode">Enter Passcode:</label>
+        <input type="text" id="passcode" name="passcode">
+        <button id="enterPasscode" class="mainButton">Submit</button>
       </div>
-      <div class="smartBlock">
+      <div class="smartBlock" id="updateDataBlock">
+        <label>Update the data from the Coinbase API</label>
+        <div><i class="fas fa-sync"></i></div>
+        <button class="mainButton" id="updateData" onclick="getPriceHistory()">Update Data</button>
+      </div>
+      <div class="smartBlock" id="predictPriceBlock">
         <label>Get Price Predictions</label>
         <div><i class="fas fa-dollar-sign"></i></div>
         <div>Supported Coins:</div>
@@ -16,7 +21,18 @@
         {% endfor %}
       </div>
     </div>
-    <div id="pricePredictionContainer">
+    <div id="mainContainer">
+      <div id="summary" style="margin:15px;">
+        <div style="width:500px;">
+          This is a proof-of-concept web platform designed to give users price
+          predictions for popular cryptocurrencies using advanced artificial
+          intelligence trained from years of historical pricing data.
+        </div>
+        <br>
+        <div id="locked">This page is <b>locked</b>. You must enter a valid passcode to start.</div>
+        <div id="unlocked" style="display:none;">This page is <b>unlocked</b>. You may continue.</div>
+      </div>
+      <div id="DataUpdateSuccess" style="margin:15px;display:none;">Data update successful!</div>
       <div id="pricePredictionBox" class="block" style="display:none;">
         <div id="predict_coin" style="font-size:30px;font-weight:bold;"></div>
         <br>

@@ -1,36 +1,76 @@
 
 // main JavaScript file for the web platform
 
-function requestSuccessful(){
+function pageUnlocked(){
+  
+  $("#locked").hide();
+  $("#unlocked").show();
+  
+}
+
+$(document).on("click","#enterPasscode",function(){
+  
+  //Execute the function to update prices in the database
+  $.ajax({
+      url:"/validate_passcode",
+      type:"POST",
+      data: JSON.stringify({passcode: $("#passcode").val()}),
+      contentType:"application/json",
+      success: pageUnlocked
+  });
+  
+});
+
+function predictionSuccessful(){
   $("#loading").hide();
 }
 
+function dataUpdateSuccessful(){
+  $("#loading").hide();
+  $("#DataUpdateSuccess").show();
+  setTimeout(function(){ $("#DataUpdateSuccess").hide();}, 6000);
+}
+
 function alreadyRunning(){
-  alert("Something is already running! Please wait.");
+  alert("Whoa, there cowboy....something is already running.");
+}
+
+function accessDenied(){
+  alert("Whoa, there cowboy....you do not have access yet. You must enter a valid passcode.");
 }
 
 function getPriceHistory(){
+  
+  if ($("#unlocked").is(":visible")) {
     
-    if ($("#loading").is(":hidden")) {
+      if ($("#loading").is(":hidden")) {
       
-      //Show the loading icon
-      $("#loading").addClass("loadingSpinner").show();
+        //Show the loading icon
+        $("#loading").addClass("loadingSpinner").show();
+        
+        //Execute the function to update prices in the database
+        $.ajax({
+          url:"/price_history",
+          type:"GET",
+          contentType:"application/json",
+          success: dataUpdateSuccessful
+        });
       
-      //Execute the function to update prices in the database
-      $.ajax({
-        url:"/price_history",
-        type:"GET",
-        contentType:"application/json",
-        success: requestSuccessful
-      });
+      } else {
+        alreadyRunning();
+      }
       
-    } else {
-      alreadyRunning();
-    }
+  } else {
+    
+    accessDenied();
+    
+  }
     
 }
 
 function pricePrediction(coin){
+  
+  if ($("#unlocked").is(":visible")) {
     
     if ($("#loading").is(":hidden")) {
       
@@ -45,7 +85,6 @@ function pricePrediction(coin){
         url: "/price_prediction",
         type: "POST",
         data: JSON.stringify({COIN: coin.value}),
-        dataType: "json",
         contentType:"application/json",
         success: function(data){
           parsed_data = JSON.parse(data);
@@ -88,7 +127,7 @@ function pricePrediction(coin){
           $("#stats_mape").html("Model MAPE = " + JSON.parse(JSON.stringify(parsed_data.stats_mape)));
           
           $("#pricePredictionBox").show();
-          requestSuccessful();
+          predictionSuccessful();
           
         }
       });
@@ -99,6 +138,12 @@ function pricePrediction(coin){
       
     }
     
+  } else {
     
+    accessDenied();
+    
+  }
     
 }
+
+

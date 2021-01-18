@@ -9,7 +9,7 @@
   text-align:center;
   display:flex;
   flex-direction:column;
-  box-shadow: 2px 2px;
+  box-shadow: 2px 2px darkgrey;
   font-family:Calibri;
   color:white;
 }
@@ -27,6 +27,7 @@ i {
   font-size:18px;
   font-family:Calibri;
   color:white;
+  box-shadow: 2px 2px darkgrey;
 }
 
 .mainButton {
@@ -39,7 +40,7 @@ i {
 
 .mainButton:hover {
   background-color: #ff5c39;
-  box-shadow: 0 3px white;
+  box-shadow: 0 3px darkgrey;
   outline:none;
   border:none;
 }
