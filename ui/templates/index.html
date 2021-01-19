@@ -1,55 +1,88 @@
 {% extends 'base.html' %}
 {% block content %}
-  <div style="display:flex;align-items:top;">
-    <div>
-      <div class="smartBlock" id="passcodeBlock">
-        <label for="passcode">Enter Passcode:</label>
-        <input type="text" id="passcode" name="passcode">
-        <button id="enterPasscode" class="mainButton">Submit</button>
-      </div>
-      <div class="smartBlock" id="predictPriceBlock">
-        <label>Get Price Predictions</label>
-        <div><i class="fas fa-dollar-sign"></i></div>
-        <div>Supported Coins:</div>
-        {% for COIN_NAME, COIN in SUPPORTED_COINS %}
-        <button class="mainButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">{{COIN_NAME}}<br>({{COIN}})</button>
-        {% endfor %}
-      </div>
+<div style="display:flex;align-items:top;">
+  <div>
+    <div class="smartBlock" id="passcodeBlock">
+      <label for="passcode">Enter Passcode:</label>
+      <input type="text" id="passcode" name="passcode">
+      <button id="enterPasscode" class="mainButton">Submit</button>
     </div>
-    <div id="mainContainer">
-      <div id="summary" style="margin:15px 15px 30px 15px;">
-        <div style="width:500px;">
-          TwentyFourCoins provides 24-hour, forwarding-looking price
-          predictions for popular cryptocurrencies using artificial
-          intelligence trained from historical pricing data. Use TwentyFourCoins to support
-          cryptocurrency trading and achieve better gains. The platform
-          is currently restricted to a private audience.
-        </div>
-        <br>
-        <div id="locked">This page is <b>locked</b>. You must enter a valid passcode to start. </div>
-        <div id="unlocked" style="display:none;">This page is <b>unlocked</b>. You may continue.</div>
-        <div id="passcodeStatus" style="display:none;"></div>
+    <div class="smartBlock" id="predictPriceBlock">
+      <label>Get Price Predictions</label>
+      <div><i class="fas fa-dollar-sign"></i></div>
+      <div>Supported Coins:</div>
+      {% for COIN_NAME, COIN in SUPPORTED_COINS %}
+      <button class="mainButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">{{COIN_NAME}}<br>({{COIN}})</button>
+      {% endfor %}
+    </div>
+  </div>
+  <div id="mainContainer">
+    <div id="summary" style="margin:15px 15px 30px 15px;">
+      <div style="width:500px;">
+        TwentyFourCoins provides 24-hour, forwarding-looking price
+        forecasts for popular cryptocurrencies using artificial
+        intelligence trained from historical pricing data. The predictive insight can support
+        cryptocurrency trading to achieve better gains. The platform
+        is currently restricted to a private audience.
       </div>
-      <div id="pricePredictionBox" class="block" style="display:none;">
-        <div id="predict_coin" style="font-size:30px;font-weight:bold;"></div>
-        <br>
-        <div id="predict_change" class="expectedPriceChange"></div>
-        <br>
-        <div id="predict_time"></div>
-        <div id="predict_now"></div>
-        <div id="predict_close"></div>
-        <div id="predict_prediction"></div>
-        <br>
-        <div id="stats_training_time"></div>
-        <div id="stats_mae"></div>
-        <div id="stats_mape"></div>
+      <br>
+      <div id="locked">This page is <b>locked</b>. You must enter a valid passcode to start. </div>
+      <div id="unlocked" style="display:none;">This page is <b>unlocked</b>. You may continue.</div>
+      <div id="passcodeStatus" style="display:none;"></div>
+    </div>
+    <div class="loading loadingSpinner" id="loading" style="display:none;"></div>
+    <!-- EXAMPLE PREDICTION -->
+    <div id="pricePredictionExample" class="block example">
+      <div style="font-size:30px;font-weight:bold;">Litecoin (LTC-USD)</div>
+      <h4 class="ribbon">EXAMPLE</h4>
+      <br>
+      <div class="expectedPriceChange">Expected 24-Hour Price Change = $ -14.7199</div>
+      <br>
+      <div>Latest Actual Price Time = 1/18/2021, 7:44:32 PM</div>
+      <div>Latest Actual Close Price = $ 157.1300</div>
+      <div>Price Prediction = $ 142.4101</div>
+      <br>
+      <div>Model Training Time = 1/18/2021, 10:53:54 AM</div>
+      <div>Model MAE = $ 5.1581</div>
+      <div>Model MAPE = 3.34%</div>
+    </div>
+    <!-- REAL PREDICTION -->
+    <div id="pricePredictionBox" class="block" style="display:none;">
+      <div id="predict_coin" style="font-size:30px;font-weight:bold;"></div>
+      <br>
+      <div>
+        <i class="fas fa-star"></i>
+        <span>24-Hour Price Forecast:</span>
+        <span id="predict_prediction" class="predAttribute"></span>
+      </div>
+      <div>
+        <i class="fas fa-star"></i>
+        <span>24-Hour Price Change:</span>
+        <span id="predict_change" class="predAttribute"></span>
+      </div>
+      <br>
+      <div>
+        <span>Latest Actual Price Time:</span>
+        <span id="predict_time" class="predAttribute"></span>
+      </div>
+      <div>
+        <span>Latest Actual Close Price:</span>
+        <span id="predict_close" class="predAttribute"></span>
+      </div>
+      <br>
+      <div>
+        <span>Model Training Time:</span>
+        <span id="stats_training_time" class="predAttribute"></span>
+      </div>
+      <div>
+        <span>Model MAE:</span>
+        <span id="stats_mae" class="predAttribute"></span>
+      </div>
+      <div>
+        <span>Model MAPE:</span>
+        <span id="stats_mape" class="predAttribute"></span>
       </div>
     </div>
   </div>
-  <div style="margin:15px;width:100%;text-align:center;font-size:12px;">
-    <span>Developed by Dale Kube (dkube@uwalumni.com)</span>
-    <br>
-    <a href="https://github.com/dalekube/TwentyFourCoins" target="_blank">https://github.com/dalekube/TwentyFourCoins</a>
-  </div>
-
+</div>
 {% endblock %}

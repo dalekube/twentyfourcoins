@@ -58,14 +58,21 @@ i {
   box-shadow: 0 3px #122a13;
 }
 
-.expectedPriceChange {
+.fa-star {
   
   background: var(--secondary_color);
-  color:white;
-  padding:10px;
-  border-radius:5px;
-  text-align:center;
+  color: white;
+  padding:3px;
+  margin-right:5px;
+  font-size:16px;
+  margin:0;
+  border-radius:50%;
   
+}
+
+.predAttribute {
+  margin-left:5px;
+  font-weight:bold;
 }
 
 .loading {
@@ -113,4 +120,35 @@ i {
   background:darkred;
 }
 
+.example {
+  overflow:hidden;
+  position:relative;
+}
+
+.ribbon {
+  margin: 0;
+  background: rebeccapurple;
+  color:white;
+  padding:1em 0;
+  position: absolute;
+  top:0;
+  right:0;
+  transform: translateX(30%) translateY(0%) rotate(45deg);
+  transform-origin: top left;
+}
+
+.ribbon:before,
+.ribbon:after {
+  content: '';
+  position: absolute;
+  top:0;
+  margin: 0 -1px; /* tweak */
+  width: 100%;
+  height: 100%;
+  background: rebeccapurple;
+}
+
+.ribbon:before {
+  right:100%;
+}
 

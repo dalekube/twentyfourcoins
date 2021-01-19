@@ -68,17 +68,17 @@ def predict_price(config, COIN):
     # If a specific model version is not defined,
     # automatically identify the best model with the lowest error
     model_files = glob.glob(MODEL_DIR + 'RF*.pkl')
-    if len(model_files) > 0:
-        model_errors = [i.split('-')[2] for i in model_files]
-        model_errors = [float(os.path.splitext(i)[0]) for i in model_errors]
-        model_min_error = min(model_errors)
-        best_model = [i for i in model_files if re.search(str(model_min_error), i)]
-        assert len(best_model) == 1, '[ERROR] Unable to identify a model with the lowest error for ' + COIN
-        MODEL_PATH = best_model[0] 
-        
-        print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
-        with open(MODEL_PATH, 'rb') as f:
-            model = pickle.load(f)
+    assert len(model_files) > 0, '[ERROR] No models are available for predictions'
+    model_errors = [i.split('-')[2] for i in model_files]
+    model_errors = [float(os.path.splitext(i)[0]) for i in model_errors]
+    model_min_error = min(model_errors)
+    best_model = [i for i in model_files if re.search(str(model_min_error), i)]
+    assert len(best_model) == 1, '[ERROR] Unable to identify a model with the lowest error for ' + COIN
+    MODEL_PATH = best_model[0] 
+    
+    print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
+    with open(MODEL_PATH, 'rb') as f:
+        model = pickle.load(f)
     
     # Make prediction with the latest observation closest to NOW()
     df['time'] = df['time'].astype(int)

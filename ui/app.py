@@ -8,7 +8,7 @@ Web application for TwentyFourCoins
 
 import sys
 import json
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect
 from flask_fontawesome import FontAwesome
 
 # Load the platform configuration
@@ -17,21 +17,15 @@ with open('../config.json') as f:
 
 app = Flask(__name__, static_url_path='')
 fa = FontAwesome(app)
-master_password = config['MASTER_PASSWORD']
+master_password = config['MASTER_PASSCODE']
 app.secret_key = master_password
 valid_passcode = False
 
 # Create a database connection
 sys.path.append('..')
 
-# Import functions
-from functions.price_history import collect_prices
+# Import functions for the UI
 from functions.predict_price import predict_price
-
-# Update the historical prices in the database upon startup
-# Always work with the latest price candles
-print('[INFO] Updating the historical prices in the database')
-collect_prices(config)
 
 # Home page
 @app.route('/', methods=['GET'])
@@ -41,6 +35,14 @@ def index():
             'index.html',
             SUPPORTED_COINS = config['SUPPORTED_COINS'].items()
             )
+
+# Error route for redirects
+@app.route('/error', methods=['GET'])
+def error_page():
+    msg = request.args.get('msg')
+    if msg is None:
+        msg = ''
+    return render_template('error.html', ERROR = msg)
 
 # Validate the passcode
 @app.route('/validate_passcode', methods=['POST'])
@@ -66,10 +68,25 @@ def price_prediction():
     global valid_passcode
     if valid_passcode:
         COIN = request.get_json()['COIN']
-        response = predict_price(config, COIN)     
+        try:
+            response = predict_price(config, COIN)
+        except:
+            return jsonify(success=False), 500
+        
         return jsonify(response)
     else:
         return jsonify(success=False), 401
+
+# Error handling
+@app.errorhandler(400)
+@app.errorhandler(404)
+@app.errorhandler(405)
+@app.errorhandler(406)
+@app.errorhandler(500)
+@app.errorhandler(502)
+@app.errorhandler(503)
+def page_not_found(e):
+    return redirect('/error?msg=' + str(e))
 
 if __name__ == '__main__':
     context = ('cert.pem', 'key.pem')#certificate and key files
