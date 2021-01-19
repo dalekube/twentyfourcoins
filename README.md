@@ -1,2 +1,2 @@
-# coinML
+# TwentyFourCoins
  
