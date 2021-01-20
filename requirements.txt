@@ -1,3 +1,5 @@
-pyOpenSSL==20.0.1
 skranger==0.3.1
 pandas==1.2.0
+Flask==1.1.2
+Flask-FontAwesome==0.1.5
+cbpro==1.1.4
