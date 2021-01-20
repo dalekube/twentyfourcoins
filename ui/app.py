@@ -90,4 +90,5 @@ def page_not_found(e):
 
 if __name__ == '__main__':
     context = ('cert.pem', 'key.pem')#certificate and key files
-    app.run(debug=True, ssl_context=context)
+    #app.run(debug=True, ssl_context=context)
+    app.run(debug=False)
