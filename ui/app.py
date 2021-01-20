@@ -89,6 +89,6 @@ def page_not_found(e):
     return redirect('/error?msg=' + str(e))
 
 if __name__ == '__main__':
-    context = ('cert.pem', 'key.pem')#certificate and key files
+    context = ('cert.pem', 'key.pem')
     #app.run(debug=True, ssl_context=context)
     app.run(debug=False)
