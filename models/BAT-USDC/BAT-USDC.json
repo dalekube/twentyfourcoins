@@ -1,4 +1,0 @@
-{
-  "LRSchedule": "False",
-  "LRScheduleRates": {"5":"10e-3","10":"10e-5"}
-}

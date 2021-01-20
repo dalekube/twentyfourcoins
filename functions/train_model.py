@@ -97,6 +97,7 @@ df = df[~pd.isnull(df['PRICE_24'])]
 # Use the latest 3,000 observations for the test split
 price_24 = df.pop('PRICE_24')
 N_TEST = 3000
+N_ESTIMATORS = 101
 SAMPLE_FRACTION = 0.25
 N_DF = len(df)
 
@@ -109,7 +110,7 @@ x_test = df[-N_TEST:]
 y_test = price_24[-N_TEST:]
 
 # Train the random forest model
-rfr = RangerForestRegressor(n_estimators=150, oob_error=False, sample_fraction=[SAMPLE_FRACTION])
+rfr = RangerForestRegressor(n_estimators=N_ESTIMATORS, oob_error=False, sample_fraction=[SAMPLE_FRACTION])
 rfr.fit(x_train, y_train)
 
 # Estimate the performance upon the test data
@@ -138,7 +139,7 @@ con.close()
 print('[INFO] Re-training the model using the full data set for best performance')
 
 # Train the random forest model
-rfr = RangerForestRegressor(n_estimators=150, oob_error=False, sample_fraction=[SAMPLE_FRACTION])
+rfr = RangerForestRegressor(n_estimators=N_ESTIMATORS, oob_error=False, sample_fraction=[SAMPLE_FRACTION])
 rfr.fit(df, price_24)
 
 # Create the model directory if it doesn't already exist

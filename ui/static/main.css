@@ -2,9 +2,14 @@
 :root {
   --primary_color: #4488EE;
   --secondary_color: #FF5C39;
+  --tertiary_color: #e7f0f7;
 }
 
-.smartBlock {
+body {
+  font-family:Calibri;
+}
+
+.inputBlock {
   border-radius:5px;
   padding:10px;
   border:thin darkgrey solid;
@@ -15,7 +20,6 @@
   display:flex;
   flex-direction:column;
   box-shadow: 2px 2px darkgrey;
-  font-family:Calibri;
   color:white;
 }
 
@@ -30,9 +34,24 @@ i {
   margin:15px;
   border-radius:5px;
   font-size:18px;
-  font-family:Calibri;
   color:white;
   box-shadow: 2px 2px darkgrey;
+}
+
+.predictionBox {
+  background: var(--tertiary_color);;
+  padding:20px;
+  margin:15px;
+  border-radius:5px;
+  border:thin solid darkgrey;
+  font-size:18px;
+  box-shadow: 2px 2px darkgrey;
+}
+
+.coinTitle {
+  font-size:30px;
+  font-weight:bold;
+  color:#4488EE;
 }
 
 .mainButton {
@@ -58,16 +77,18 @@ i {
   box-shadow: 0 3px #122a13;
 }
 
-.fa-star {
-  
-  background: var(--secondary_color);
-  color: white;
-  padding:3px;
-  margin-right:5px;
-  font-size:16px;
-  margin:0;
-  border-radius:50%;
-  
+.fa-caret-up {
+  margin: 0 3px 0 0;
+  color: green;
+  font-size:20px;
+  margin-top:2px;
+}
+
+.fa-caret-down {
+  margin: 0 3px 0 0;
+  color: red;
+  font-size:20px;
+  margin-top:2px;
 }
 
 .predAttribute {
@@ -127,7 +148,7 @@ i {
 
 .ribbon {
   margin: 0;
-  background: rebeccapurple;
+  background: #FF5C39;
   color:white;
   padding:1em 0;
   position: absolute;
@@ -145,7 +166,7 @@ i {
   margin: 0 -1px; /* tweak */
   width: 100%;
   height: 100%;
-  background: rebeccapurple;
+  background: #FF5C39;
 }
 
 .ribbon:before {
