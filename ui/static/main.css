@@ -39,7 +39,7 @@ i {
 }
 
 .predictionBox {
-  background: var(--tertiary_color);;
+  background: var(--tertiary_color);
   padding:20px;
   margin:15px;
   border-radius:5px;
@@ -55,6 +55,7 @@ i {
 }
 
 .mainButton {
+  background: var(--tertiary_color);
   margin-top:10px;
   padding:5px;
   border:none;
