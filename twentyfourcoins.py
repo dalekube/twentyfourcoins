@@ -6,23 +6,20 @@ Web application for TwentyFourCoins
 @author: Dale Kube (dkube@uwalumni.com)
 """
 
-import sys
 import json
 from flask import Flask, render_template, jsonify, request, redirect
 from flask_fontawesome import FontAwesome
 
 # Load the platform configuration
-with open('../config.json') as f:
+with open('config.json') as f:
     config = json.load(f)
 
+# Define the Flask application object
 app = Flask(__name__, static_url_path='')
 fa = FontAwesome(app)
 master_password = config['MASTER_PASSCODE']
 app.secret_key = master_password
 valid_passcode = False
-
-# Create a database connection
-sys.path.append('..')
 
 # Import functions for the UI
 from functions.predict_price import predict_price
@@ -88,7 +85,3 @@ def price_prediction():
 def page_not_found(e):
     return redirect('/error?msg=' + str(e))
 
-if __name__ == '__main__':
-    context = ('cert.pem', 'key.pem')
-    #app.run(debug=True, ssl_context=context)
-    app.run(debug=False)
