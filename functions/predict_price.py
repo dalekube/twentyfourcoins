@@ -42,7 +42,7 @@ def predict_price(config, COIN):
     
     # Load the data for the coin
     # Print the row count when finished
-    con = db_connect('../data/db.sqlite')
+    con = db_connect('data/db.sqlite')
     statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
     df = pd.read_sql(statement, con)
     del df['coin']
@@ -63,7 +63,7 @@ def predict_price(config, COIN):
     df = df.astype(np.float32)
     
     # Load the best model
-    MODEL_DIR = '../models/' + COIN + '/'
+    MODEL_DIR = 'models/' + COIN + '/'
     
     # If a specific model version is not defined,
     # automatically identify the best model with the lowest error
