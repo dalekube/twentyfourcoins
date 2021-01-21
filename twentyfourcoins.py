@@ -7,7 +7,7 @@ Web application for TwentyFourCoins
 """
 
 import json
-from flask import Flask, render_template, jsonify, request, redirect
+from flask import Flask, render_template, jsonify, request, redirect, session
 from flask_fontawesome import FontAwesome
 
 # Load the platform configuration
@@ -19,7 +19,6 @@ app = Flask(__name__, static_url_path='')
 fa = FontAwesome(app)
 master_password = config['MASTER_PASSCODE']
 app.secret_key = master_password
-valid_passcode = False
 
 # Import functions for the UI
 from functions.predict_price import predict_price
@@ -45,15 +44,12 @@ def error_page():
 @app.route('/validate_passcode', methods=['POST'])
 def validate_passcode():
     
-    global valid_passcode
-    passcode = request.get_json()['passcode']
+    session['passcode'] = request.get_json()['passcode']
     print('[INFO] Received passcode from the UI')
-    if passcode == master_password:
-        valid_passcode = True
+    if session['passcode'] == master_password:
         print('[INFO] Successfully validated the passcode')
         return jsonify(success=True)
     else:
-        valid_passcode = False
         print('[ERROR] Invalid passcode')
         return jsonify(success=False), 401
 
@@ -62,8 +58,7 @@ def validate_passcode():
 def price_prediction():
     '''Get the price prediction for a specific coin
     '''
-    global valid_passcode
-    if valid_passcode:
+    if session['passcode'] == master_password:
         COIN = request.get_json()['COIN']
         try:
             response = predict_price(config, COIN)
