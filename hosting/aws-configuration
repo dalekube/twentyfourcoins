@@ -1,0 +1,56 @@
+
+
+Ubuntu t2.medium (2 CPU, 4 GB)
+twentyfourcoins security group
+
+chmod 0600 /home/dale/Downloads/twentyfourcoins.pem
+ssh -i /home/dale/Downloads/twentyfourcoins.pem ubuntu@ec2-18-191-29-151.us-east-2.compute.amazonaws.com
+
+sudo apt update
+sudo apt upgrade
+
+git clone https://dalekube@github.com/dalekube/TwentyFourCoins
+sudo apt install python3-pip nginx gunicorn certbot python3-certbot-nginx
+sudo pip3 install -r TwentyFourCoins/requirements.txt
+
+crontab -e
+*/30 * * * * cd /home/ubuntu/TwentyFourCoins/functions;/usr/bin/python3 price_history.py >> price_history.log 2>&1
+
+# https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04
+sudo vi /etc/systemd/system/twentyfourcoins.service
+
+[Unit]
+Description=Gunicorn instance to serve TwentyFourCoins
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/TwentyFourCoins
+Environment="PATH=/usr/bin"
+ExecStart=/usr/bin/gunicorn --workers 2 --bind unix:/tmp/twentyfourcoins.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
+
+
+sudo vi /etc/nginx/sites-available/twentyfourcoins
+
+server {
+    listen 80;
+    server_name twentyfourcoins.com www.twentyfourcoins.com;
+    access_log   /var/log/nginx/access.log;
+    error_log    /var/log/nginx/error.log;
+    
+    location / {
+    include proxy_params;
+    proxy_pass http://unix:/tmp/twentyfourcoins.sock;
+    proxy_headers_hash_bucket_size 128;
+    }
+}
+
+sudo ln -s /etc/nginx/sites-available/twentyfourcoins /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+sudo ufw allow 'Nginx Full'
+sudo certbot --nginx -d twentyfourcoins.com -d www.twentyfourcoins.com
