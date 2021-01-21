@@ -102,6 +102,7 @@ def predict_price(config, COIN):
     predict_close = round(p_close,8)
     prediction = round(prediction,8)
     expected_change = round(expected_change,8)
+    change_direction = 'up' if expected_change > 0 else 'down'
     
     cursor = con.cursor()
     statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "P01", %s, %s, %s, NULL)' % (predict_close, prediction, p_unixtime)
@@ -137,6 +138,7 @@ def predict_price(config, COIN):
             'predict_close':'$ {:,.4f}'.format(predict_close),
             'prediction':'$ {:,.4f}'.format(prediction),
             'expected_change':'$ {:,.4f}'.format(expected_change),
+            'change_direction': change_direction,
             'stats_training_time': training_time,
             'stats_mae': '$ {:,.4f}'.format(model_min_error),
             'stats_mape': '{:.2%}'.format(model_stats['VALUE2'])

@@ -102,13 +102,13 @@ function pricePrediction(coin){
           $("#predict_time").html(predict_time);
           $("#predict_close").html(JSON.parse(JSON.stringify(parsed_data.predict_close)));
           
-          const price_change = JSON.parse(JSON.stringify(parsed_data.expected_change));
+          const change_direction = JSON.parse(JSON.stringify(parsed_data.change_direction));
           var indicator = "<i class='fas fa-caret-down'></i>";
-          if (price_change > 0) {
+          if (change_direction == 'up') {
             indicator = "<i class='fas fa-caret-up'></i>";
           }
           $("#predict_prediction").html(indicator + JSON.parse(JSON.stringify(parsed_data.prediction)));
-          $("#predict_change").html(indicator + price_change);
+          $("#predict_change").html(indicator + JSON.parse(JSON.stringify(parsed_data.expected_change)));
           
           // Parse the training timestamp and present in locale
           var training_time = JSON.parse(JSON.stringify(parsed_data.stats_training_time));
