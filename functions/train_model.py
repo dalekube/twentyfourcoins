@@ -17,7 +17,8 @@ import json
 import pandas as pd
 import numpy as np
 from skranger.ensemble import RangerForestRegressor
-import pickle
+import bz2
+import _pickle as cPickle
 
 ## DEVELOPMENT ONLY
 ## import os
@@ -150,8 +151,8 @@ if not os.path.exists(MODEL_DIR):
 # Save the random forest model
 RF_FILE = MODEL_DIR + '/RF-' + MAE + '.pkl'
 print("[INFO] Saving the RangerForestRegressor model to file:", RF_FILE)
-with open(RF_FILE, 'wb') as f:
-    pickle.dump(rfr, f)
+with bz2.BZ2File(RF_FILE, 'wb') as f:
+    cPickle.dump(rfr, f)
 
 # Finished
 print("[FINISHED] Successfully trained the model for", COIN)

@@ -19,7 +19,8 @@ import glob
 import numpy as np
 import pandas as pd
 from datetime import datetime
-import pickle
+import bz2
+import _pickle as cPickle
 from functions.db_connect import db_connect
 
 ## DEVELOPMENT ONLY
@@ -77,8 +78,8 @@ def predict_price(config, COIN):
     MODEL_PATH = best_model[0] 
     
     print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
-    with open(MODEL_PATH, 'rb') as f:
-        model = pickle.load(f)
+    with bz2.BZ2File(MODEL_PATH, 'rb') as f:
+        model = cPickle.load(f)
     
     # Make prediction with the latest observation closest to NOW()
     df['time'] = df['time'].astype(int)
