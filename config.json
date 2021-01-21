@@ -1,5 +1,6 @@
 {
   "MASTER_PASSCODE":"24CP1$",
+  "TEMPORARY_PASSCODES":["TRIALJAN21"],
   "SUPPORTED_COINS":{
     "Basic Attention Token":"BAT-USDC",
     "Bitcoin":"BTC-USD",

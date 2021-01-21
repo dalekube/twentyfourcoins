@@ -17,8 +17,10 @@ with open('config.json') as f:
 # Define the Flask application object
 app = Flask(__name__, static_url_path='')
 fa = FontAwesome(app)
-master_password = config['MASTER_PASSCODE']
-app.secret_key = master_password
+master_passcode = config['MASTER_PASSCODE']
+access_passcodes = config['TEMPORARY_PASSCODES']
+access_passcodes.append(master_passcode)
+app.secret_key = master_passcode
 
 # Import functions for the UI
 from functions.predict_price import predict_price
@@ -46,7 +48,7 @@ def validate_passcode():
     
     session['passcode'] = request.get_json()['passcode']
     print('[INFO] Received passcode from the UI')
-    if session['passcode'] == master_password:
+    if session['passcode'] in access_passcodes:
         print('[INFO] Successfully validated the passcode')
         return jsonify(success=True)
     else:
@@ -58,7 +60,7 @@ def validate_passcode():
 def price_prediction():
     '''Get the price prediction for a specific coin
     '''
-    if session['passcode'] == master_password:
+    if session['passcode'] in access_passcodes:
         COIN = request.get_json()['COIN']
         try:
             response = predict_price(config, COIN)
