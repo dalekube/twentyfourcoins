@@ -11,7 +11,7 @@ function pageUnlocked(){
     if ($(".passcodeAccepted").is(":visible")) {
       $("#passcodeStatus").empty().hide();
     }
-  }, 5000);
+  }, 30000);
   
 }
 
@@ -25,7 +25,7 @@ function invalidPasscode(){
     if ($(".passcodeDenied").is(":visible")) {
       $("#passcodeStatus").empty().hide();
     }
-  }, 5000);
+  }, 30000);
   
 }
 
@@ -43,26 +43,20 @@ $(document).on("click","#enterPasscode",function(){
   
 });
 
-function predictionSuccessful(){
-  $("#loading").hide();
-}
-
 function alreadyRunning(){
-  alert("Whoa, there cowboy....something is already running.");
+  alert("Something is already running. Please wait.");
 }
 
 function accessDenied(){
-  alert("Whoa, there cowboy....you do not have access yet. You must enter a valid passcode.");
+  alert("You do not have access yet. You must enter a valid passcode to gain access to premium coins.");
 }
 
-function pricePrediction(coin){
+function pricePrediction(coin, type){
   
-  if ($("#unlocked").is(":visible")) {
-    
-    if ($("#loading").is(":hidden")) {
+  if ($("#unlocked").is(":visible") || type == 'free') {
       
-      //Show the loading icon
-      $("#loading").show();
+      //Hide the example box
+      $("#pricePredictionExample").hide();
       
       //Empty the price prediction box
       $("#pricePredictionBox").hide();
@@ -128,16 +122,9 @@ function pricePrediction(coin){
           $("#stats_mape").html(JSON.parse(JSON.stringify(parsed_data.stats_mape)));
           
           $("#pricePredictionBox").show();
-          predictionSuccessful();
           
         }
       });
-      
-    } else {
-      
-      alreadyRunning();
-      
-    }
     
   } else {
     

@@ -8,6 +8,7 @@
     "Ethereum":"ETH-USD",
     "Bitcoin Cash":"BCH-USD"
     },
+  "PREMIUM_COINS":["ETH-USD","BCH-USD"],
   "MODEL_CORRELATIONS":{
     "LTC-USD":["BTC-USD"]
   },

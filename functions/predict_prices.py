@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Train the model for BAT-USDC
+Predict new prices for all supported coins
 
-Example call: python3 predict-price.py BAT-USDC weights-BAT-USDC-0.0005.hdf5
-
-    Parameters:
-        Coin (string): The code for a coin (e.g. BAT-USDC)
-        Model Object (string): Filename for the model object to use for the inference
-
-@author: dale
+@author: Dale Kube (dkube@uwalumni.com)
 """
 
 import os
@@ -21,29 +15,26 @@ import pandas as pd
 from datetime import datetime
 import bz2
 import _pickle as cPickle
-from functions.db_connect import db_connect
 
 ## DEVELOPMENT ONLY
-## os.chdir('/home/dale/Downloads/GitHub/coinML/functions')
+## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
-def predict_price(config, COIN):
-    '''Predict the 24-hour, forward-looking price for a specified coin
+from db_connect import db_connect
+con = db_connect('../data/db.sqlite')
+
+# Load the configurations
+with open('../config.json') as f:
+    config = json.load(f)
+
+# Iterate over every supported coin
+for COIN in config['SUPPORTED_COINS'].values():
     
-    ::param dict config: dictionary with the platform configurations
-    ::param str COIN: the name of the coin (e.g. "BAT-USDC")
-    ::param RandomForestRegressor model: the pre-trained model to use for the predictions
-    ::param float model_min_error: the mean absolute error for the model
-    '''
-    
+    print('[INFO] Starting the iteration for', COIN)
     ## DEVELOPMENT ONLY
     ## COIN = 'BAT-USDC'
     
-    # Identify the specific coin
-    assert COIN in config['SUPPORTED_COINS'].values(), "[ERROR] " + COIN + " is not supported"
-    
     # Load the data for the coin
     # Print the row count when finished
-    con = db_connect('data/db.sqlite')
     statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
     df = pd.read_sql(statement, con)
     del df['coin']
@@ -64,7 +55,7 @@ def predict_price(config, COIN):
     df = df.astype(np.float32)
     
     # Load the best model
-    MODEL_DIR = 'models/' + COIN + '/'
+    MODEL_DIR = '../models/' + COIN + '/'
     
     # If a specific model version is not defined,
     # automatically identify the best model with the lowest error
@@ -120,7 +111,7 @@ def predict_price(config, COIN):
     # Query the database for the logged performance statistics
     statement = 'SELECT * FROM logs WHERE ACTIVITY="M01" AND VALUE1=%s AND META1="%s"' % (model_min_error, COIN)
     model_stats = pd.read_sql(statement, con)
-    con.close()
+    
     assert len(model_stats) > 0, '[ERROR] Did not identify any statistics in the logs'
     model_stats = model_stats.sort_values(by=['UTC_TIME'], ascending=False)
     model_stats = model_stats.iloc[0,:]
@@ -131,9 +122,12 @@ def predict_price(config, COIN):
     print('[INFO] Model trained at', training_time)
     print('[INFO] Mean Absolute Error (MAE) =', '${:,.4f}'.format(model_min_error))
     print('[INFO] Mean Absolute Percentage Error (MAPE) =', '{:.2%}'.format(model_stats['VALUE2']))
-    print('[FINISHED] Successfully returned the model performance statistics')
+    print('[FINISHED] Finished with the forecast for', COIN)
     
-    return json.dumps({
+    # Overwrite the JSON file with the latest details
+    JSON_DUMP = MODEL_DIR + 'latest.json'
+    with open(JSON_DUMP, 'w') as f:
+        json.dump({
             'predict_time':predict_time,
             'predict_now':predict_now,
             'predict_close':'$ {:,.4f}'.format(predict_close),
@@ -143,5 +137,7 @@ def predict_price(config, COIN):
             'stats_training_time': training_time,
             'stats_mae': '$ {:,.4f}'.format(model_min_error),
             'stats_mape': '{:.2%}'.format(model_stats['VALUE2'])
-            })
+            }, f)
 
+# Close the database connection when finished
+con.close()

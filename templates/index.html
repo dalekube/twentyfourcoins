@@ -2,32 +2,36 @@
 {% block content %}
 <div style="display:flex;align-items:top;">
   <div>
-    <div class="inputBlock" id="passcodeBlock">
-      <label for="passcode">Enter Passcode:</label>
-      <input type="text" id="passcode" name="passcode">
-      <button id="enterPasscode" class="mainButton">Submit</button>
-    </div>
     <div class="inputBlock" id="predictPriceBlock">
-      <label>Get Price Predictions</label>
       <div><i class="fas fa-dollar-sign"></i></div>
       <div>Supported Coins:</div>
       {% for COIN_NAME, COIN in SUPPORTED_COINS %}
-      <button class="mainButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">{{COIN_NAME}}<br>({{COIN}})</button>
+        {% if COIN in PREMIUM_COINS %}
+          <button class="mainButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this, 'premium')"><div class="premiumCoin">Premium</div>{{COIN_NAME}}<br>({{COIN}})</button>
+        {% else %}
+          <button class="mainButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this, 'free')"><div class="freeCoin">Free</div>{{COIN_NAME}}<br>({{COIN}})</button>
+        {% endif %}
       {% endfor %}
+    </div>
+    <div class="inputBlock" id="passcodeBlock">
+      <label for="passcode">Enter Passcode to Unlock Premium Coins:</label>
+      <input type="text" id="passcode" name="passcode">
+      <button id="enterPasscode" class="mainButton">Submit</button>
     </div>
   </div>
   <div id="mainContainer">
-    <div id="summary" style="margin:15px 15px 30px 15px;">
-      <div style="width:500px;">
+    <div id="summary" style="margin:15px 15px 30px 15px;width:500px;">
+      <div>
         TwentyFourCoins provides 24-hour, forwarding-looking price
         forecasts for popular cryptocurrencies using artificial
-        intelligence trained from historical pricing data. The predictive insight can support
+        intelligence trained from historical pricing data. The forecasts can support
         cryptocurrency trading to achieve better gains. The platform
-        is currently restricted to a private audience.
+        is currently restricted to a private audience. Contact <a href="mailto:twentyfourcoins@gmail.com">twentyfourcoins@gmail.com</a>
+        for support.
       </div>
       <br>
-      <div id="locked">This page is <b>locked</b>. You must enter a valid passcode to start. </div>
-      <div id="unlocked" style="display:none;">This page is <b>unlocked</b>. You may continue.</div>
+      <div id="locked">Premium coins are <b>locked</b>. You must enter a valid passcode to gain access to premium coins.</div>
+      <div id="unlocked" style="display:none;">Premium coins are <b>unlocked</b>.</div>
       <div id="passcodeStatus" style="display:none;"></div>
     </div>
     <div class="loading loadingSpinner" id="loading" style="display:none;"></div>

@@ -174,3 +174,13 @@ i {
   right:100%;
 }
 
+.freeCoin {
+  color: var(--primary_color) !important;
+  font-weight:bold !important;
+  margin-bottom:5px !important;
+}
+
+.premiumCoin {
+  color: var(--secondary_color) !important;
+  font-weight:bold;
+}
