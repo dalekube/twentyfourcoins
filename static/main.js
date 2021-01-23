@@ -14,12 +14,12 @@ function pageUnlocked(){
   
 }
 
-function invalidPasscode(){
+function invalidPasscode(msg){
   
   $("#locked").show();
   $("#unlocked").hide();
   $("#pricePredictionBox").hide();
-  $("#passcodeStatus").html("Passcode Denied").removeClass().addClass("passcodeStatus passcodeDenied").show();
+  $("#passcodeStatus").html(msg).removeClass().addClass("passcodeStatus passcodeDenied").show();
   setTimeout(function(){
     if ($(".passcodeDenied").is(":visible")) {
       $("#passcodeStatus").empty().hide();
@@ -37,7 +37,7 @@ $(document).on("click","#enterPasscode",function(){
       data: JSON.stringify({passcode: $("#passcode").val()}),
       contentType:"application/json",
       success: pageUnlocked,
-      error: invalidPasscode
+      error: invalidPasscode("Invalid Passcode")
   });
   
 });
@@ -50,16 +50,15 @@ function alreadyRunning(){
   alert("Something is already running. Please wait.");
 }
 
-function accessDenied(){
-  alert("You do not have access yet. You must enter a valid passcode to gain access to premium coins.");
-}
-
 function pricePrediction(coin, type){
   
   if ($("#unlocked").is(":visible") || type == 'free') {
       
       //Empty the price prediction box
       $("#pricePredictionBox").hide();
+      
+      //Hide any passcode denied alert
+      $("#passcodeStatus").hide();
       
       var coin_split = coin.value.split(":");
       const coin_name = coin_split[0];
@@ -72,7 +71,7 @@ function pricePrediction(coin, type){
         data: JSON.stringify({COIN: coin_code}),
         contentType:"application/json",
         error: function(){
-          msg = "Failed Price Prediction for " + coin_name + " (" + coin_code + ")";
+          msg = "Failed to retrieve the forecast data for " + coin_name + " (" + coin_code + ")";
           window.location.replace("/error?msg=" + msg);
         },
         success: function(data){
@@ -128,7 +127,7 @@ function pricePrediction(coin, type){
     
   } else {
     
-    accessDenied();
+    invalidPasscode("Passcode Required");
     
   }
     
@@ -137,6 +136,6 @@ function pricePrediction(coin, type){
 // Load an initial free coin
 $(window).on('load', function(){
   $("#getPriceBAT-USDC").click();
-})
+});
 
 
