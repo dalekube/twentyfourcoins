@@ -27,21 +27,18 @@
     </div>
   </div>
   <div id="mainContainer">
-    <div id="summary" style="margin:15px 15px 30px 15px;width:500px;">
+    <div id="summary">
       <div>
-        TwentyFourCoins provides 24-hour, forwarding-looking price
+        TwentyFourCoins offers 24-hour, forwarding-looking price
         forecasts for popular cryptocurrencies using artificial
         intelligence trained from historical pricing data. The forecasts can support
-        cryptocurrency trading to achieve better gains. The platform
-        is currently restricted to a private audience. Contact <a href="mailto:support@twentyfourcoins.com">support@twentyfourcoins.com</a>
-        for any questions.
+        cryptocurrency trading to achieve better gains.
       </div>
       <br>
       <div id="locked">Premium coins are <b>locked</b>. You must enter a valid passcode to gain access to premium coins.</div>
       <div id="unlocked" style="display:none;">Premium coins are <b>unlocked</b>.</div>
       <div id="passcodeStatus" style="display:none;"></div>
     </div>
-    <div class="loading loadingSpinner" id="loading" style="display:none;"></div>
     <!-- REAL PREDICTION -->
     <div id="pricePredictionBox" class="predictionBox" style="display:none;">
       <div id="predict_coin" class="coinTitle"></div>
@@ -64,7 +61,10 @@
         <span id="predict_close" class="predAttribute"></span>
       </div>
       <br>
-      <button data-toggle="collapse" data-target="#modelDetails">Model Details</button>
+      <button id="modelDetailsButton" data-toggle="collapse" data-target="#modelDetails">
+        <i id="modelDetailsCaret" class="fas fa-caret-right"></i>
+        Model Details
+      </button>
       <div id="modelDetails" class="collapse">
         <div>
           <span>Model Training Time:</span>

@@ -34,8 +34,15 @@ i {
   box-shadow: 2px 2px darkgrey;
 }
 
+#summary {
+  margin:15px 15px 30px 15px;
+  width:500px;
+  color:black;
+}
+
 .predictionBox {
   background: var(--tertiary_color);
+  color: black;
   padding:20px;
   margin:15px;
   border-radius:5px;
@@ -72,6 +79,12 @@ button:active {
   box-shadow: 0 3px var(--tertiary_color);
 }
 
+.premiumCoin {
+  color: white !important;
+  font-weight:bold !important;
+  margin-bottom:10px !important;
+}
+
 .coinButton {
   height:60px;
   margin-top:10px;
@@ -85,6 +98,7 @@ button:active {
   height:30px;
   margin-top:10px;
   box-shadow: 0px 3px var(--secondary_color);
+  background: var(--tertiary_color);
 }
 
 .fa-caret-up {
@@ -155,11 +169,6 @@ button:active {
   background:darkred;
 }
 
-.example {
-  overflow:hidden;
-  position:relative;
-}
-
 .ribbon {
   margin: 0;
   background: #FF5C39;
@@ -187,8 +196,18 @@ button:active {
   right:100%;
 }
 
-.premiumCoin {
-  color: white !important;
-  font-weight:bold !important;
-  margin-bottom:10px !important;
+#modelDetailsButton {
+  padding:0px;
+}
+
+#modelDetailsCaret {
+  margin:3px;
+  font-size:20px;
+}
+
+.rotate {
+    -ms-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
 }

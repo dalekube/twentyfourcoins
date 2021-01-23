@@ -42,6 +42,10 @@ $(document).on("click","#enterPasscode",function(){
   
 });
 
+$(document).on("click","#modelDetailsButton",function(){
+  $("#modelDetailsCaret").toggleClass("rotate")
+})
+
 function alreadyRunning(){
   alert("Something is already running. Please wait.");
 }
