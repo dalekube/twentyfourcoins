@@ -101,6 +101,14 @@ button:active {
   transform: translateY(2px);
 }
 
+#passcode {
+  border-radius:5px;
+  background: var(--tertiary_color);
+  border:none !important;
+  outline:none !important;
+  padding:3px 5px 3px 5px;
+}
+
 .submitButton {
   height:30px;
   margin-top:10px;
