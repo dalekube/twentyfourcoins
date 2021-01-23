@@ -19,6 +19,13 @@
   color:white;
 }
 
+.passcodeBlock {
+  height:30px;
+  position:relative;
+  width:100%;
+  height:100%;
+}
+
 i {
   margin:10px;
   font-size:30px;
@@ -198,11 +205,16 @@ button:active {
 
 #modelDetailsButton {
   padding:0px;
+  background: var(--tertiary_color);
 }
 
 #modelDetailsCaret {
   margin:3px;
   font-size:20px;
+}
+
+#modelDetailsBlock {
+  margin-top:10px;
 }
 
 .rotate {

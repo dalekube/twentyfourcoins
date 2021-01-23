@@ -43,8 +43,16 @@ $(document).on("click","#enterPasscode",function(){
 });
 
 $(document).on("click","#modelDetailsButton",function(){
-  $("#modelDetailsCaret").toggleClass("rotate")
-})
+  $("#modelDetailsCaret").toggleClass("rotate");
+});
+
+$(document).on("click","#showPassword",function(){
+    // toggle the type attribute
+    const type = $("#passcode").attr('type') === 'password' ? 'text' : 'password';
+    $("#passcode").attr('type', type);
+    // toggle the eye slash icon
+    this.classList.toggle('fa-eye-slash');
+});
 
 function alreadyRunning(){
   alert("Something is already running. Please wait.");
