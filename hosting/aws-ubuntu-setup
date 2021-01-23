@@ -14,7 +14,8 @@ sudo apt install python3-pip nginx gunicorn certbot python3-certbot-nginx
 sudo pip3 install -r TwentyFourCoins/requirements.txt
 
 crontab -e
-*/30 * * * * cd /home/ubuntu/TwentyFourCoins/functions;/usr/bin/python3 price_history.py >> price_history.log 2>&1
+*/30 * * * * cd /home/ubuntu/TwentyFourCoins/functions;/usr/bin/python3 price_history.py >> /tmp/price_history.log 2>&1
+*/5 * * * * cd /home/ubuntu/TwentyFourCoins/functions;/usr/bin/python3 predict_prices.py >> /tmp/predict_prices.log 2>&1
 
 # https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04
 sudo vi /etc/systemd/system/twentyfourcoins.service
