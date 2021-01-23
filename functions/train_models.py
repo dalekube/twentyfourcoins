@@ -117,7 +117,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     evallist = [(dtrain, 'train'), (dtest, 'val')]
     param = {'max_depth': 6, 'eta': 0.1, 'objective': 'reg:squarederror', 
-             'eval_metric': 'mape', 'subsample':0.3, 'tree_method':'gpu_hist'}
+             'eval_metric': 'mape', 'subsample':0.3}
     
     xgb_model = xgb.train(param, dtrain, num_boost_round=500, evals=evallist, 
                           early_stopping_rounds=3, maximize=False)

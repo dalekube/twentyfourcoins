@@ -1,1 +1,1 @@
-{"predict_time": "2021-01-23 17:25:20", "predict_now": "2021-01-23 20:06:09", "predict_close": "$ 0.3375", "prediction": "$ 0.3563", "expected_change": "$ 0.0188", "change_direction": "up", "stats_training_time": "2021-01-23 19:52:41", "stats_mae": "$ 0.0063", "stats_mape": "2.33%"}
+{"predict_time": "2021-01-23 17:25:20", "predict_now": "2021-01-23 20:15:25", "predict_close": "$ 0.3375", "prediction": "$ 0.3563", "expected_change": "$ 0.0188", "change_direction": "up", "stats_training_time": "2021-01-23 19:52:41", "stats_mae": "$ 0.0063", "stats_mape": "2.33%"}
