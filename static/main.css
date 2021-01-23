@@ -5,17 +5,13 @@
   --tertiary_color: #e7f0f7;
 }
 
-body {
-  font-family:Calibri;
-}
-
 .inputBlock {
   border-radius:5px;
   padding:10px;
   border:thin darkgrey solid;
   margin:15px;
   background: var(--primary_color);
-  width:200px;
+  width:250px;
   text-align:center;
   display:flex;
   flex-direction:column;
@@ -54,28 +50,41 @@ i {
   color:#4488EE;
 }
 
-.mainButton {
-  background: var(--tertiary_color);
-  margin-top:10px;
+button {
+  border:none !important;
+  outline:none !important;
+  border-radius: 5px !important;
   padding:5px;
-  border:none;
-  outline:none;
+  cursor:pointer;
+}
+
+button:active {
+  transform: translateY(2px);
+}
+
+.freeButton {
+  background: var(--tertiary_color);
   box-shadow: 0 3px var(--secondary_color);
 }
 
-.mainButton:hover {
-  background-color: var(--secondary_color);
-  box-shadow: 0 3px darkgrey;
-  outline:none;
-  border:none;
+.premiumButton {
+  background: var(--secondary_color);
+  box-shadow: 0 3px var(--tertiary_color);
 }
 
-.mainButton:active {
-  background-color: var(--secondary_color);
-  border:none;
-  outline:none;
+.coinButton {
+  height:60px;
+  margin-top:10px;
+}
+
+.coinButton:active {
   transform: translateY(2px);
-  box-shadow: 0 3px #122a13;
+}
+
+.submitButton {
+  height:30px;
+  margin-top:10px;
+  box-shadow: 0px 3px var(--secondary_color);
 }
 
 .fa-caret-up {
@@ -90,6 +99,10 @@ i {
   color: red;
   font-size:20px;
   margin-top:2px;
+}
+
+.fa-dollar-sign {
+  color:white !important;
 }
 
 .predAttribute {
@@ -130,7 +143,7 @@ i {
   padding:10px;
   border-radius:5px;
   text-align:center;
-  width:150px;
+  width:250px;
   margin-top:15px;
 }
 
@@ -174,13 +187,8 @@ i {
   right:100%;
 }
 
-.freeCoin {
-  color: var(--primary_color) !important;
-  font-weight:bold !important;
-  margin-bottom:5px !important;
-}
-
 .premiumCoin {
-  color: var(--secondary_color) !important;
-  font-weight:bold;
+  color: white !important;
+  font-weight:bold !important;
+  margin-bottom:10px !important;
 }

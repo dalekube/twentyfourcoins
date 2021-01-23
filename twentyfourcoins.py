@@ -23,6 +23,19 @@ access_passcodes = config['TEMPORARY_PASSCODES']
 access_passcodes.append(master_passcode)
 app.secret_key = master_passcode
 
+# Function to retrieve price prediction
+def pricePrediction(COIN):
+    try:
+        JSON_PATH = 'models/' + COIN + '/' + 'latest.json'
+        assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN
+        with open(JSON_PATH) as f:
+            latest_json = json.load(f)
+    
+    except:
+        return jsonify(success=False), 500
+    
+    return jsonify(json.dumps(latest_json))
+
 # Home page
 @app.route('/', methods=['GET'])
 def index():
@@ -59,21 +72,19 @@ def validate_passcode():
 def price_prediction():
     '''Retrieve the latest price prediction
     '''
-    if session['passcode'] in access_passcodes:
-        COIN = request.get_json()['COIN']
-        try:
-            JSON_PATH = 'models/' + COIN + '/' + 'latest.json'
-            assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN
-            with open(JSON_PATH) as f:
-                latest_json = json.load(f)
-            
-        except:
-            return jsonify(success=False), 500
+    COIN = request.get_json()['COIN']
+    if COIN in config['PREMIUM_COINS']:
+        if 'passcode' in session:
+            if session['passcode'] in access_passcodes:
+                
+                return pricePrediction(COIN)
         
-        return jsonify(json.dumps(latest_json))
-
-    else:
-        return jsonify(success=False), 401
+            else:
+                return jsonify(success=False), 401
+        else:
+            return jsonify(success=False), 401
+    
+    return pricePrediction(COIN)
 
 # Error handling
 @app.errorhandler(400)

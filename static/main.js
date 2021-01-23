@@ -3,7 +3,6 @@
 
 function pageUnlocked(){
   
-  $("#pricePredictionExample").hide();
   $("#locked").hide();
   $("#unlocked").show();
   $("#passcodeStatus").html("Passcode Accepted").removeClass().addClass("passcodeStatus passcodeAccepted").show();
@@ -54,9 +53,6 @@ function accessDenied(){
 function pricePrediction(coin, type){
   
   if ($("#unlocked").is(":visible") || type == 'free') {
-      
-      //Hide the example box
-      $("#pricePredictionExample").hide();
       
       //Empty the price prediction box
       $("#pricePredictionBox").hide();
@@ -133,5 +129,10 @@ function pricePrediction(coin, type){
   }
     
 }
+
+// Load an initial free coin
+$(window).on('load', function(){
+  $("#getPriceBAT-USDC").click();
+})
 
 
