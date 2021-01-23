@@ -15,6 +15,7 @@ import pandas as pd
 from datetime import datetime
 import bz2
 import _pickle as cPickle
+import xgboost as xgb
 
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
@@ -59,18 +60,18 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     # If a specific model version is not defined,
     # automatically identify the best model with the lowest error
-    model_files = glob.glob(MODEL_DIR + 'RF*.pkl')
-    assert len(model_files) > 0, '[ERROR] No models are available for predictions'
+    model_files = glob.glob(MODEL_DIR + 'models*.pkl')
+    assert len(model_files) > 0, '[ERROR] No models are available for predictions for ' + COIN
     model_errors = [i.split('-')[2] for i in model_files]
     model_errors = [float(os.path.splitext(i)[0]) for i in model_errors]
     model_min_error = min(model_errors)
     best_model = [i for i in model_files if re.search(str(model_min_error), i)]
-    assert len(best_model) == 1, '[ERROR] Unable to identify a model with the lowest error for ' + COIN
-    MODEL_PATH = best_model[0] 
+    assert len(best_model) == 1, '[ERROR] Unable to identify a pickle file with the lowest error for ' + COIN
     
-    print("[INFO] Loading the RangerForestRegressor model", MODEL_PATH)
-    with bz2.BZ2File(MODEL_PATH, 'rb') as f:
-        model = cPickle.load(f)
+    MODELS_FILE = best_model[0] 
+    print("[INFO] Loading the model", MODELS_FILE)
+    with bz2.BZ2File(MODELS_FILE, 'rb') as f:
+        rfr, xgb_model = cPickle.load(f)
     
     # Make prediction with the latest observation closest to NOW()
     df['time'] = df['time'].astype(int)
@@ -84,7 +85,15 @@ for COIN in config['SUPPORTED_COINS'].values():
     p_close = float(df_predict['close'])
     predict_now = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     
-    prediction = float(model.predict(df_predict))
+    # Random forest prediction
+    rf_pred = rfr.predict(df_predict)
+    
+    # XGBoost prediction
+    dPredict = xgb.DMatrix(df_predict[xgb_model.feature_names])
+    xgb_pred = xgb_model.predict(dPredict)
+    
+    # Ensembled predictions to arrive at the final prediction
+    prediction = float((rf_pred+xgb_pred)/2.0)
     expected_change = prediction-p_close
     
     # Log the current price and prediction (P01)

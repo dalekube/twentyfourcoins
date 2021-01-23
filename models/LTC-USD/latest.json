@@ -1,1 +1,1 @@
-{"predict_time": "2021-01-22 02:44:16", "predict_now": "2021-01-22 03:00:31", "predict_close": "$ 132.8100", "prediction": "$ 139.6216", "expected_change": "$ 6.8116", "change_direction": "up", "stats_training_time": "2021-01-21 05:48:08", "stats_mae": "$ 4.6263", "stats_mape": "3.06%"}
+{"predict_time": "2021-01-23 17:29:36", "predict_now": "2021-01-23 20:06:20", "predict_close": "$ 139.3800", "prediction": "$ 143.8655", "expected_change": "$ 4.4855", "change_direction": "up", "stats_training_time": "2021-01-23 19:53:20", "stats_mae": "$ 3.2449", "stats_mape": "2.27%"}
