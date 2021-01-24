@@ -33,28 +33,25 @@ app.config['SESSION_PERMANENT'] = False
 SUMMARY = 'TwentyFourCoins offers 24-hour, forwarding-looking price\
         forecasts for popular cryptocurrencies using artificial\
         intelligence trained from historical pricing data to support\
-        cryptocurrency trading.'
-
-# Function to retrieve price prediction
-def pricePrediction(COIN):
-    try:
-        JSON_PATH = 'models/' + COIN + '/' + 'latest.json'
-        assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN
-        with open(JSON_PATH) as f:
-            latest_json = json.load(f)
-    
-    except:
-        return jsonify(success=False), 500
-    
-    return jsonify(json.dumps(latest_json))
+        cryptocurrency trading.'    
 
 # Home
 @app.route('/', methods=['GET'])
 def index():
     
+    # Retrieve the latest predictions for all supported coins
+    SUPPORTED_COINS = config['SUPPORTED_COINS'].items()
+    COIN_STATS = {}
+    for COIN in config['SUPPORTED_COINS'].values():
+        JSON_PATH = 'models/' + COIN + '/' + 'latest.json'
+        assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN
+        with open(JSON_PATH) as f:
+            COIN_STATS[COIN] = json.load(f)
+    
     return render_template(
             'index.html',
-            SUPPORTED_COINS = config['SUPPORTED_COINS'].items(),
+            SUPPORTED_COINS = SUPPORTED_COINS,
+            COIN_STATS = COIN_STATS,
             PREMIUM_COINS = config['PREMIUM_COINS'],
             SUMMARY = SUMMARY
             )
@@ -79,7 +76,16 @@ def price_prediction():
     '''Retrieve the latest price prediction
     '''
     COIN = request.get_json()['COIN']
-    return pricePrediction(COIN)
+    try:
+        JSON_PATH = 'models/' + COIN + '/' + 'latest.json'
+        assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN
+        with open(JSON_PATH) as f:
+            latest_json = json.load(f)
+    
+    except:
+        return jsonify(success=False), 500
+    
+    return jsonify(json.dumps(latest_json))
 
 # Error handling
 @app.errorhandler(400)

@@ -6,9 +6,6 @@ $(document).on("click","#modelDetailsButton",function(){
 });
 
 function pricePrediction(coin){
-      
-    //Empty the price prediction box
-    $("#pricePredictionBox").hide();
     
     var coin_split = coin.value.split(":");
     const coin_name = coin_split[0];
@@ -70,8 +67,6 @@ function pricePrediction(coin){
         $("#stats_training_time").html(training_date);
         $("#stats_mae").html(JSON.parse(JSON.stringify(parsed_data.stats_mae)));
         $("#stats_mape").html(JSON.parse(JSON.stringify(parsed_data.stats_mape)));
-        
-        $("#pricePredictionBox").show();
         
       }
     });

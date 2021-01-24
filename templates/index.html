@@ -1,22 +1,29 @@
 {% extends 'base.html' %}
 {% set active_page = "index" %}
 {% block content %}
+<div style="width:600px !important;color:black;">
+  <div>
+    {{SUMMARY}}
+  </div>
+</div>
+<br>
 <div style="display:flex;align-items:top;">
   <div class="coinBlock container" id="predictPriceBlock">
     <div style="color:white;">Supported Coins:</div>
     {% for COIN_NAME, COIN in SUPPORTED_COINS %}
-        <button class="coinButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">{{COIN_NAME}}<br>({{COIN}})</button>
+        <button class="coinButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">
+          {{COIN_NAME}}
+          <br>
+          ({{COIN}})
+          <br>
+          {% if COIN_STATS[COIN]['change_direction'] == 'up' %} <i class='fas fa-caret-up'></i> {% else %} <i class='fas fa-caret-down'></i> {% endif %}
+          {{COIN_STATS[COIN]['expected_change_pct']}}
+        </button>
     {% endfor %}
   </div>
   <div class="container">
-    <div style="width:500px !important;color:black;">
-      <div>
-        {{SUMMARY}}
-      </div>
-    </div>
-    <br>
     <!-- REAL PREDICTION -->
-    <div id="pricePredictionBox" class="predictionBox" style="display:none;">
+    <div id="pricePredictionBox" class="predictionBox">
       <div id="predict_coin" class="coinTitle"></div>
       <br>
       <div>
