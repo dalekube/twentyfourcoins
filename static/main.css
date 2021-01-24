@@ -13,6 +13,7 @@
   background: var(--primary_color);
   width:250px;
   text-align:center;
+  white-space:nowrap;
   display:flex;
   flex-direction:column;
   box-shadow: 2px 2px darkgrey;
@@ -47,6 +48,7 @@ i {
   padding:20px;
   margin:15px;
   border-radius:5px;
+  white-space:nowrap;
   border:thin solid darkgrey;
   font-size:18px;
   box-shadow: 2px 2px darkgrey;
