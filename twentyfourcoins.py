@@ -23,6 +23,12 @@ access_passcodes = config['TEMPORARY_PASSCODES']
 access_passcodes.append(master_passcode)
 app.secret_key = master_passcode
 
+# Session management cookie configuration
+app.config['SESSION_COOKIE_NAME'] = 'tfc-tmp-session-mgmt'
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_PERMANENT'] = False
+
 # Function to retrieve price prediction
 def pricePrediction(COIN):
     try:
@@ -54,36 +60,12 @@ def error_page():
         msg = ''
     return render_template('error.html', ERROR = msg)
 
-# Validate the passcode
-@app.route('/validate_passcode', methods=['POST'])
-def validate_passcode():
-    
-    session['passcode'] = request.get_json()['passcode']
-    print('[INFO] Received passcode from the UI')
-    if session['passcode'] in access_passcodes:
-        print('[INFO] Successfully validated the passcode')
-        return jsonify(success=True)
-    else:
-        print('[ERROR] Invalid passcode')
-        return jsonify(success=False), 401
-
 # Collect price prediction
 @app.route('/price_prediction', methods=['POST'])
 def price_prediction():
     '''Retrieve the latest price prediction
     '''
     COIN = request.get_json()['COIN']
-    if COIN in config['PREMIUM_COINS']:
-        if 'passcode' in session:
-            if session['passcode'] in access_passcodes:
-                
-                return pricePrediction(COIN)
-        
-            else:
-                return jsonify(success=False), 401
-        else:
-            return jsonify(success=False), 401
-    
     return pricePrediction(COIN)
 
 # Error handling
