@@ -102,6 +102,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     # VALUE3 = Unix time for the candle used for the prediction
     predict_close = round(p_close,8)
     prediction = round(prediction,8)
+    expected_change_pct = round((prediction/p_close)-1,8)
     expected_change = round(expected_change,8)
     change_direction = 'up' if expected_change > 0 else 'down'
     
@@ -115,7 +116,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     print('[INFO] Current time =', predict_now)  
     print('[INFO] Current price =', str(predict_close))
     print('[INFO] Predicted price =', str(prediction))
-    print('[FINISHED] The price is expected to change by', str(expected_change), 'dollars in the next 24 hours')
+    print('[INFO] The price is expected to change by', str(expected_change), 'dollars in the next 24 hours')
     
     # Query the database for the logged performance statistics
     statement = 'SELECT * FROM logs WHERE ACTIVITY="M01" AND VALUE1=%s AND META1="%s"' % (model_min_error, COIN)
@@ -142,6 +143,7 @@ for COIN in config['SUPPORTED_COINS'].values():
             'predict_close':'$ {:,.4f}'.format(predict_close),
             'prediction':'$ {:,.4f}'.format(prediction),
             'expected_change':'$ {:,.4f}'.format(expected_change),
+            'expected_change_pct':'{:.2%}'.format(expected_change_pct),
             'change_direction': change_direction,
             'stats_training_time': training_time,
             'stats_mae': '$ {:,.4f}'.format(model_min_error),

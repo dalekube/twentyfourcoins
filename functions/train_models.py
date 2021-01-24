@@ -15,6 +15,7 @@ import os
 import json
 import pandas as pd
 import numpy as np
+import glob
 
 import xgboost as xgb
 from skranger.ensemble import RangerForestRegressor
@@ -35,7 +36,9 @@ with open('../config.json') as f:
 
 # Iterate over the supported coins
 for COIN in config['SUPPORTED_COINS'].values():
-
+    
+    print('[INFO] Staring the iteration for', COIN)
+    
     # Load the data for the coin
     # Print the row count when finished
     statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
@@ -129,16 +132,16 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     # Mean Absolute Error
     MAE = np.mean(abs(predictions - y_test))
-    print('[INFO] Ensemble MAE =', '${:,.4f}'.format(MAE))
+    print('[INFO]', COIN, 'Ensemble MAE =', '${:,.4f}'.format(MAE))
     MAE = '{:.8f}'.format(MAE)
     
     # Mean Absolute Percentage Error
     MAPE_RF = np.mean(abs((rf_preds - y_test)/y_test))
     MAPE_XGB = np.mean(abs((xgb_preds - y_test)/y_test))
     MAPE = np.mean(abs((predictions - y_test)/y_test))
-    print('[INFO] Ensemble MAPE =', '{:.2%}'.format(MAPE))
+    print('[INFO]', COIN, 'Ensemble MAPE =', '{:.2%}'.format(MAPE))
     BASELINE = (MAPE/min(MAPE_RF,MAPE_XGB))-1
-    print('[INFO] Percentage improvement due to ensemble =', '{:.2%}'.format(-1 * BASELINE))
+    print('[INFO]', COIN, 'Percentage improvement due to ensemble =', '{:.2%}'.format(-1 * BASELINE))
     MAPE = '{:.8f}'.format(MAPE)
     
     # Log the model performance (M01)
@@ -153,6 +156,11 @@ for COIN in config['SUPPORTED_COINS'].values():
     MODEL_DIR = '../models/' + COIN
     if not os.path.exists(MODEL_DIR):
         os.mkdir(MODEL_DIR)
+    
+    # Delete existing models
+    print('[INFO] Deleting existing models')
+    for f in glob.glob(MODEL_DIR + '/models*.pkl'):
+        os.remove(f)
     
     # Save both models
     MODELS_FILE = MODEL_DIR + '/models-' + MAE + '.pkl'

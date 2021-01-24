@@ -5,7 +5,7 @@
   --tertiary_color: #e7f0f7;
 }
 
-.inputBlock {
+.coinBlock {
   border-radius:5px;
   padding:10px;
   border:thin darkgrey solid;
@@ -17,12 +17,6 @@
   flex-direction:column;
   box-shadow: 2px 2px darkgrey;
   color:white;
-}
-
-.passcodeBlock {
-  height:30px;
-  position:relative;
-  width:100%;
   height:100%;
 }
 
@@ -76,44 +70,15 @@ button:active {
   transform: translateY(2px);
 }
 
-.freeButton {
+.coinButton {
   background: var(--tertiary_color);
   box-shadow: 0 3px var(--secondary_color);
-}
-
-.premiumButton {
-  background: var(--secondary_color);
-  box-shadow: 0 3px var(--tertiary_color);
-}
-
-.premiumCoin {
-  color: white !important;
-  font-weight:bold !important;
-  margin-bottom:10px !important;
-}
-
-.coinButton {
   height:60px;
   margin-top:10px;
 }
 
 .coinButton:active {
   transform: translateY(2px);
-}
-
-#passcode {
-  border-radius:5px;
-  background: var(--tertiary_color);
-  border:none !important;
-  outline:none !important;
-  padding:3px 5px 3px 5px;
-}
-
-.submitButton {
-  height:30px;
-  margin-top:10px;
-  box-shadow: 0px 3px var(--secondary_color);
-  background: var(--tertiary_color);
 }
 
 .fa-caret-up {
@@ -130,85 +95,9 @@ button:active {
   margin-top:2px;
 }
 
-.fa-dollar-sign {
-  color:white !important;
-}
-
 .predAttribute {
   margin-left:5px;
   font-weight:bold;
-}
-
-.loading {
-  
-  margin-left:50px;
-
-}
-
-.loadingSpinner {
-  border: 8px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 8px solid var(--secondary_color);
-  width: 30px;
-  height: 30px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
-  -moz-animation: spin 2s linear infinite; /* Safari */
-  animation: spin 2s linear infinite;
-}
-
-/* Safari */
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.passcodeStatus {
-  color:white;
-  padding:10px;
-  border-radius:5px;
-  text-align:center;
-  width:250px;
-  margin-top:15px;
-}
-
-.passcodeAccepted {
-  background: var(--secondary_color);
-}
-
-.passcodeDenied {
-  background:darkred;
-}
-
-.ribbon {
-  margin: 0;
-  background: #FF5C39;
-  color:white;
-  padding:1em 0;
-  position: absolute;
-  top:0;
-  right:0;
-  transform: translateX(30%) translateY(0%) rotate(45deg);
-  transform-origin: top left;
-}
-
-.ribbon:before,
-.ribbon:after {
-  content: '';
-  position: absolute;
-  top:0;
-  margin: 0 -1px; /* tweak */
-  width: 100%;
-  height: 100%;
-  background: #FF5C39;
-}
-
-.ribbon:before {
-  right:100%;
 }
 
 #modelDetailsButton {
