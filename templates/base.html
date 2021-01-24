@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+{% set navigation_bar = [
+    ('/', 'index', 'Home'),
+    ('/about', 'about', 'About')
+] -%}
+{% set active_page = active_page|default('index') -%}
 <head>
   {{ fontawesome_html() }}
   <title>TwentyFourCoins</title>
@@ -12,14 +17,46 @@
   <script data-ad-client="ca-pub-6598494579544515" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
-  <div class="block" style="display:flex;align-items:center;height:100px;min-width:700px;">
-    <i class="fas fa-coins" style="margin-right:15px;"></i>
+  <div class="headerBar">
     <div>
-      <span style="font-size:28px;font-weight:bold;">TwentyFourCoins</span>
+      <a class="headerLink" href="/"><i class="fas fa-coins"></i></a>
+    </div>
+    <div>
+      <span style="font-size:28px;font-weight:bold;"><a class="headerLink" href="/">TwentyFourCoins</a></span>
       <br>
       24-hour cryptocurrency price forecasts using artificial intelligence
     </div>
   </div>
-  {% block content %}{% endblock %}
+  <div style="display:flex;align-items:top;">
+    <div id="sidepanel" class="sidepanel">
+      <div>
+        Navigation:
+        {% for href, id, caption in navigation_bar %}
+          <div>
+            <a {% if id == active_page %} class="activeLink" {% endif %} href="{{ href|e }}">{{ caption|e }}</a>
+          </div>
+        {% endfor %}
+      </div>
+      <br>
+      <div>
+        Share:
+        <div>
+          <a class="socialLink" title="Share on Twitter" href="https://twitter.com/intent/tweet?text=AI-powered cryptocurrency price forecasts!%0D%0A&url=https://TwentyFourCoins.com%0D%0A%0D%0A&hashtags=bitcoin,litecoin,bitcoincash,ethereum,basicattentiontoken" target="_blank">
+            <img alt="Share on Twitter" class="socialIcon" src='Twitter.svg'>
+          </a>
+          <a class="socialLink" href="https://www.facebook.com/sharer/sharer.php?u=https://TwentyFourCoins.com&quote=AI-powered cryptocurrency price forecasts!%0D%0A" title="Share on Facebook" target="_blank">
+            <img alt="Share on Facebook" class="socialIcon" src="Facebook.svg" />
+          </a>
+          <a class="socialLink" href="http://www.linkedin.com/shareArticle?mini=true&url=https://TwentyFourCoins.com" target="_blank" title="Share on LinkedIn">
+            <img alt="Share on LinkedIn" class="socialIcon" src="LinkedIn.svg" />
+            </a>
+        </div>
+      </div>
+    </div>
+    <div style="padding:15px;">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
 </body>
 </html>
+

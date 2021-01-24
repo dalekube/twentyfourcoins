@@ -29,6 +29,12 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_PERMANENT'] = False
 
+# Main summary
+SUMMARY = 'TwentyFourCoins offers 24-hour, forwarding-looking price\
+        forecasts for popular cryptocurrencies using artificial\
+        intelligence trained from historical pricing data to support\
+        cryptocurrency trading.'
+
 # Function to retrieve price prediction
 def pricePrediction(COIN):
     try:
@@ -42,15 +48,22 @@ def pricePrediction(COIN):
     
     return jsonify(json.dumps(latest_json))
 
-# Home page
+# Home
 @app.route('/', methods=['GET'])
 def index():
     
     return render_template(
             'index.html',
             SUPPORTED_COINS = config['SUPPORTED_COINS'].items(),
-            PREMIUM_COINS = config['PREMIUM_COINS']
+            PREMIUM_COINS = config['PREMIUM_COINS'],
+            SUMMARY = SUMMARY
             )
+    
+# About
+@app.route('/about', methods=['GET'])
+def about():
+    
+    return render_template('about.html', SUMMARY = SUMMARY)
 
 # Error route for redirects
 @app.route('/error', methods=['GET'])

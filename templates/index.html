@@ -1,21 +1,20 @@
 {% extends 'base.html' %}
+{% set active_page = "index" %}
 {% block content %}
 <div style="display:flex;align-items:top;">
-  <div class="coinBlock" id="predictPriceBlock">
-    <div>Supported Coins:</div>
+  <div class="coinBlock container" id="predictPriceBlock">
+    <div style="color:white;">Supported Coins:</div>
     {% for COIN_NAME, COIN in SUPPORTED_COINS %}
         <button class="coinButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">{{COIN_NAME}}<br>({{COIN}})</button>
     {% endfor %}
   </div>
-  <div id="mainContainer">
-    <div id="summary">
+  <div class="container">
+    <div style="width:500px !important;color:black;">
       <div>
-        TwentyFourCoins offers 24-hour, forwarding-looking price
-        forecasts for popular cryptocurrencies using artificial
-        intelligence trained from historical pricing data to support
-        cryptocurrency trading.
+        {{SUMMARY}}
       </div>
     </div>
+    <br>
     <!-- REAL PREDICTION -->
     <div id="pricePredictionBox" class="predictionBox" style="display:none;">
       <div id="predict_coin" class="coinTitle"></div>
@@ -45,15 +44,15 @@
       </button>
       <div id="modelDetailsBlock" class="collapse">
         <div>
-          <span>Model Training Time:</span>
+          <span>Training Time:</span>
           <span id="stats_training_time" class="predAttribute"></span>
         </div>
         <div>
-          <span>Model MAE:</span>
+          <span>MAE:</span>
           <span id="stats_mae" class="predAttribute"></span>
         </div>
         <div>
-          <span>Model MAPE:</span>
+          <span>MAPE:</span>
           <span id="stats_mape" class="predAttribute"></span>
         </div>
       </div>
