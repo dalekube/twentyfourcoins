@@ -1,12 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Train the model for the specified coin.
-
-Example call: python3 train-model.py BAT-USDC
-
-    Parameters:
-        Coin (string): The code for a coin (e.g. BAT-USDC)
+Train the models for supported coins.
 
 @author: Dale Kube (dkube@uwalumni.com)
 """
@@ -169,7 +164,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         cPickle.dump([rfr,xgb_model], f)
     
     # Finished
-    print("[FINISHED] Successfully trained the models for", COIN)
+    print("[INFO] Successfully trained the models for", COIN)
 
 # Close the database connection
 con.close()

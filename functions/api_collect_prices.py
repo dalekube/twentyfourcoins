@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Collect historical COIN prices for machine learning model training. Maintain
-the historical data in the 'COINML/data' directory.
-
-Example call: python3 collect-data.py BAT-USDC
-
-    Parameters:
-        COIN (string): The code for a COIN (e.g. BAT-USDC)
+Collect historical prices for supported coins.
 
 @author: Dale Kube (dkube@uwalumni.com)
 """
@@ -19,7 +13,6 @@ from datetime import datetime
 from pprint import pprint
 import cbpro
 from db_connect import db_connect
-
 
 # Load the platform configuration
 with open('../config.json') as f:
@@ -143,4 +136,4 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
 # Close the database connection
 con.commit()
 con.close()
-print('[FINISHED] Successfully collected historical price data')
+print('[FINISHED] Successfully collected historical prices')
