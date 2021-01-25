@@ -9,12 +9,10 @@
 <br>
 <div style="display:flex;align-items:top;">
   <div class="coinBlock container" id="predictPriceBlock">
-    <div style="color:white;">Supported Coins:</div>
+    <div style="color:white;">Supported Coins</div>
     {% for COIN_NAME, COIN in SUPPORTED_COINS %}
         <button class="coinButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">
           {{COIN_NAME}}
-          <br>
-          ({{COIN}})
           <br>
           {% if COIN_STATS[COIN]['change_direction'] == 'up' %} <i class='fas fa-caret-up'></i> {% else %} <i class='fas fa-caret-down'></i> {% endif %}
           {{COIN_STATS[COIN]['expected_change_pct']}}
