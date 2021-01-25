@@ -8,7 +8,7 @@ Web application for TwentyFourCoins
 
 import os
 import json
-from flask import Flask, render_template, jsonify, request, redirect, session
+from flask import Flask, render_template, jsonify, request, redirect
 from flask_fontawesome import FontAwesome
 
 # Load the platform configuration
@@ -27,13 +27,7 @@ app.secret_key = master_passcode
 app.config['SESSION_COOKIE_NAME'] = 'tfc-tmp-session-mgmt'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
-app.config['SESSION_PERMANENT'] = False
-
-# Main summary
-SUMMARY = 'TwentyFourCoins offers 24-hour, forwarding-looking price\
-        forecasts for popular cryptocurrencies using artificial\
-        intelligence trained from historical pricing data to support\
-        cryptocurrency trading.'    
+app.config['SESSION_PERMANENT'] = False 
 
 # Home
 @app.route('/', methods=['GET'])
@@ -52,15 +46,14 @@ def index():
             'index.html',
             SUPPORTED_COINS = SUPPORTED_COINS,
             COIN_STATS = COIN_STATS,
-            PREMIUM_COINS = config['PREMIUM_COINS'],
-            SUMMARY = SUMMARY
+            PREMIUM_COINS = config['PREMIUM_COINS']
             )
     
 # About
 @app.route('/about', methods=['GET'])
 def about():
     
-    return render_template('about.html', SUMMARY = SUMMARY)
+    return render_template('about.html')
 
 # Error route for redirects
 @app.route('/error', methods=['GET'])

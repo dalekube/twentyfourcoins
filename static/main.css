@@ -63,7 +63,7 @@
   flex-direction:column;
   box-shadow: 2px 2px darkgrey;
   color:white;
-  height:400px;
+  height:100%;
 }
 
 i {
