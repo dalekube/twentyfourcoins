@@ -73,12 +73,13 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
         
         # Delete the bad price records in the database
         time_purge = df.loc[df['UTC_DAY'].isin(day_list),'time'].to_list()
-        time_purge = tuple(time_purge)
-        statement = 'DELETE FROM prices WHERE coin = "%s" AND time IN %s' % (COIN, time_purge)
-        cursor = con.cursor()
-        cursor.execute(statement)
-        cursor.close()
-        con.commit()
+        if len(time_purge) > 0:
+            time_purge = '({})'.format(','.join(str(time) for time in time_purge))
+            statement = 'DELETE FROM prices WHERE coin = "%s" AND time IN %s' % (COIN, time_purge)
+            cursor = con.cursor()
+            cursor.execute(statement)
+            cursor.close()
+            con.commit()
         
         # Identify existing UTC dates with good data
         # Recalculate prices for the current date to avoid intra-day gaps
@@ -87,7 +88,7 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
         exist_dates = set(df['UTC_DAY'])
         del df['UTC_DAY']
         datelist = [x for x in datelist if x not in exist_dates]
-    
+
     # Iterate over the dates to collect new candles using the Coinbase API
     # Iteratively save the data after 10 dates have passed
     try:
