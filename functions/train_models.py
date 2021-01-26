@@ -113,6 +113,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     y_train.drop(idx, inplace=True)
     
     # Train the random forest model
+    print("[INFO] Training the RangerForestRegressor model")
     rfr = RangerForestRegressor(n_estimators=101, oob_error=False, sample_fraction=[0.25])
     rfr.fit(x_train, y_train)
     
@@ -120,6 +121,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     rf_preds = rfr.predict(x_test)
     
     # Train the xgboost model
+    print("[INFO] Training the XGBoost model")
     dtrain = xgb.DMatrix(x_train, y_train)
     dtest = xgb.DMatrix(x_test, y_test)
     
