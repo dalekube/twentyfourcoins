@@ -11,6 +11,7 @@ import json
 import pandas as pd
 import numpy as np
 import glob
+import random
 
 import xgboost as xgb
 from skranger.ensemble import RangerForestRegressor
@@ -81,29 +82,38 @@ for COIN in config['SUPPORTED_COINS'].values():
     # Sort and calculate the 24 hours forward closing price (288 time periods of five minutes)
     # 86400/300 = 288
     # Remove observations without a 24-hour price target
-    df.sort_values(by=['time'], inplace=True)
+    df.sort_values(by=['time'], inplace=True, ascending=False)
     df['PRICE_24'] = df['close'].shift(288)
     df = df[~pd.isnull(df['PRICE_24'])]
     
     # Split the training and testing data
-    # Use the latest 3,000 observations for the test split
+    # Use a combinatorial approach, with samples from recent days and random days across history
     price_24 = df.pop('PRICE_24')
-    N_TEST = 3000
-    N_ESTIMATORS = 101
-    SAMPLE_FRACTION = 0.25
+    N_TEST_RECENT = 2000
+    N_TEST_RANDOM = 2000
     N_DF = len(df)
-    
     print("[INFO] Defining the train/test split")
-    print("[INFO] Training the models and evaluating the performance using the latest", '{:,}'.format(N_TEST), "candles")
-    x_train = df[0:N_DF-N_TEST]
-    y_train = price_24[0:N_DF-N_TEST]
     
-    x_test = df[-N_TEST:]
-    y_test = price_24[-N_TEST:]
+    # Sample recent days
+    x_train = df[N_TEST_RECENT:].reset_index(drop=True)
+    y_train = price_24[N_TEST_RECENT:].reset_index(drop=True)
+    
+    x_test_recent = df[:N_TEST_RECENT]
+    y_test_recent = price_24[:N_TEST_RECENT]
+    
+    # Random sample from the rest of the training data
+    idx = random.sample(range(0,len(x_train)), N_TEST_RANDOM)
+    x_test_random = x_train.iloc[idx,:]
+    y_test_random = y_train.iloc[idx]
+    
+    x_test = pd.concat([x_test_recent, x_test_random])
+    y_test = pd.concat([y_test_recent, y_test_random])
+    
+    x_train.drop(idx, inplace=True)
+    y_train.drop(idx, inplace=True)
     
     # Train the random forest model
-    rfr = RangerForestRegressor(n_estimators=N_ESTIMATORS, oob_error=False, 
-                                sample_fraction=[SAMPLE_FRACTION])
+    rfr = RangerForestRegressor(n_estimators=101, oob_error=False, sample_fraction=[0.25])
     rfr.fit(x_train, y_train)
     
     # Estimate the performance upon the test data
@@ -114,29 +124,38 @@ for COIN in config['SUPPORTED_COINS'].values():
     dtest = xgb.DMatrix(x_test, y_test)
     
     evallist = [(dtrain, 'train'), (dtest, 'val')]
-    param = {'max_depth': 6, 'eta': 0.1, 'objective': 'reg:squarederror', 
-             'eval_metric': 'mape', 'subsample':0.3}
+    param = {'max_depth': 2, 'eta': 0.1, 'objective': 'reg:squarederror', 
+             'eval_metric': 'mae', 'subsample':0.3, 'colsample_bytree':0.25}
     
     xgb_model = xgb.train(param, dtrain, num_boost_round=500, evals=evallist, 
                           early_stopping_rounds=3, maximize=False)
     
     xgb_preds = xgb_model.predict(dtest)
     
+    # Evaluate all models and ensembles to achieve optimal performance
     # Ensemble the predictions from both models
-    predictions = (rf_preds+xgb_preds)/2.0
+    ensemble_preds = (rf_preds+xgb_preds)/2.0
+    prediction_sets = {
+            'RangerForestRegressor': rf_preds,
+            'XGBoost': xgb_preds,
+            'Ensemble': ensemble_preds
+            }
+    results = {}
+    for model, preds in prediction_sets.items():
+        
+        # Mean Absolute Error
+        MAE = np.mean(abs(preds - y_test))
+        print('[INFO]', COIN, model, 'MAE =', '${:,.6f}'.format(MAE))
+        results[model] = MAE
     
-    # Mean Absolute Error
-    MAE = np.mean(abs(predictions - y_test))
-    print('[INFO]', COIN, 'Ensemble MAE =', '${:,.4f}'.format(MAE))
+    best_model = min(results, key=results.get)
+    print('[INFO] Best model with the lowest MAE =', best_model)
+    best_preds = prediction_sets[best_model]
+    
+    # Calculate the MAE and MAPE with the best set of predictions
+    MAE = np.mean(abs(best_preds - y_test))
     MAE = '{:.8f}'.format(MAE)
-    
-    # Mean Absolute Percentage Error
-    MAPE_RF = np.mean(abs((rf_preds - y_test)/y_test))
-    MAPE_XGB = np.mean(abs((xgb_preds - y_test)/y_test))
-    MAPE = np.mean(abs((predictions - y_test)/y_test))
-    print('[INFO]', COIN, 'Ensemble MAPE =', '{:.2%}'.format(MAPE))
-    BASELINE = (MAPE/min(MAPE_RF,MAPE_XGB))-1
-    print('[INFO]', COIN, 'Percentage improvement due to ensemble =', '{:.2%}'.format(-1 * BASELINE))
+    MAPE = np.mean(abs((best_preds - y_test)/y_test))
     MAPE = '{:.8f}'.format(MAPE)
     
     # Log the model performance (M01)
@@ -161,7 +180,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     MODELS_FILE = MODEL_DIR + '/models-' + MAE + '.pkl'
     print("[INFO] Saving the models to file:", MODELS_FILE)
     with bz2.BZ2File(MODELS_FILE, 'wb') as f:
-        cPickle.dump([rfr,xgb_model], f)
+        cPickle.dump([rfr, xgb_model, best_model], f)
     
     # Finished
     print("[INFO] Successfully trained the models for", COIN)

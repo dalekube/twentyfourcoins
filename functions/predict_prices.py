@@ -71,7 +71,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     MODELS_FILE = best_model[0] 
     print("[INFO] Loading the model", MODELS_FILE)
     with bz2.BZ2File(MODELS_FILE, 'rb') as f:
-        rfr, xgb_model = cPickle.load(f)
+        rfr, xgb_model, best_model = cPickle.load(f)
     
     # Make prediction with the latest observation closest to NOW()
     df['time'] = df['time'].astype(int)
@@ -92,9 +92,20 @@ for COIN in config['SUPPORTED_COINS'].values():
     dPredict = xgb.DMatrix(df_predict[xgb_model.feature_names])
     xgb_pred = xgb_model.predict(dPredict)
     
-    # Ensembled predictions to arrive at the final prediction
-    prediction = float((rf_pred+xgb_pred)/2.0)
-    expected_change = prediction-p_close
+    # Use the predictions associated with the best model
+    assert best_model in ['RangerForestRegressor','XGBoost','Ensemble']
+    print('[INFO] Making predictions with the best model:', best_model)
+    if best_model == 'Ensemble':
+
+        prediction = float((rf_pred+xgb_pred)/2.0)
+        
+    elif best_model == 'RangerForestRegressor':
+        
+        prediction = rf_pred[0]
+    
+    else:
+        
+        prediction = xgb_pred[0]
     
     # Log the current price and prediction (P01)
     # VALUE1 = Latest Price
@@ -103,6 +114,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     predict_close = round(p_close,8)
     prediction = round(prediction,8)
     expected_change_pct = round((prediction/p_close)-1,8)
+    expected_change = prediction-p_close
     expected_change = round(expected_change,8)
     change_direction = 'up' if expected_change > 0 else 'down'
     
