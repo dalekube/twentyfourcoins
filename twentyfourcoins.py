@@ -8,7 +8,7 @@ Web application for TwentyFourCoins
 
 import os
 import json
-from flask import Flask, render_template, jsonify, request, redirect, session
+from flask import Flask, render_template, jsonify, request, redirect
 from flask_fontawesome import FontAwesome
 
 # Load the platform configuration

@@ -8,11 +8,11 @@ Used to initialize the SQLite3 database from scratch.
 
 ## DEVELOPMENT ONLY
 ## import os
-## os.chdir('/home/dale/Downloads/GitHub/coinML')
+## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
 # Create a database object if it doesn't already exist
-from data.db_connect import db_connect
-con = db_connect('./data/db.sqlite')
+from db_connect import db_connect
+con = db_connect('../data/db.sqlite')
 cursor = con.cursor()
 
 # Create the master 'logs' table
@@ -44,13 +44,9 @@ cursor.execute(statement)
 
 # Random queries to validate changes
 statement = 'SELECT * FROM logs'
+statement = 'SELECT * FROM logs ORDER BY UTC_TIME DESC LIMIT 10'
 statement = 'SELECT * FROM prices LIMIT 10'
 statement = 'pragma table_info("logs")'
-statement = 'DROP TABLE logs'
-statement = 'DROP TABLE prices'
-statement = 'DELETE FROM logs'
-statement = 'SELECT CURRENT_TIMESTAMP'
-statement = 'SELECT strftime("%s","now")'
 cursor.execute(statement)
 cursor.fetchall()
 

@@ -163,7 +163,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     # Log the model performance (M01)
     print('[INFO] Logging the model performance to the database')
     cursor = con.cursor()
-    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "M01", %s, %s, NULL, "%s")' % (MAE, MAPE, COIN)
+    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "M01", %s, %s, NULL, "%s", NULL)' % (MAE, MAPE, COIN)
     cursor.execute(statement)    
     cursor.close()
     con.commit()

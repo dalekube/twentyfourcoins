@@ -120,7 +120,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     change_direction = 'up' if expected_change > 0 else 'down'
     
     cursor = con.cursor()
-    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "P01", %s, %s, %s, "%s")' % (predict_close, prediction, p_unixtime, COIN)
+    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "P01", %s, %s, %s, "%s", NULL)' % (predict_close, prediction, p_unixtime, COIN)
     cursor.execute(statement)    
     cursor.close()
     con.commit()
