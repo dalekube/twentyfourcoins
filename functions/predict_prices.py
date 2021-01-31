@@ -30,12 +30,12 @@ with open('../config.json') as f:
 # Iterate over every supported coin
 for COIN in config['SUPPORTED_COINS'].values():
     
-    print('[INFO] Starting the iteration for', COIN)
     ## DEVELOPMENT ONLY
     ## COIN = 'BAT-USDC'
     
     # Load the data for the coin
     # Print the row count when finished
+    print('[INFO] Starting the iteration for', COIN)
     statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
     df = pd.read_sql(statement, con)
     del df['coin']
@@ -111,6 +111,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     # VALUE1 = Latest Price
     # VALUE2 = Predicted Price
     # VALUE3 = Unix time for the candle used for the prediction
+    # META1 = Coin
     predict_close = round(p_close,8)
     prediction = round(prediction,8)
     expected_change_pct = round((prediction/p_close)-1,8)
@@ -119,7 +120,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     change_direction = 'up' if expected_change > 0 else 'down'
     
     cursor = con.cursor()
-    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "P01", %s, %s, %s, NULL)' % (predict_close, prediction, p_unixtime)
+    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "P01", %s, %s, %s, "%s")' % (predict_close, prediction, p_unixtime, COIN)
     cursor.execute(statement)    
     cursor.close()
     con.commit()
@@ -161,6 +162,10 @@ for COIN in config['SUPPORTED_COINS'].values():
             'stats_mae': '$ {:,.4f}'.format(model_min_error),
             'stats_mape': '{:.2%}'.format(model_stats['VALUE2'])
             }, f)
+    
+    # Collect predictions for the predictive performance chart
+    #statement = 'SELECT * FROM logs WHERE ACTIVITY="P01" AND META1="BAT-USDC"'
+    #df = pd.read_sql(statement, con)
 
 # Close the database connection when finished
 con.close()
