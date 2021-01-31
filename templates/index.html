@@ -9,7 +9,7 @@
       Predicted 24-Hour Price Change
     </div>
     {% for COIN_NAME, COIN in SUPPORTED_COINS %}
-        <button class="coinButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">
+        <button class="coinButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this, 'Y')">
           {{COIN_NAME}}
           <br>
           {% if COIN_STATS[COIN]['change_direction'] == 'up' %} <i class='fas fa-caret-up'></i> {% else %} <i class='fas fa-caret-down'></i> {% endif %}

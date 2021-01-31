@@ -8,7 +8,7 @@ Web application for TwentyFourCoins
 
 import os
 import json
-from flask import Flask, render_template, jsonify, request, redirect
+from flask import Flask, render_template, jsonify, request, redirect, session
 from flask_fontawesome import FontAwesome
 
 # Load the platform configuration
@@ -29,6 +29,18 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_PERMANENT'] = False 
 
+# Establish database connection
+from functions.db_connect import db_connect
+
+# Save user activity in logs
+def log_activity(activity, route, coin=None):
+    cnx = db_connect('./data/db.sqlite')
+    cursorx = cnx.cursor()
+    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "%s", NULL, NULL, NULL, "%s", "%s")' % (activity, route, coin)
+    cursorx.execute(statement)    
+    cursorx.close()
+    cnx.commit()
+
 # Home
 @app.route('/', methods=['GET'])
 def index():
@@ -42,6 +54,10 @@ def index():
         with open(JSON_PATH) as f:
             COIN_STATS[COIN] = json.load(f)
     
+    # Log the user activity
+    # A01 = User visit
+    log_activity("A01", "/")
+    
     return render_template(
             'index.html',
             SUPPORTED_COINS = SUPPORTED_COINS,
@@ -53,6 +69,10 @@ def index():
 @app.route('/about', methods=['GET'])
 def about():
     
+    # Log the user activity
+    # A01 = User visit
+    log_activity("A01", "/about")
+    
     return render_template('about.html')
 
 # Error route for redirects
@@ -61,6 +81,11 @@ def error_page():
     msg = request.args.get('msg')
     if msg is None:
         msg = ''
+    
+    # Log the user activity
+    # A01 = User visit
+    log_activity("A01", "/error")
+    
     return render_template('error.html', ERROR = msg)
 
 # Collect price prediction
@@ -68,7 +93,16 @@ def error_page():
 def price_prediction():
     '''Retrieve the latest price prediction
     '''
-    COIN = request.get_json()['COIN']
+    response = request.get_json()
+    COIN = response['COIN']
+    CLICK = response['CLICK']
+    
+    # Avoid the logging for the view of the default coin
+    if CLICK == 'Y':
+        # Log the user activity
+        # A02 = Viewed price prediction
+        log_activity("A02", "/price_prediction", COIN)
+    
     try:
         JSON_PATH = 'models/' + COIN + '/' + 'latest.json'
         assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN

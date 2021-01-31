@@ -5,7 +5,7 @@ $(document).on("click","#modelDetailsButton",function(){
   $("#modelDetailsCaret").toggleClass("rotate");
 });
 
-function pricePrediction(coin){
+function pricePrediction(coin, userclick){
     
     var coin_split = coin.value.split(":");
     const coin_name = coin_split[0];
@@ -15,7 +15,7 @@ function pricePrediction(coin){
     $.ajax({
       url: "/price_prediction",
       type: "POST",
-      data: JSON.stringify({COIN: coin_code}),
+      data: JSON.stringify({COIN: coin_code, CLICK:userclick}),
       contentType:"application/json",
       error: function(){
         msg = "Failed to retrieve the forecast data for " + coin_name + " (" + coin_code + ")";
@@ -75,7 +75,7 @@ function pricePrediction(coin){
 
 // Load an initial free coin
 $(window).on('load', function(){
-  $("#getPriceBAT-USDC").click();
+  pricePrediction({value:"Basic Attention Token:BAT-USDC"}, 'N');
 });
 
 
