@@ -145,7 +145,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     print('[INFO] Model trained at', training_time)
     print('[INFO] Mean Absolute Error (MAE) =', '${:,.4f}'.format(model_min_error))
     print('[INFO] Mean Absolute Percentage Error (MAPE) =', '{:.2%}'.format(model_stats['VALUE2']))
-    print('[FINISHED] Finished with the forecast for', COIN)
+    print('[INFO] Finished with the forecast for', COIN)
     
     # Overwrite the JSON file with the latest details
     JSON_DUMP = MODEL_DIR + 'latest.json'
@@ -163,15 +163,34 @@ for COIN in config['SUPPORTED_COINS'].values():
             'stats_mape': '{:.2%}'.format(model_stats['VALUE2'])
             }, f)
     
-#    # Collect predictions for the predictive performance chart
-#    statement = 'SELECT UTC_TIME, VALUE2 FROM logs WHERE ACTIVITY="P01" AND META1="BAT-USDC"'
-#    df_preds = pd.read_sql(statement, con)
-#    df_preds.columns = ['time','pred']
-#    
-#    statement = 'SELECT time, close FROM prices WHERE coin="BAT-USDC"'
-#    df_actuals = pd.read_sql(statement, con)
+    # Collect predictions for the predictive performance chart
+    # Limit to the past 12 months
+    YEAR_DT = pd.to_datetime('now') - pd.DateOffset(months=12)
     
+    statement = 'SELECT UTC_TIME, VALUE2 FROM logs WHERE ACTIVITY="P01" AND META1="%s"' % COIN
+    df_preds = pd.read_sql(statement, con)
+    df_preds.columns = ['time','pred']
+    df_preds['time'] = df_preds.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
+    df_preds['time'] = pd.to_datetime(df_preds['time'])
+    df_preds = df_preds[df_preds['time'] > YEAR_DT]
+    print('[INFO] Collected', '{:,}'.format(len(df_preds)), 'predicted prices for the charts')
     
+    statement = 'SELECT time, close FROM prices WHERE coin="%s"' % COIN
+    df_actuals = pd.read_sql(statement, con)
+    df_actuals['time'] = df_actuals.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
+    df_actuals['time'] = pd.to_datetime(df_actuals['time'])
+    df_actuals = df_actuals[df_actuals['time'] > YEAR_DT]
+    df_actuals = df_actuals[df_actuals['time'] >= min(df_preds['time'])]
+    print('[INFO] Collected', '{:,}'.format(len(df_actuals)), 'actual prices for the charts')
+    
+    # Overwrite the JSON file with the latest details
+    JSON_DUMP = MODEL_DIR + 'charts.json'
+    with open(JSON_DUMP, 'w') as f:
+        json.dump({
+            'actuals':df_actuals.to_json(),
+            'predictions':df_preds.to_json(),
+            }, f)
 
 # Close the database connection when finished
 con.close()
+

@@ -22,10 +22,13 @@ function pricePrediction(coin, userclick){
         window.location.replace("/error?msg=" + msg);
       },
       success: function(data){
-        parsed_data = JSON.parse(data);
+        
+        // Parse the incoming data
+        stats = data.stats;
+        charts = data.charts;
         
         // Parse the prediction timestamps and present in locale
-        var predict_time = JSON.parse(JSON.stringify(parsed_data.predict_time));
+        var predict_time = JSON.parse(JSON.stringify(stats.predict_time));
         predict_time = predict_time.split(" ");
         var predict_time_dt = predict_time[0].split("-");
         const predict_year = parseInt(predict_time_dt[0]);
@@ -40,19 +43,19 @@ function pricePrediction(coin, userclick){
         // Display the price prediction details
         $("#predict_coin").html(coin_name + " (" + coin_code + ")");
         $("#predict_time").html(predict_time);
-        $("#predict_close").html(JSON.parse(JSON.stringify(parsed_data.predict_close)));
+        $("#predict_close").html(JSON.parse(JSON.stringify(stats.predict_close)));
         
-        const change_direction = JSON.parse(JSON.stringify(parsed_data.change_direction));
+        const change_direction = JSON.parse(JSON.stringify(stats.change_direction));
         var indicator = "<i class='fas fa-caret-down'></i>";
         if (change_direction == 'up') {
           indicator = "<i class='fas fa-caret-up'></i>";
         }
-        $("#predict_prediction").html(indicator + JSON.parse(JSON.stringify(parsed_data.prediction)));
-        $("#predict_change").html(indicator + JSON.parse(JSON.stringify(parsed_data.expected_change)));
-        $("#predict_change_pct").html(" (" + JSON.parse(JSON.stringify(parsed_data.expected_change_pct)) + ")");
+        $("#predict_prediction").html(indicator + JSON.parse(JSON.stringify(stats.prediction)));
+        $("#predict_change").html(indicator + JSON.parse(JSON.stringify(stats.expected_change)));
+        $("#predict_change_pct").html(" (" + JSON.parse(JSON.stringify(stats.expected_change_pct)) + ")");
         
         // Parse the training timestamp and present in locale
-        var training_time = JSON.parse(JSON.stringify(parsed_data.stats_training_time));
+        var training_time = JSON.parse(JSON.stringify(stats.stats_training_time));
         training_time = training_time.split(" ");
         var training_date = training_time[0].split("-");
         const year = parseInt(training_date[0]);
@@ -65,11 +68,14 @@ function pricePrediction(coin, userclick){
         training_date = new Date(Date.UTC(year,month,day,hours,min,sec)).toLocaleString();
         
         $("#stats_training_time").html(training_date);
-        $("#stats_mae").html(JSON.parse(JSON.stringify(parsed_data.stats_mae)));
-        $("#stats_mape").html(JSON.parse(JSON.stringify(parsed_data.stats_mape)));
+        $("#stats_mae").html(JSON.parse(JSON.stringify(stats.stats_mae)));
+        $("#stats_mape").html(JSON.parse(JSON.stringify(stats.stats_mape)));
         
-      }
-    });
+        $("#mainChart").html(Bokeh.embed.embed_item(charts));
+            
+          } // end of success
+          
+        }); // end of AJAX call
     
 }
 
