@@ -173,6 +173,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     df_preds['time'] = df_preds.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
     df_preds['time'] = pd.to_datetime(df_preds['time'])
     df_preds = df_preds[df_preds['time'] > YEAR_DT]
+    df_preds = df_preds.sort_values(by=['time'])
     print('[INFO] Collected', '{:,}'.format(len(df_preds)), 'predicted prices for the charts')
     
     statement = 'SELECT time, close FROM prices WHERE coin="%s"' % COIN
@@ -181,6 +182,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     df_actuals['time'] = pd.to_datetime(df_actuals['time'])
     df_actuals = df_actuals[df_actuals['time'] > YEAR_DT]
     df_actuals = df_actuals[df_actuals['time'] >= min(df_preds['time'])]
+    df_actuals = df_actuals.sort_values(by=['time'])
     print('[INFO] Collected', '{:,}'.format(len(df_actuals)), 'actual prices for the charts')
     
     # Overwrite the JSON file with the latest details
