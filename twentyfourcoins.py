@@ -132,8 +132,8 @@ def price_prediction():
         preds_values = list(preds['pred'].values())
         
         fig = figure(x_axis_type='datetime')
-        fig.line(actuals_time, actuals_values, color='blue', line_width=2, legend_label='Actuals')
-        fig.line(preds_time, preds_values, color='red', line_width=2, legend_label='Predictions')
+        fig.line(actuals_time, actuals_values, color='#4488EE', line_width=2, legend_label='Actuals')
+        fig.line(preds_time, preds_values, color='#FF5C39', line_width=2, legend_label='Predictions')
         fig.width = 450
         fig.height = 300
         fig.toolbar.logo = None
