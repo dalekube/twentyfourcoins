@@ -163,9 +163,15 @@ for COIN in config['SUPPORTED_COINS'].values():
             'stats_mape': '{:.2%}'.format(model_stats['VALUE2'])
             }, f)
     
-    # Collect predictions for the predictive performance chart
-    #statement = 'SELECT * FROM logs WHERE ACTIVITY="P01" AND META1="BAT-USDC"'
-    #df = pd.read_sql(statement, con)
+#    # Collect predictions for the predictive performance chart
+#    statement = 'SELECT UTC_TIME, VALUE2 FROM logs WHERE ACTIVITY="P01" AND META1="BAT-USDC"'
+#    df_preds = pd.read_sql(statement, con)
+#    df_preds.columns = ['time','pred']
+#    
+#    statement = 'SELECT time, close FROM prices WHERE coin="BAT-USDC"'
+#    df_actuals = pd.read_sql(statement, con)
+    
+    
 
 # Close the database connection when finished
 con.close()
