@@ -12,7 +12,7 @@ from flask import Flask, render_template, jsonify, request, redirect
 from flask_fontawesome import FontAwesome
 from bokeh.plotting import figure
 from bokeh.embed import json_item
-from bokeh.models import NumeralTickFormatter
+from bokeh.models import NumeralTickFormatter, Legend
 
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/')
@@ -132,6 +132,7 @@ def price_prediction():
         preds_values = list(preds['pred'].values())
         
         fig = figure(x_axis_type='datetime')
+        fig.add_layout(Legend(location=(50, 0), orientation="horizontal"), "above")
         fig.line(actuals_time, actuals_values, color='#4488EE', line_width=2, legend_label='Actuals')
         fig.line(preds_time, preds_values, color='#FF5C39', line_width=2, legend_label='Predictions')
         fig.width = 450
@@ -140,8 +141,11 @@ def price_prediction():
         fig.toolbar_location = None
         fig.background_fill_color = None
         fig.border_fill_color = None
-        fig.legend.location = "top_left"
+        #fig.legend.location = "top_left"
         fig.legend.background_fill_color = None
+        fig.legend.padding = 0
+        fig.legend.margin = 0
+        fig.legend.spacing = 10
         fig.toolbar.active_drag = None
         fig.yaxis[0].formatter = NumeralTickFormatter(format="$0,.00")
     
