@@ -107,7 +107,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     dtest = xgb.DMatrix(x_test, y_test)
     
     evallist = [(dtrain, 'train'), (dtest, 'val')]
-    param = {'max_depth': 5, 'eta': 0.1, 'objective': 'reg:squarederror', 
+    param = {'max_depth': 2, 'eta': 0.1, 'objective': 'reg:squarederror', 
              'eval_metric': 'mae', 'subsample':0.2, 'colsample_bytree':0.2}
     
     xgb_model = xgb.train(param, dtrain, num_boost_round=500, evals=evallist, 
