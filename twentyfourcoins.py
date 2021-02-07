@@ -142,6 +142,7 @@ def price_prediction():
         fig.border_fill_color = None
         fig.legend.location = "top_left"
         fig.legend.background_fill_color = None
+        fig.toolbar.active_drag = None
         fig.yaxis[0].formatter = NumeralTickFormatter(format="$0,.00")
     
     except:
