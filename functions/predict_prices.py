@@ -75,15 +75,15 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     # Make prediction with the latest observation closest to NOW()
     df['time'] = df['time'].astype(int)
-    df['UTC_TIME'] = df.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
     df.sort_values(by=['time'], inplace=True)
     df_predict = df.tail(1)
     
-    p_unixtime = int(df_predict['time'])
-    p_time = df_predict.pop('UTC_TIME')
-    predict_time = str(p_time.tolist()[0])
-    p_close = float(df_predict['close'])
-    predict_now = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    actual_time = int(df_predict['time'])
+    actual_time_str = datetime.utcfromtimestamp(actual_time).strftime("%Y-%m-%d %H:%M:%S")
+    actual_close = float(df_predict['close'])
+    
+    predict_time = int(df_predict['time']) + 86400    
+    predict_time_str = datetime.utcfromtimestamp(predict_time).strftime("%Y-%m-%d %H:%M:%S")
     
     # Random forest prediction
     rf_pred = rfr.predict(df_predict)
@@ -96,7 +96,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     assert best_model in ['RangerForestRegressor','XGBoost','Ensemble']
     print('[INFO] Making predictions with the best model:', best_model)
     if best_model == 'Ensemble':
-
+        
         prediction = float((rf_pred+xgb_pred)/2.0)
         
     elif best_model == 'RangerForestRegressor':
@@ -107,27 +107,23 @@ for COIN in config['SUPPORTED_COINS'].values():
         
         prediction = xgb_pred[0]
     
-    # Log the current price and prediction (P01)
-    # VALUE1 = Latest Price
-    # VALUE2 = Predicted Price
-    # VALUE3 = Unix time for the candle used for the prediction
-    # META1 = Coin
-    predict_close = round(p_close,8)
+    # Log the latest actual price and corresponding prediction details
+    actual_close = round(actual_close,8)
     prediction = round(prediction,8)
-    expected_change_pct = round((prediction/p_close)-1,8)
-    expected_change = prediction-p_close
+    expected_change_pct = round((prediction/actual_close)-1,8)
+    expected_change = prediction-actual_close
     expected_change = round(expected_change,8)
     change_direction = 'up' if expected_change > 0 else 'down'
     
     cursor = con.cursor()
-    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "P01", %s, %s, %s, "%s", NULL)' % (predict_close, prediction, p_unixtime, COIN)
+    statement = 'INSERT INTO predictions VALUES ("%s", "%s", %s, "%s", %s)' % (COIN, actual_time, actual_close, predict_time, prediction)
     cursor.execute(statement)    
     cursor.close()
     con.commit()
     
-    print('[INFO] Making forward-looking prediction from', predict_time)
-    print('[INFO] Current time =', predict_now)  
-    print('[INFO] Current price =', str(predict_close))
+    print('[INFO] Making forward-looking prediction from', actual_time_str)
+    print('[INFO] Latest actual price =', str(actual_close))
+    print('[INFO] Prediction time =', predict_time_str)  
     print('[INFO] Predicted price =', str(prediction))
     print('[INFO] The price is expected to change by', str(expected_change), 'dollars in the next 24 hours')
     
@@ -151,9 +147,8 @@ for COIN in config['SUPPORTED_COINS'].values():
     JSON_DUMP = MODEL_DIR + 'latest.json'
     with open(JSON_DUMP, 'w') as f:
         json.dump({
-            'predict_time':predict_time,
-            'predict_now':predict_now,
-            'predict_close':'$ {:,.4f}'.format(predict_close),
+            'actual_time':actual_time_str,
+            'actual_close':'$ {:,.4f}'.format(actual_close),
             'prediction':'$ {:,.4f}'.format(prediction),
             'expected_change':'$ {:,.4f}'.format(expected_change),
             'expected_change_pct':'{:.2%}'.format(expected_change_pct),
@@ -167,11 +162,12 @@ for COIN in config['SUPPORTED_COINS'].values():
     # Limit to the past 12 months
     YEAR_DT = pd.to_datetime('now') - pd.DateOffset(months=12)
     
-    statement = 'SELECT UTC_TIME, VALUE2 FROM logs WHERE ACTIVITY="P01" AND META1="%s"' % COIN
+    statement = 'SELECT PREDICTION_TIME, PREDICTION FROM predictions WHERE COIN = "%s"' % COIN
     df_preds = pd.read_sql(statement, con)
     df_preds.columns = ['time','pred']
     df_preds['time'] = df_preds.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
     df_preds['time'] = pd.to_datetime(df_preds['time'])
+    df_preds['time'] = df_preds['time']
     df_preds = df_preds[df_preds['time'] > YEAR_DT]
     df_preds = df_preds.sort_values(by=['time'])
     print('[INFO] Collected', '{:,}'.format(len(df_preds)), 'predicted prices for the charts')

@@ -28,22 +28,22 @@ function pricePrediction(coin, userclick){
         charts = data.charts;
         
         // Parse the prediction timestamps and present in locale
-        var predict_time = JSON.parse(JSON.stringify(stats.predict_time));
-        predict_time = predict_time.split(" ");
-        var predict_time_dt = predict_time[0].split("-");
-        const predict_year = parseInt(predict_time_dt[0]);
-        const predict_month = parseInt(predict_time_dt[1])-1;
-        const predict_day = parseInt(predict_time_dt[2]);
-        predict_time = predict_time[1].split(":");
-        const predict_hours = parseInt(predict_time[0]);
-        const predict_min = parseInt(predict_time[1]);
-        const predict_sec = parseInt(predict_time[2]);
-        predict_time = new Date(Date.UTC(predict_year,predict_month,predict_day,predict_hours,predict_min,predict_sec)).toLocaleString();
+        var actual_time = JSON.parse(JSON.stringify(stats.actual_time));
+        actual_time = actual_time.split(" ");
+        var actual_time_dt = actual_time[0].split("-");
+        const predict_year = parseInt(actual_time_dt[0]);
+        const predict_month = parseInt(actual_time_dt[1])-1;
+        const predict_day = parseInt(actual_time_dt[2]);
+        actual_time = actual_time[1].split(":");
+        const predict_hours = parseInt(actual_time[0]);
+        const predict_min = parseInt(actual_time[1]);
+        const predict_sec = parseInt(actual_time[2]);
+        actual_time = new Date(Date.UTC(predict_year,predict_month,predict_day,predict_hours,predict_min,predict_sec)).toLocaleString();
         
         // Display the price prediction details
         $("#predict_coin").html(coin_name + " (" + coin_code + ")");
-        $("#predict_time").html(predict_time);
-        $("#predict_close").html(JSON.parse(JSON.stringify(stats.predict_close)));
+        $("#actual_time").html(actual_time);
+        $("#actual_close").html(JSON.parse(JSON.stringify(stats.actual_close)));
         
         const change_direction = JSON.parse(JSON.stringify(stats.change_direction));
         var indicator = "<i class='fas fa-caret-down'></i>";
