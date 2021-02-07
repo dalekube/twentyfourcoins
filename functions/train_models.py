@@ -19,7 +19,6 @@ import bz2
 import _pickle as cPickle
 
 ## DEVELOPMENT ONLY
-## import os
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
 # Create a database connection
@@ -33,6 +32,9 @@ with open('../config.json') as f:
 # Iterate over the supported coins
 for COIN in config['SUPPORTED_COINS'].values():
     
+    ## DEVELOPMENT ONLY
+    ## COIN = 'BAT-USDC'
+    
     print('[INFO] Staring the iteration for', COIN)
     
     # Load the data for the coin
@@ -44,27 +46,6 @@ for COIN in config['SUPPORTED_COINS'].values():
     N_DF = len(df)
     assert N_DF > 0, '[ERROR] Zero rows in the collected data for ' + COIN
     print("[INFO] Successfully read", '{:,}'.format(N_DF), "rows from the database")
-    
-    #    # Append closing prices and volumes for correlative coins
-    #    # Correlative data helps the model to understand confounding market trends
-    #    correlations = config['MODEL_CORRELATIONS']['BAT-USDC']
-    #    close_cols = []
-    #    for i in correlations:
-    #            # Load the data for the coin
-    #            # Print the row count when finished
-    #            print('[INFO] Reading historical data for correlative coin', i)
-    #            statement = 'SELECT time, close, volume FROM prices WHERE coin = "%s"' % i
-    #            df_cor = pd.read_sql(statement, con)
-    #            N_DF_COR = len(df_cor)
-    #            assert N_DF_COR > 0, '[ERROR] Missing prices for correlative coin'
-    #            print('[INFO] Successfully read', '{:,}'.format(N_DF_COR), 'rows from the database')
-    #            
-    #            print('[INFO] Merging the correlative prices and volumes')
-    #            cols_cor = [j + '-' + i for j in df_cor.columns if j != 'time']
-    #            close_cols = close_cols + [cols_cor[0]]
-    #            df_cor.columns = ['time'] + cols_cor
-    #            df = df.merge(df_cor,on='time',how='left')
-    #            assert N_DF == len(df), '[ERROR] Unintended row expansion from correlative data merger'
     
     # Calculate rolling average features
     df.sort_values(by=['time'], inplace=True)
@@ -126,8 +107,8 @@ for COIN in config['SUPPORTED_COINS'].values():
     dtest = xgb.DMatrix(x_test, y_test)
     
     evallist = [(dtrain, 'train'), (dtest, 'val')]
-    param = {'max_depth': 2, 'eta': 0.1, 'objective': 'reg:squarederror', 
-             'eval_metric': 'mae', 'subsample':0.3, 'colsample_bytree':0.25}
+    param = {'max_depth': 5, 'eta': 0.1, 'objective': 'reg:squarederror', 
+             'eval_metric': 'mae', 'subsample':0.2, 'colsample_bytree':0.2}
     
     xgb_model = xgb.train(param, dtrain, num_boost_round=500, evals=evallist, 
                           early_stopping_rounds=3, maximize=False)
