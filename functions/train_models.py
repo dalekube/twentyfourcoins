@@ -52,9 +52,6 @@ for COIN in config['SUPPORTED_COINS'].values():
     NUM_MOV_AVG = int(config['NUM_MOV_AVG'])
     for i in range(10, NUM_MOV_AVG, 10):
         df['MA_close_'+str(i)] = df['close'].rolling(window=i, min_periods=1, center=False).mean()
-        #df['MA_volume_'+str(i)] = df['volume'].rolling(window=i, min_periods=1, center=False).mean()
-    #        for y in close_cols:
-    #            df['MA'+str(i)+'_'+y] = df[y].rolling(window=i, min_periods=1, center=False).mean()
     
     # Drop rows with na values and convert to float32
     df.fillna(0, inplace=True)
@@ -80,7 +77,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     y_train = price_24[N_TEST_RECENT:].reset_index(drop=True)
     
     x_test_recent = df[:N_TEST_RECENT]
-    y_test_recent = price_24[:N_TEST_RECENT]
+    y_test_recent = price_24[:N_TEST_RECENT] 
     
     # Random sample from the rest of the training data
     idx = random.sample(range(0,len(x_train)), N_TEST_RANDOM)
@@ -100,7 +97,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     # Estimate the performance upon the test data
     rf_preds = rfr.predict(x_test)
-    
+        
     # Train the xgboost model
     print("[INFO] Training the XGBoost model")
     dtrain = xgb.DMatrix(x_train, y_train)
@@ -108,20 +105,31 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     evallist = [(dtrain, 'train'), (dtest, 'val')]
     param = {'max_depth': 2, 'eta': 0.1, 'objective': 'reg:squarederror', 
-             'eval_metric': 'mae', 'subsample':0.2, 'colsample_bytree':0.2}
+             'eval_metric': 'mae', 'subsample':0.2, 'colsample_bytree':0.8}
     
     xgb_model = xgb.train(param, dtrain, num_boost_round=500, evals=evallist, 
                           early_stopping_rounds=3, maximize=False)
     
     xgb_preds = xgb_model.predict(dtest)
     
+    # Use the simple moving average as an option
+    mov_avg_col = 'MA_close_100'
+    mov_avg = x_test[mov_avg_col]
+    
     # Evaluate all models and ensembles to achieve optimal performance
     # Ensemble the predictions from both models
-    ensemble_preds = (rf_preds+xgb_preds)/2.0
+    ensemble_preds_all = (rf_preds+xgb_preds+mov_avg)/2.0
+    ensemble_preds_rf_xgb = (rf_preds+xgb_preds)/2.0
+    ensemble_preds_rf_avg = (rf_preds+mov_avg)/2.0
+    ensemble_preds_xgb_avg = (xgb_preds+mov_avg)/2.0
     prediction_sets = {
             'RangerForestRegressor': rf_preds,
             'XGBoost': xgb_preds,
-            'Ensemble': ensemble_preds
+            'MovingAverage':mov_avg,
+            'Ensemble_All': ensemble_preds_all,
+            'Ensemble_RF_XGB': ensemble_preds_rf_xgb,
+            'Ensemble_RF_AVG': ensemble_preds_rf_avg,
+            'Ensemble_XGB_AVG': ensemble_preds_xgb_avg
             }
     results = {}
     for model, preds in prediction_sets.items():
@@ -163,7 +171,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     MODELS_FILE = MODEL_DIR + '/models-' + MAE + '.pkl'
     print("[INFO] Saving the models to file:", MODELS_FILE)
     with bz2.BZ2File(MODELS_FILE, 'wb') as f:
-        cPickle.dump([rfr, xgb_model, best_model], f)
+        cPickle.dump([rfr, xgb_model, best_model, mov_avg_col], f)
     
     # Finished
     print("[INFO] Successfully trained the models for", COIN)

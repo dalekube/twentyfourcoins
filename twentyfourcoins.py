@@ -131,6 +131,7 @@ def price_prediction():
         preds_time = list(preds['time'].values())
         preds_values = list(preds['pred'].values())
         
+        # Define the chart figure
         fig = figure(x_axis_type='datetime')
         fig.add_layout(Legend(location=(50, 0), orientation="horizontal"), "above")
         fig.line(actuals_time, actuals_values, color='#4488EE', line_width=2, legend_label='Actuals')
@@ -141,7 +142,6 @@ def price_prediction():
         fig.toolbar_location = None
         fig.background_fill_color = None
         fig.border_fill_color = None
-        #fig.legend.location = "top_left"
         fig.legend.background_fill_color = None
         fig.legend.padding = 0
         fig.legend.margin = 0

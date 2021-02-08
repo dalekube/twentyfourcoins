@@ -49,7 +49,6 @@ for COIN in config['SUPPORTED_COINS'].values():
     NUM_MOV_AVG = int(config['NUM_MOV_AVG'])
     for i in range(10, NUM_MOV_AVG, 10):
         df['MA_close_'+str(i)] = df['close'].rolling(window=i, min_periods=1, center=False).mean()
-        df['MA_volume_'+str(i)] = df['volume'].rolling(window=i, min_periods=1, center=False).mean()
     
     # Drop rows with na values and convert to float32
     df.fillna(0, inplace=True)
@@ -71,7 +70,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     MODELS_FILE = best_model[0] 
     print("[INFO] Loading the model", MODELS_FILE)
     with bz2.BZ2File(MODELS_FILE, 'rb') as f:
-        rfr, xgb_model, best_model = cPickle.load(f)
+        rfr, xgb_model, best_model, mov_avg_col = cPickle.load(f)
     
     # Make prediction with the latest observation closest to NOW()
     df['time'] = df['time'].astype(int)
@@ -92,20 +91,41 @@ for COIN in config['SUPPORTED_COINS'].values():
     dPredict = xgb.DMatrix(df_predict[xgb_model.feature_names])
     xgb_pred = xgb_model.predict(dPredict)
     
+    # Moving average prediction
+    avg_pred = df_predict[mov_avg_col]
+    
     # Use the predictions associated with the best model
-    assert best_model in ['RangerForestRegressor','XGBoost','Ensemble']
+    assert best_model in ['RangerForestRegressor','XGBoost','MovingAverage',
+                          'Ensemble_All','Ensemble_RF_XGB','Ensemble_RF_AVG',
+                          'Ensemble_XGB_AVG']
     print('[INFO] Making predictions with the best model:', best_model)
-    if best_model == 'Ensemble':
+    if best_model == 'RangerForestRegressor':
+        
+        prediction = rf_pred[0]
+        
+    elif best_model == 'XGBoost':
+        
+        prediction = xgb_pred[0]
+    
+    elif best_model == 'MovingAverage':
+        
+        prediction = float(avg_pred)
+    
+    elif best_model == 'Ensemble_All':
+            
+        prediction = float((rf_pred+xgb_pred+avg_pred)/2.0)
+    
+    elif best_model == 'Ensemble_RF_XGB':
         
         prediction = float((rf_pred+xgb_pred)/2.0)
         
-    elif best_model == 'RangerForestRegressor':
+    elif best_model == 'Ensemble_RF_AVG':
         
-        prediction = rf_pred[0]
-    
-    else:
+        prediction = float((rf_pred+avg_pred)/2.0)
         
-        prediction = xgb_pred[0]
+    elif best_model == 'Ensemble_XGB_AVG':
+        
+        prediction = float((xgb_pred+avg_pred)/2.0)
     
     # Log the latest actual price and corresponding prediction details
     actual_close = round(actual_close,8)
@@ -122,9 +142,9 @@ for COIN in config['SUPPORTED_COINS'].values():
     con.commit()
     
     print('[INFO] Making forward-looking prediction from', actual_time_str)
-    print('[INFO] Latest actual price =', str(actual_close))
+    print('[INFO] Latest actual price =', '{:,}'.format(actual_close))
     print('[INFO] Prediction time =', predict_time_str)  
-    print('[INFO] Predicted price =', str(prediction))
+    print('[INFO] Predicted price =', '{:,}'.format(prediction))
     print('[INFO] The price is expected to change by', str(expected_change), 'dollars in the next 24 hours')
     
     # Query the database for the logged performance statistics
