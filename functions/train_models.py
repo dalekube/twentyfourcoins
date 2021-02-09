@@ -91,7 +91,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     # Train the random forest model
     print("[INFO] Training the RangerForestRegressor model")
-    rfr = RangerForestRegressor(n_estimators=131, oob_error=False, sample_fraction=[0.25], min_node_size=1)
+    rfr = RangerForestRegressor(n_estimators=71, oob_error=False, sample_fraction=[0.25])
     rfr.fit(x_train, y_train)
     
     # Estimate the performance upon the test data

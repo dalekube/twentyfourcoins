@@ -67,7 +67,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     assert len(best_model) == 1, '[ERROR] Unable to identify a pickle file with the lowest error for ' + COIN
     
     MODELS_FILE = best_model[0] 
-    print("[INFO] Loading the model", MODELS_FILE)
+    print("[INFO] Loading the model objects:", MODELS_FILE)
     with bz2.BZ2File(MODELS_FILE, 'rb') as f:
         rfr, best_model, mov_avg_col = cPickle.load(f)
     
