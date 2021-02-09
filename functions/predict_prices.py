@@ -15,7 +15,6 @@ import pandas as pd
 from datetime import datetime
 import bz2
 import _pickle as cPickle
-import xgboost as xgb
 
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
@@ -70,7 +69,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     MODELS_FILE = best_model[0] 
     print("[INFO] Loading the model", MODELS_FILE)
     with bz2.BZ2File(MODELS_FILE, 'rb') as f:
-        rfr, xgb_model, best_model, mov_avg_col = cPickle.load(f)
+        rfr, best_model, mov_avg_col = cPickle.load(f)
     
     # Make prediction with the latest observation closest to NOW()
     df['time'] = df['time'].astype(int)
@@ -87,45 +86,23 @@ for COIN in config['SUPPORTED_COINS'].values():
     # Random forest prediction
     rf_pred = rfr.predict(df_predict)
     
-    # XGBoost prediction
-    dPredict = xgb.DMatrix(df_predict[xgb_model.feature_names])
-    xgb_pred = xgb_model.predict(dPredict)
-    
     # Moving average prediction
     avg_pred = df_predict[mov_avg_col]
     
     # Use the predictions associated with the best model
-    assert best_model in ['RangerForestRegressor','XGBoost','MovingAverage',
-                          'Ensemble_All','Ensemble_RF_XGB','Ensemble_RF_AVG',
-                          'Ensemble_XGB_AVG']
+    assert best_model in ['RangerForestRegressor', 'MovingAverage', 'Ensemble_RF_AVG']
     print('[INFO] Making predictions with the best model:', best_model)
     if best_model == 'RangerForestRegressor':
         
         prediction = rf_pred[0]
-        
-    elif best_model == 'XGBoost':
-        
-        prediction = xgb_pred[0]
     
     elif best_model == 'MovingAverage':
         
         prediction = float(avg_pred)
-    
-    elif best_model == 'Ensemble_All':
-            
-        prediction = float((rf_pred+xgb_pred+avg_pred)/2.0)
-    
-    elif best_model == 'Ensemble_RF_XGB':
-        
-        prediction = float((rf_pred+xgb_pred)/2.0)
         
     elif best_model == 'Ensemble_RF_AVG':
         
         prediction = float((rf_pred+avg_pred)/2.0)
-        
-    elif best_model == 'Ensemble_XGB_AVG':
-        
-        prediction = float((xgb_pred+avg_pred)/2.0)
     
     # Log the latest actual price and corresponding prediction details
     actual_close = round(actual_close,8)

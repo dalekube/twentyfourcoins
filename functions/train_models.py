@@ -13,7 +13,6 @@ import numpy as np
 import glob
 import random
 
-import xgboost as xgb
 from skranger.ensemble import RangerForestRegressor
 import bz2
 import _pickle as cPickle
@@ -67,8 +66,8 @@ for COIN in config['SUPPORTED_COINS'].values():
     # Split the training and testing data
     # Use a combinatorial approach, with samples from recent days and random days across history
     price_24 = df.pop('PRICE_24')
-    N_TEST_RECENT = 2000
-    N_TEST_RANDOM = 2000
+    N_TEST_RECENT = 3000
+    N_TEST_RANDOM = 3000
     N_DF = len(df)
     print("[INFO] Defining the train/test split")
     
@@ -92,44 +91,29 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     # Train the random forest model
     print("[INFO] Training the RangerForestRegressor model")
-    rfr = RangerForestRegressor(n_estimators=101, oob_error=False, sample_fraction=[0.25])
+    rfr = RangerForestRegressor(n_estimators=131, oob_error=False, sample_fraction=[0.25], min_node_size=1)
     rfr.fit(x_train, y_train)
     
     # Estimate the performance upon the test data
     rf_preds = rfr.predict(x_test)
-        
-    # Train the xgboost model
-    print("[INFO] Training the XGBoost model")
-    dtrain = xgb.DMatrix(x_train, y_train)
-    dtest = xgb.DMatrix(x_test, y_test)
-    
-    evallist = [(dtrain, 'train'), (dtest, 'val')]
-    param = {'max_depth': 2, 'eta': 0.1, 'objective': 'reg:squarederror', 
-             'eval_metric': 'mae', 'subsample':0.2, 'colsample_bytree':0.8}
-    
-    xgb_model = xgb.train(param, dtrain, num_boost_round=500, evals=evallist, 
-                          early_stopping_rounds=3, maximize=False)
-    
-    xgb_preds = xgb_model.predict(dtest)
     
     # Use the simple moving average as an option
-    mov_avg_col = 'MA_close_100'
+    # Evaluate multiple moving averages to find the best performing range
+    avgs_range = range(10, NUM_MOV_AVG, 10)
+    avgs_mae = [np.mean(abs(x_test['MA_close_'+str(g)] - y_test)) for g in avgs_range]
+    best_mov_avg = avgs_range[avgs_mae.index(min(avgs_mae))]
+    mov_avg_col = 'MA_close_'+str(best_mov_avg)
+    print('[INFO] Using', mov_avg_col, 'as the best moving average')
     mov_avg = x_test[mov_avg_col]
     
     # Evaluate all models and ensembles to achieve optimal performance
     # Ensemble the predictions from both models
-    ensemble_preds_all = (rf_preds+xgb_preds+mov_avg)/2.0
-    ensemble_preds_rf_xgb = (rf_preds+xgb_preds)/2.0
+    ensemble_preds_all = (rf_preds+mov_avg)/2.0
     ensemble_preds_rf_avg = (rf_preds+mov_avg)/2.0
-    ensemble_preds_xgb_avg = (xgb_preds+mov_avg)/2.0
     prediction_sets = {
             'RangerForestRegressor': rf_preds,
-            'XGBoost': xgb_preds,
             'MovingAverage':mov_avg,
-            'Ensemble_All': ensemble_preds_all,
-            'Ensemble_RF_XGB': ensemble_preds_rf_xgb,
             'Ensemble_RF_AVG': ensemble_preds_rf_avg,
-            'Ensemble_XGB_AVG': ensemble_preds_xgb_avg
             }
     results = {}
     for model, preds in prediction_sets.items():
@@ -167,11 +151,11 @@ for COIN in config['SUPPORTED_COINS'].values():
     for f in glob.glob(MODEL_DIR + '/models*.pkl'):
         os.remove(f)
     
-    # Save both models
+    # Save the model objects
     MODELS_FILE = MODEL_DIR + '/models-' + MAE + '.pkl'
     print("[INFO] Saving the models to file:", MODELS_FILE)
     with bz2.BZ2File(MODELS_FILE, 'wb') as f:
-        cPickle.dump([rfr, xgb_model, best_model, mov_avg_col], f)
+        cPickle.dump([rfr, best_model, mov_avg_col], f)
     
     # Finished
     print("[INFO] Successfully trained the models for", COIN)
