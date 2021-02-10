@@ -72,6 +72,7 @@ function pricePrediction(coin, userclick){
         $("#stats_mape").html(JSON.parse(JSON.stringify(stats.stats_mape)));
         
         $("#mainChart").html(Bokeh.embed.embed_item(charts));
+        $("#pricePredictionBox").show();
             
           } // end of success
           
