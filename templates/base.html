@@ -1,21 +1,14 @@
 <!DOCTYPE html>
-{% set navigation_bar = [
-    ('/', 'index', 'Home'),
-    ('/about', 'about', 'About')
-] -%}
-{% set active_page = active_page|default('index') -%}
 <head>
   {{ fontawesome_html() }}
   <title>TwentyFourCoins</title>
   <!-- Generated with https://gauger.io/fonticon/ -->
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <script type=text/javascript src="{{ url_for('static', filename='jquery-3.5.1.min.js') }}"></script>
   <script src="{{ url_for('static', filename='main.js') }}"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-  <script data-ad-client="ca-pub-6598494579544515" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.2.3.min.js" crossorigin="anonymous"></script>
+  <script type=text/javascript src="{{ url_for('static', filename='bokeh-2.2.3.min.js') }}"></script>
   
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4MW95L9F9S"></script>
@@ -42,35 +35,8 @@
         <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="twentyfourcoins" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy the project a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" style="height:10px !important;"></script>
     </div>
   </div>
-  <div style="display:flex;align-items:top;">
-    <div id="sidepanel" class="sidepanel">
-      <div>
-        Navigation:
-        {% for href, id, caption in navigation_bar %}
-          <div>
-            <a {% if id == active_page %} class="activeLink" {% endif %} href="{{ href|e }}">{{ caption|e }}</a>
-          </div>
-        {% endfor %}
-      </div>
-      <br>
-      <div>
-        Share:
-        <div>
-          <a class="socialLink" title="Share on Twitter" href="https://twitter.com/intent/tweet?text=AI-powered cryptocurrency price forecasts!%0D%0A&url=https://TwentyFourCoins.com%0D%0A%0D%0A&hashtags=bitcoin,litecoin,bitcoincash,ethereum,basicattentiontoken" target="_blank">
-            <img alt="Share on Twitter" class="socialIcon" src='Twitter.svg'>
-          </a>
-          <a class="socialLink" href="https://www.facebook.com/sharer/sharer.php?u=https://TwentyFourCoins.com&quote=AI-powered cryptocurrency price forecasts!%0D%0A" title="Share on Facebook" target="_blank">
-            <img alt="Share on Facebook" class="socialIcon" src="Facebook.svg" />
-          </a>
-          <a class="socialLink" href="http://www.linkedin.com/shareArticle?mini=true&url=https://TwentyFourCoins.com" target="_blank" title="Share on LinkedIn">
-            <img alt="Share on LinkedIn" class="socialIcon" src="LinkedIn.svg" />
-            </a>
-        </div>
-      </div>
-    </div>
-    <div style="padding:15px;">
-      {% block content %}{% endblock %}
-    </div>
+  <div style="padding:30px 0 0 30px;float:left;">
+    {% block content %}{% endblock %}
   </div>
 </body>
 </html>

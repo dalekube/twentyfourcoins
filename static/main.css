@@ -25,20 +25,6 @@
   text-decoration:none !important;
 }
 
-.activeLink {
-  text-decoration:underline;
-}
-
-.sidepanel {
-  width:150px;
-  white-space:nowrap;
-  padding:15px;
-  background: var(--tertiary_color);
-  border-right: thin solid var(--secondary_color);
-  height: 100vh;
-  text-align:center;
-}
-
 .socialIcon {
   width:30px;
 }
@@ -63,7 +49,6 @@
   flex-direction:column;
   box-shadow: 2px 2px darkgrey;
   color:white;
-  height:100%;
 }
 
 i {
@@ -71,19 +56,9 @@ i {
   font-size:30px;
 }
 
-.block {
-  background: var(--primary_color);
-  padding:20px;
-  margin:15px;
-  border-radius:5px;
-  font-size:18px;
+.tfcContainer {
+  margin:10px;
   color:white;
-  box-shadow: 2px 2px darkgrey;
-}
-
-.container {
-  margin:15px;
-  color:black;
 }
 
 .predictionBox {
@@ -95,6 +70,7 @@ i {
   border:thin solid darkgrey;
   font-size:18px;
   box-shadow: 2px 2px darkgrey;
+  width:500px;
 }
 
 .coinTitle {
@@ -120,10 +96,23 @@ button:active {
   box-shadow: 0 3px var(--secondary_color);
   height:60px;
   margin-top:10px;
+  color:black;
 }
 
 .coinButton:active {
   transform: translateY(2px);
+}
+
+.navButton {
+  display:inline-flex;
+  align-items:center;
+  background:none;
+  border:thin solid black !important;
+  padding:10px;
+}
+
+.navLink {
+  text-decoration:none !important;
 }
 
 .fa-caret-up {
