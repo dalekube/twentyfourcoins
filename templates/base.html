@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <script type=text/javascript src="{{ url_for('static', filename='jquery-3.5.1.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='main.js') }}"></script>
   <script type=text/javascript src="{{ url_for('static', filename='bokeh-2.2.3.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
   
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4MW95L9F9S"></script>
@@ -35,7 +35,7 @@
         <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="twentyfourcoins" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy the project a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" style="height:10px !important;"></script>
     </div>
   </div>
-  <div style="padding:30px 0 0 30px;float:left;">
+  <div style="padding:30px;float:left;">
     {% block content %}{% endblock %}
   </div>
 </body>

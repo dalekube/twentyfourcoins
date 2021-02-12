@@ -1,10 +1,6 @@
 
 // main JavaScript file for the web platform
 
-$(document).on("click","#modelDetailsButton",function(){
-  $("#modelDetailsCaret").toggleClass("rotate");
-});
-
 function pricePrediction(coin, userclick){
     
     var coin_split = coin.value.split(":");
@@ -80,7 +76,7 @@ function pricePrediction(coin, userclick){
     
 }
 
-// Load an initial free coin
+// Load an initial coin
 $(window).on('load', function(){
   pricePrediction({value:"Basic Attention Token:BAT-USDC"}, 'N');
 });
