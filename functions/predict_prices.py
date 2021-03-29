@@ -10,7 +10,6 @@ import os
 import re
 import json
 import glob
-import numpy as np
 import pandas as pd
 from datetime import datetime
 import bz2
@@ -19,6 +18,7 @@ import _pickle as cPickle
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
+from training_data import training_data
 from db_connect import db_connect
 con = db_connect('../data/db.sqlite')
 
@@ -35,23 +35,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     # Load the data for the coin
     # Print the row count when finished
     print('[INFO] Starting the iteration for', COIN)
-    statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
-    df = pd.read_sql(statement, con)
-    del df['coin']
-    
-    N_DF = len(df)
-    assert N_DF > 0, "[ERROR] Zero rows in the collected data for " + COIN
-    print("[INFO] Successfully read", '{:,}'.format(N_DF), "rows from the database")
-    
-    # Calculate rolling average features
-    df.sort_values(by=['time'], inplace=True)
-    NUM_MOV_AVG = int(config['NUM_MOV_AVG'])
-    for i in range(10, NUM_MOV_AVG, 10):
-        df['MA_close_'+str(i)] = df['close'].rolling(window=i, min_periods=1, center=False).mean()
-    
-    # Drop rows with na values and convert to float32
-    df.fillna(0, inplace=True)
-    df = df.astype(np.float32)
+    df = training_data(con, config, COIN, inference=True)
     
     # Load the best model
     MODEL_DIR = '../models/' + COIN + '/'
@@ -72,16 +56,11 @@ for COIN in config['SUPPORTED_COINS'].values():
         rfr, best_model, mov_avg_col = cPickle.load(f)
     
     # Make prediction with the latest observation closest to NOW()
-    df['time'] = df['time'].astype(int)
-    df.sort_values(by=['time'], inplace=True)
     df_predict = df.tail(1)
-    
-    actual_time = int(df_predict['time'])
-    actual_time_str = datetime.utcfromtimestamp(actual_time).strftime("%Y-%m-%d %H:%M:%S")
-    actual_close = float(df_predict['close'])
-    
-    predict_time = int(df_predict['time']) + 86400    
-    predict_time_str = datetime.utcfromtimestamp(predict_time).strftime("%Y-%m-%d %H:%M:%S")
+    actual_time = str(df_predict['time'].iloc[0])
+    actual_close = float(df_predict['close'].iloc[0])
+    predict_time = str(df_predict['time'].iloc[0] + pd.DateOffset(1))
+    del df_predict['time']
     
     # Random forest prediction
     rf_pred = rfr.predict(df_predict)
@@ -113,38 +92,42 @@ for COIN in config['SUPPORTED_COINS'].values():
     change_direction = 'up' if expected_change > 0 else 'down'
     
     cursor = con.cursor()
-    statement = 'INSERT INTO predictions VALUES ("%s", "%s", %s, "%s", %s)' % (COIN, actual_time, actual_close, predict_time, prediction)
+    statement = 'INSERT INTO predictions \
+    VALUES ("%s", "%s", %s, "%s", %s)' % (COIN, actual_time, actual_close, predict_time, prediction)
     cursor.execute(statement)    
     cursor.close()
     con.commit()
     
-    print('[INFO] Making forward-looking prediction from', actual_time_str)
+    print('[INFO] Making forward-looking prediction from', actual_time)
     print('[INFO] Latest actual price =', '{:,}'.format(actual_close))
-    print('[INFO] Prediction time =', predict_time_str)  
+    print('[INFO] Prediction time =', predict_time)  
     print('[INFO] Predicted price =', '{:,}'.format(prediction))
     print('[INFO] The price is expected to change by', str(expected_change), 'dollars in the next 24 hours')
     
     # Query the database for the logged performance statistics
-    statement = 'SELECT * FROM logs WHERE ACTIVITY="M01" AND VALUE1=%s AND META1="%s"' % (model_min_error, COIN)
+    statement = 'SELECT * FROM logs \
+    WHERE ACTIVITY="M01" AND VALUE1=%s AND META1="%s"' % (model_min_error, COIN)
     model_stats = pd.read_sql(statement, con)
     
     assert len(model_stats) > 0, '[ERROR] Did not identify any statistics in the logs'
+    model_stats['UTC_TIME'] = pd.to_datetime(model_stats['UTC_TIME'])
     model_stats = model_stats.sort_values(by=['UTC_TIME'], ascending=False)
-    model_stats = model_stats.iloc[0,:]
-    training_time = str(datetime.utcfromtimestamp(model_stats['UTC_TIME']))
+    model_stats = model_stats.head(1) 
+    training_time = str(model_stats['UTC_TIME'].iloc[0])
+    MAPE = model_stats['VALUE2'].iloc[0]
     
     # Print the performance statistics
     print('[INFO] Model statistics for', COIN)
     print('[INFO] Model trained at', training_time)
     print('[INFO] Mean Absolute Error (MAE) =', '${:,.4f}'.format(model_min_error))
-    print('[INFO] Mean Absolute Percentage Error (MAPE) =', '{:.2%}'.format(model_stats['VALUE2']))
+    print('[INFO] Mean Absolute Percentage Error (MAPE) =', '{:.2%}'.format(MAPE))
     print('[INFO] Finished with the forecast for', COIN)
     
     # Overwrite the JSON file with the latest details
     JSON_DUMP = MODEL_DIR + 'latest.json'
     with open(JSON_DUMP, 'w') as f:
         json.dump({
-            'actual_time':actual_time_str,
+            'actual_time':actual_time,
             'actual_close':'$ {:,.4f}'.format(actual_close),
             'prediction':'$ {:,.4f}'.format(prediction),
             'expected_change':'$ {:,.4f}'.format(expected_change),
@@ -152,7 +135,7 @@ for COIN in config['SUPPORTED_COINS'].values():
             'change_direction': change_direction,
             'stats_training_time': training_time,
             'stats_mae': '$ {:,.4f}'.format(model_min_error),
-            'stats_mape': '{:.2%}'.format(model_stats['VALUE2'])
+            'stats_mape': '{:.2%}'.format(MAPE)
             }, f)
     
     # Collect predictions for the predictive performance chart
@@ -162,7 +145,6 @@ for COIN in config['SUPPORTED_COINS'].values():
     statement = 'SELECT PREDICTION_TIME, PREDICTION FROM predictions WHERE COIN = "%s"' % COIN
     df_preds = pd.read_sql(statement, con)
     df_preds.columns = ['time','pred']
-    df_preds['time'] = df_preds.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
     df_preds['time'] = pd.to_datetime(df_preds['time'])
     df_preds['time'] = df_preds['time']
     df_preds = df_preds[df_preds['time'] > YEAR_DT]
@@ -171,12 +153,15 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     statement = 'SELECT time, close FROM prices WHERE coin="%s"' % COIN
     df_actuals = pd.read_sql(statement, con)
-    df_actuals['time'] = df_actuals.apply(lambda row: datetime.utcfromtimestamp(row['time']), axis=1)
     df_actuals['time'] = pd.to_datetime(df_actuals['time'])
     df_actuals = df_actuals[df_actuals['time'] > YEAR_DT]
     df_actuals = df_actuals[df_actuals['time'] >= min(df_preds['time'])]
     df_actuals = df_actuals.sort_values(by=['time'])
     print('[INFO] Collected', '{:,}'.format(len(df_actuals)), 'actual prices for the charts')
+    
+    # Timestamps are not JSON serializable
+    df_preds['time'] = str(df_preds['time'])
+    df_actuals['time'] = str(df_actuals['time'])
     
     # Overwrite the JSON file with the latest details
     JSON_DUMP = MODEL_DIR + 'charts.json'

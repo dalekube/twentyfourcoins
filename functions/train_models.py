@@ -17,12 +17,10 @@ from skranger.ensemble import RangerForestRegressor
 import bz2
 import _pickle as cPickle
 
-from features.stock_spy import features_stock_spy
-
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
-# Create a database connection
+from training_data import training_data
 from db_connect import db_connect
 con = db_connect('../data/db.sqlite')
 
@@ -36,44 +34,8 @@ for COIN in config['SUPPORTED_COINS'].values():
     ## DEVELOPMENT ONLY
     ## COIN = 'BAT-USDC'
     
-    print('[INFO] Staring the iteration for', COIN)
-    
-    # Load the data for the coin
-    # Print the row count when finished
-    statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
-    df = pd.read_sql(statement, con)
-    df['time'] = pd.to_datetime(df['time'])
-    del df['coin']
-    
-    N_DF = len(df)
-    assert N_DF > 0, '[ERROR] Zero rows in the collected data for ' + COIN
-    print("[INFO] Successfully read", '{:,}'.format(N_DF), "rows from the database")
-    
-    # Add stock market features
-    prices_spy = features_stock_spy(con)
-    prices_spy.rename(columns={'time':'time_merge'}, inplace=True)
-    df['time_merge'] = df['time'].dt.strftime('%Y-%m-%d')
-    df['time_merge'] = pd.to_datetime(df['time_merge'])
-    df = df.merge(prices_spy, on=['time_merge'], how='left')
-    
-    del df['time_merge'], df['stock_spy_time']
-    
-    # Calculate rolling average features
-    df.sort_values(by=['time'], inplace=True)
-    NUM_MOV_AVG = int(config['NUM_MOV_AVG'])
-    for i in range(10, NUM_MOV_AVG, 10):
-        df['MA_close_'+str(i)] = df['close'].rolling(window=i, min_periods=1, center=False).mean()
-    
-    # Drop rows with na values and convert to float32
-    df.fillna(0, inplace=True)
-    
-    # Sort and calculate the 24 hours forward closing price (288 time periods of five minutes)
-    # 86400/300 = 288
-    # Remove observations without a 24-hour price target
-    df.sort_values(by=['time'], inplace=True, ascending=False)
-    df['PRICE_24'] = df['close'].shift(288)
-    df = df[~pd.isnull(df['PRICE_24'])]
-    del df['time']
+    print('[INFO] Starting the iteration for', COIN)
+    df = training_data(con, config, COIN)
     
     # Split the training and testing data
     # Use a combinatorial approach, with samples from recent days and random days across history
@@ -91,6 +53,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     y_test_recent = price_24[:N_TEST_RECENT] 
     
     # Random sample from the rest of the training data
+    random.seed(1000)
     idx = random.sample(range(0,len(x_train)), N_TEST_RANDOM)
     x_test_random = x_train.iloc[idx,:]
     y_test_random = y_train.iloc[idx]
@@ -111,7 +74,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     # Use the simple moving average as an option
     # Evaluate multiple moving averages to find the best performing range
-    avgs_range = range(10, NUM_MOV_AVG, 10)
+    avgs_range = range(10, int(config['NUM_MOV_AVG']), 10)
     avgs_mae = [np.mean(abs(x_test['MA_close_'+str(g)] - y_test)) for g in avgs_range]
     best_mov_avg = avgs_range[avgs_mae.index(min(avgs_mae))]
     mov_avg_col = 'MA_close_'+str(best_mov_avg)
@@ -148,7 +111,9 @@ for COIN in config['SUPPORTED_COINS'].values():
     # Log the model performance (M01)
     print('[INFO] Logging the model performance to the database')
     cursor = con.cursor()
-    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "M01", %s, %s, NULL, "%s", NULL)' % (MAE, MAPE, COIN)
+    statement = 'INSERT INTO logs \
+    VALUES (strftime("%%Y-%%m-%%d %%H:%%M:%%S", datetime("now")), \
+    "M01", %s, %s, NULL, "%s", NULL)' % (MAE, MAPE, COIN)
     cursor.execute(statement)    
     cursor.close()
     con.commit()

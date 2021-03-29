@@ -12,6 +12,15 @@ DEPENDENCY: runs from within the train_models.py code.
 
 import yfinance as yf
 import pandas as pd
+from datetime import datetime as dt
+
+def reshape_stock_spy(df):
+    df = df.reset_index()
+    df = df[['Date','Open','Close']]
+    df['stock_time'] = pd.to_datetime(df['Date'])
+    df = df[['stock_time','Open','Close']]
+    df.columns = ['stock_spy_time','stock_spy_open','stock_spy_close']
+    return df
 
 def features_stock_spy(con):
     
@@ -29,11 +38,7 @@ def features_stock_spy(con):
     if len(table_check) == 0:
         
         prices = yf.download('SPY', period='max', interval='1d')
-        prices = prices.reset_index()
-        prices = prices[['Date','Open','Close']]
-        prices['stock_time'] = pd.to_datetime(prices['Date'])
-        prices = prices[['stock_time','Open','Close']]
-        prices.columns = ['stock_spy_time','stock_spy_open','stock_spy_close']
+        prices = reshape_stock_spy(prices)
         
         statement = 'SELECT time FROM prices'
         crypto_times = pd.read_sql(statement, con)
@@ -53,22 +58,24 @@ def features_stock_spy(con):
         
         statement = 'SELECT MAX(stock_spy_time) AS MAX_TIME FROM %s' % TABLE_NAME
         max_date = pd.read_sql(statement, con)['MAX_TIME'].iloc[0]
-        max_date = pd.to_datetime(max_date)      
-        
+        max_date = pd.to_datetime(max_date)
         max_date_plus1 = max_date + pd.DateOffset(1)
-        prices = yf.download('SPY', start=max_date_plus1, interval='1d')
-        prices = prices.reset_index()
-        prices = prices[prices['Date'] > max_date]
         
-        if len(prices) > 0:
-            prices.to_sql(TABLE_NAME, con, if_exists='append', index=False)
+        if max_date_plus1 < dt.utcnow():
+        
+            prices = yf.download('SPY', start=max_date_plus1, interval='1d')
+            prices = reshape_stock_spy(prices)
+            prices = prices[prices['stock_spy_time'] > max_date]
+            
+            if len(prices) > 0:
+                prices.to_sql(TABLE_NAME, con, if_exists='append', index=False)
     
     # Gather all of the stock prices
     statement = 'SELECT * FROM %s' % TABLE_NAME
     all_prices = pd.read_sql(statement, con)
     all_prices['stock_spy_time'] = pd.to_datetime(all_prices['stock_spy_time'])
     all_prices['time'] = pd.to_datetime(all_prices['time'])
-    con.close()
+    
     print('[INFO] Finished gathering stock market data for SPY')
     return all_prices
 
