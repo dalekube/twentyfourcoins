@@ -5,8 +5,7 @@
     "Basic Attention Token":"BAT-USDC",
     "Bitcoin":"BTC-USD",
     "Litecoin":"LTC-USD",
-    "Ethereum":"ETH-USD",
-    "Bitcoin Cash":"BCH-USD"
+    "Ethereum":"ETH-USD"
     },
   "PREMIUM_COINS":["ETH-USD","BCH-USD"],
   "MODEL_CORRELATIONS":{

@@ -32,7 +32,7 @@ cursor.execute(statement)
 statement = '\
 CREATE TABLE IF NOT EXISTS prices (\
 coin TEXT NOT NULL,\
-time INT NOT NULL,\
+time DATETIME NOT NULL,\
 low FLOAT NOT NULL,\
 high FLOAT NOT NULL,\
 open FLOAT NOT NULL,\
@@ -53,3 +53,13 @@ cursor.fetchall()
 # Close the cursor and connection
 cursor.close()
 con.close()
+
+statement = 'pragma table_info("prices")'
+statement = 'SELECT * FROM prices LIMIT 15'
+statement = 'UPDATE prices SET time = datetime(time, "unixepoch", "utc")'
+
+statement = 'DROP TABLE prices'
+cursor.execute(statement)
+cursor.fetchall()
+cursor.commit()
+con.commit()

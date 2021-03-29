@@ -17,6 +17,8 @@ from skranger.ensemble import RangerForestRegressor
 import bz2
 import _pickle as cPickle
 
+from features.stock_spy import features_stock_spy
+
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
@@ -40,11 +42,21 @@ for COIN in config['SUPPORTED_COINS'].values():
     # Print the row count when finished
     statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
     df = pd.read_sql(statement, con)
+    df['time'] = pd.to_datetime(df['time'])
     del df['coin']
     
     N_DF = len(df)
     assert N_DF > 0, '[ERROR] Zero rows in the collected data for ' + COIN
     print("[INFO] Successfully read", '{:,}'.format(N_DF), "rows from the database")
+    
+    # Add stock market features
+    prices_spy = features_stock_spy(con)
+    prices_spy.rename(columns={'time':'time_merge'}, inplace=True)
+    df['time_merge'] = df['time'].dt.strftime('%Y-%m-%d')
+    df['time_merge'] = pd.to_datetime(df['time_merge'])
+    df = df.merge(prices_spy, on=['time_merge'], how='left')
+    
+    del df['time_merge'], df['stock_spy_time']
     
     # Calculate rolling average features
     df.sort_values(by=['time'], inplace=True)
@@ -54,7 +66,6 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     # Drop rows with na values and convert to float32
     df.fillna(0, inplace=True)
-    df = df.astype(np.float32)
     
     # Sort and calculate the 24 hours forward closing price (288 time periods of five minutes)
     # 86400/300 = 288
@@ -62,6 +73,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     df.sort_values(by=['time'], inplace=True, ascending=False)
     df['PRICE_24'] = df['close'].shift(288)
     df = df[~pd.isnull(df['PRICE_24'])]
+    del df['time']
     
     # Split the training and testing data
     # Use a combinatorial approach, with samples from recent days and random days across history

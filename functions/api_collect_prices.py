@@ -24,14 +24,14 @@ public_client = cbpro.PublicClient()
 START_DT_UTC = '2019-01-01 00:00:00'
 NOW_DT_UTC = datetime.utcnow().strftime('%Y-%m-%d')
 
-# Connect to the COINbase API
-# API Docs: https://docs.pro.COINbase.com/
-# Manage API Keys and Secrets: https://pro.COINbase.com/profile/api
+# Connect to the Coinbase API
+# API Docs: https://docs.pro.coinbase.com/
+# Manage API Keys and Secrets: https://pro.coinbase.com/profile/api
 products = public_client.get_products()
 
 ## DEVELOPMENT ONLY
 ## import os
-## os.chdir('/home/dale/Downloads/GitHub/coinML/functions')
+## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
 # Consider all supported coins
 for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
@@ -51,6 +51,7 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
     con = db_connect('../data/db.sqlite')
     statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
     df = pd.read_sql(statement, con)
+    df['time'] = pd.to_datetime(df['time'])
     
     # Create a list of possible dates between the specific range
     datelist = pd.date_range(START_DT_UTC, NOW_DT_UTC).tolist()
@@ -59,7 +60,7 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
         
         # Data cleansing and validation
         # Purge data for dates with incomplete, excessive, or duplicate records
-        df['UTC_DAY'] = df.apply(lambda row: datetime.utcfromtimestamp(row['time']).strftime('%Y-%m-%d'), axis=1)
+        df['UTC_DAY'] = df['time'].dt.strftime('%Y-%m-%d')
         day_counts = df['UTC_DAY'].value_counts()
         day_counts = day_counts[(day_counts<200) | (day_counts > 300)]
         day_list = day_counts.index.values.tolist()
@@ -72,9 +73,13 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
         print('[INFO] Purging existing prices for', str(N_PURGE), 'days')
         
         # Delete the bad price records in the database
-        time_purge = df.loc[df['UTC_DAY'].isin(day_list),'time'].to_list()
+        # Concatenate timestamp strings
+        time_purge = df.loc[df['UTC_DAY'].isin(day_list)]['time'].astype(str).to_list()
         if len(time_purge) > 0:
-            time_purge = '({})'.format(','.join(str(time) for time in time_purge))
+            if len(time_purge) == 1:
+                time_purge = '(' + time_purge + ')'
+            else:
+                time_purge = tuple(time_purge)
             statement = 'DELETE FROM prices WHERE coin = "%s" AND time IN %s' % (COIN, time_purge)
             cursor = con.cursor()
             cursor.execute(statement)
@@ -88,7 +93,7 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
         exist_dates = set(df['UTC_DAY'])
         del df['UTC_DAY']
         datelist = [x for x in datelist if x not in exist_dates]
-
+    
     # Iterate over the dates to collect new candles using the Coinbase API
     # Iteratively save the data after 10 dates have passed
     try:
@@ -108,7 +113,12 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
             hist = pd.DataFrame(hist, columns=df.columns[1:])
             hist.insert(loc=0, column='coin', value=COIN)
             N_HIST = len(hist)
-            print('[INFO] Gathered', N_HIST, 'new price candles from the API for', d)
+            print('[INFO] Gathered', N_HIST, 'new price candles for', d)
+            
+            # Convert unix epoch time stamps to UTC datetime
+            hist['time'] = pd.to_datetime(hist['time'], unit='s', utc=True)
+            hist['time'] = hist['time'].dt.strftime('%Y-%m-%d %H:%M:%S')
+            hist['time'] = pd.to_datetime(hist['time'])
             
             # Monitor the API calls for empty responses
             # Stop if five consecutive empty responses are observed
@@ -125,7 +135,7 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
             if DATE_COUNTER % 10 == 0 or DATE_COUNTER == N_DATES:
                 
                 cmp_pct = '{:.1%}'.format(DATE_COUNTER/N_DATES)
-                print('[INFO]', cmp_pct, 'finished with the iterations')
+                print('[INFO]', cmp_pct, 'finished with the iterations for', COIN)
     
     except KeyboardInterrupt:
         
