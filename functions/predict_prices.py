@@ -11,7 +11,6 @@ import re
 import json
 import glob
 import pandas as pd
-from datetime import datetime
 import bz2
 import _pickle as cPickle
 
@@ -146,22 +145,25 @@ for COIN in config['SUPPORTED_COINS'].values():
     df_preds = pd.read_sql(statement, con)
     df_preds.columns = ['time','pred']
     df_preds['time'] = pd.to_datetime(df_preds['time'])
-    df_preds['time'] = df_preds['time']
     df_preds = df_preds[df_preds['time'] > YEAR_DT]
     df_preds = df_preds.sort_values(by=['time'])
+    assert len(df_preds) > 0, '[ERROR] Collected zero predicted prices'
     print('[INFO] Collected', '{:,}'.format(len(df_preds)), 'predicted prices for the charts')
     
     statement = 'SELECT time, close FROM prices WHERE coin="%s"' % COIN
     df_actuals = pd.read_sql(statement, con)
     df_actuals['time'] = pd.to_datetime(df_actuals['time'])
     df_actuals = df_actuals[df_actuals['time'] > YEAR_DT]
-    df_actuals = df_actuals[df_actuals['time'] >= min(df_preds['time'])]
+    df_actuals = df_actuals[df_actuals['time'] >= min(df_preds['time']) - pd.DateOffset(7)]
     df_actuals = df_actuals.sort_values(by=['time'])
+    assert len(df_actuals) > 0, '[ERROR] Collected zero actual prices'
     print('[INFO] Collected', '{:,}'.format(len(df_actuals)), 'actual prices for the charts')
     
     # Timestamps are not JSON serializable
-    df_preds['time'] = str(df_preds['time'])
-    df_actuals['time'] = str(df_actuals['time'])
+    df_preds['time'] = df_preds['time'].astype(str)
+    df_preds = df_preds.reset_index(drop=True)
+    df_actuals['time'] = df_actuals['time'].astype(str)
+    df_actuals = df_actuals.reset_index(drop=True)
     
     # Overwrite the JSON file with the latest details
     JSON_DUMP = MODEL_DIR + 'charts.json'

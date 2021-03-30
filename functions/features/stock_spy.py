@@ -37,7 +37,7 @@ def features_stock_spy(con):
     # Otherwise, append new daily prices upon the existing table
     if len(table_check) == 0:
         
-        prices = yf.download('SPY', period='max', interval='1d')
+        prices = yf.download('SPY', period='max', interval='1d', progress=False)
         prices = reshape_stock_spy(prices)
         
         statement = 'SELECT time FROM prices'
@@ -59,11 +59,11 @@ def features_stock_spy(con):
         statement = 'SELECT MAX(stock_spy_time) AS MAX_TIME FROM %s' % TABLE_NAME
         max_date = pd.read_sql(statement, con)['MAX_TIME'].iloc[0]
         max_date = pd.to_datetime(max_date)
-        max_date_plus1 = max_date + pd.DateOffset(1)
         
-        if max_date_plus1 < dt.utcnow():
-        
-            prices = yf.download('SPY', start=max_date_plus1, interval='1d')
+        if max_date < dt.utcnow():
+            max_date_plus1 = max_date + pd.DateOffset(1)
+            today = dt.utcnow().strftime("%Y-%m-%d")
+            prices = yf.download('SPY', start=max_date_plus1, end=today, interval='1d', progress=False)
             prices = reshape_stock_spy(prices)
             prices = prices[prices['stock_spy_time'] > max_date]
             

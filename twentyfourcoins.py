@@ -13,6 +13,7 @@ from flask_fontawesome import FontAwesome
 from bokeh.plotting import figure
 from bokeh.embed import json_item
 from bokeh.models import NumeralTickFormatter, Legend
+import pandas as pd
 
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/')
@@ -42,7 +43,9 @@ from functions.db_connect import db_connect
 def log_activity(activity, route, coin=None):
     cnx = db_connect('./data/db.sqlite')
     cursorx = cnx.cursor()
-    statement = 'INSERT INTO logs VALUES (strftime("%%s","now"), "%s", NULL, NULL, NULL, "%s", "%s")' % (activity, route, coin)
+    statement = 'INSERT INTO logs \
+    VALUES (strftime("%%Y-%%m-%%d %%H:%%M:%%S", datetime("now")), \
+    "%s", NULL, NULL, NULL, "%s", "%s")' % (activity, route, coin)
     cursorx.execute(statement)    
     cursorx.close()
     cnx.commit()
@@ -126,16 +129,20 @@ def price_prediction():
         actuals = json.loads(chart_data['actuals'])
         actuals_time = list(actuals['time'].values())
         actuals_values = list(actuals['close'].values())
+        df_actuals = pd.DataFrame({'time':actuals_time, 'values':actuals_values})
+        df_actuals['time'] = pd.to_datetime(df_actuals['time'])
         
         preds = json.loads(chart_data['predictions'])
         preds_time = list(preds['time'].values())
         preds_values = list(preds['pred'].values())
+        df_preds = pd.DataFrame({'time':preds_time, 'values':preds_values})
+        df_preds['time'] = pd.to_datetime(df_preds['time'])
         
         # Define the chart figure
         fig = figure(x_axis_type='datetime')
         fig.add_layout(Legend(location=(50, 0), orientation="horizontal"), "above")
-        fig.line(actuals_time, actuals_values, color='#4488EE', line_width=2, legend_label='Actuals')
-        fig.line(preds_time, preds_values, color='#FF5C39', line_width=2, legend_label='Predictions')
+        fig.line(df_actuals['time'], df_actuals['values'], color='#4488EE', line_width=2, legend_label='Actuals')
+        fig.line(df_preds['time'], df_preds['values'], color='#FF5C39', line_width=2, legend_label='Predictions')
         fig.width = 450
         fig.height = 300
         fig.toolbar.logo = None
