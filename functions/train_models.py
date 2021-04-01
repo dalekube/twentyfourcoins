@@ -14,6 +14,7 @@ import glob
 import random
 
 from skranger.ensemble import RangerForestRegressor
+from sklearn.linear_model import LinearRegression
 import bz2
 import _pickle as cPickle
 
@@ -64,12 +65,10 @@ for COIN in config['SUPPORTED_COINS'].values():
     x_train.drop(idx, inplace=True)
     y_train.drop(idx, inplace=True)
     
-    # Train the random forest model
+    # Train  and evaluate the random forest model
     print("[INFO] Training the RangerForestRegressor model")
     rfr = RangerForestRegressor(n_estimators=71, oob_error=False, sample_fraction=[0.25])
     rfr.fit(x_train, y_train)
-    
-    # Estimate the performance upon the test data
     rf_preds = rfr.predict(x_test)
     
     # Use the simple moving average as an option
@@ -81,14 +80,25 @@ for COIN in config['SUPPORTED_COINS'].values():
     print('[INFO] Using', mov_avg_col, 'as the best moving average')
     mov_avg = x_test[mov_avg_col]
     
+    # Linear regression fit
+    print("[INFO] Training the LinearRegression model")
+    lr = LinearRegression(normalize=True).fit(x_train, y_train)
+    lr_preds = lr.predict(x_test)
+    
     # Evaluate all models and ensembles to achieve optimal performance
     # Ensemble the predictions from both models
-    ensemble_preds_all = (rf_preds+mov_avg)/2.0
+    ensemble_preds_all = (rf_preds+mov_avg+lr_preds)/3.0
     ensemble_preds_rf_avg = (rf_preds+mov_avg)/2.0
+    ensemble_preds_rf_lr = (rf_preds+lr_preds)/2.0
+    ensemble_preds_avg_lr = (mov_avg+lr_preds)/2.0
     prediction_sets = {
             'RangerForestRegressor': rf_preds,
             'MovingAverage':mov_avg,
+            'LinearRegression':lr_preds,
+            'Ensemble_ALL':ensemble_preds_all,
             'Ensemble_RF_AVG': ensemble_preds_rf_avg,
+            'Ensemble_RF_LR': ensemble_preds_rf_lr,
+            'Ensemble_AVG_LR': ensemble_preds_avg_lr,
             }
     results = {}
     for model, preds in prediction_sets.items():
@@ -132,7 +142,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     MODELS_FILE = MODEL_DIR + '/models-' + MAE + '.pkl'
     print("[INFO] Saving the models to file:", MODELS_FILE)
     with bz2.BZ2File(MODELS_FILE, 'wb') as f:
-        cPickle.dump([rfr, best_model, mov_avg_col], f)
+        cPickle.dump([rfr, lr, best_model, mov_avg_col], f)
     
     # Finished
     print("[INFO] Successfully trained the models for", COIN)

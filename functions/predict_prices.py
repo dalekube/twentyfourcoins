@@ -52,7 +52,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     MODELS_FILE = best_model[0] 
     print("[INFO] Loading the model objects:", MODELS_FILE)
     with bz2.BZ2File(MODELS_FILE, 'rb') as f:
-        rfr, best_model, mov_avg_col = cPickle.load(f)
+        rfr, lr, best_model, mov_avg_col = cPickle.load(f)
     
     # Make prediction with the latest observation closest to NOW()
     df_predict = df.tail(1)
@@ -64,11 +64,15 @@ for COIN in config['SUPPORTED_COINS'].values():
     # Random forest prediction
     rf_pred = rfr.predict(df_predict)
     
+    # Linear regression prediction
+    lr_pred = lr.predict(df_predict)
+    
     # Moving average prediction
     avg_pred = df_predict[mov_avg_col]
     
     # Use the predictions associated with the best model
-    assert best_model in ['RangerForestRegressor', 'MovingAverage', 'Ensemble_RF_AVG']
+    assert best_model in ['RangerForestRegressor', 'MovingAverage', 'LinearRegression',
+                          'Ensemble_ALL', 'Ensemble_RF_AVG', 'Ensemble_RF_LR', 'Ensemble_AVG_LR']
     print('[INFO] Making predictions with the best model:', best_model)
     if best_model == 'RangerForestRegressor':
         
@@ -78,9 +82,25 @@ for COIN in config['SUPPORTED_COINS'].values():
         
         prediction = float(avg_pred)
         
+    elif best_model == 'LinearRegression':
+        
+        prediction = float(lr_pred)
+        
+    elif best_model == 'Ensemble_ALL':
+        
+        prediction = float((rf_pred+avg_pred+lr_pred)/3.0)
+        
     elif best_model == 'Ensemble_RF_AVG':
         
         prediction = float((rf_pred+avg_pred)/2.0)
+    
+    elif best_model == 'Ensemble_RF_LR':
+        
+        prediction = float((rf_pred+lr_pred)/2.0)
+        
+    elif best_model == 'Ensemble_AVG_LR':
+        
+        prediction = float((avg_pred+lr_pred)/2.0)
     
     # Log the latest actual price and corresponding prediction details
     actual_close = round(actual_close,8)
