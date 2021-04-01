@@ -1,88 +1,101 @@
 {% extends 'base.html' %}
 {% set active_page = "index" %}
 {% block content %}
-<div style="display:flex;align-items:top;float:left;">
-  <div>
-    <div class="coinBlock tfcContainer">
-      <a href='/about' style="color:white;text-decoration:underline;">What is TwentyFourCoins?</a>
+<meta http-equiv="Refresh" content="300">
+<div style="display:flex;flex-direction:column;align-items:center;">
+  <div style="display:flex;align-items:top;float:left;">
+    <div style="max-width:300px;">
+      <div class="coinBlock tfcContainer">
+        <a href='/about' style="color:white;text-decoration:underline;">What is TwentyFourCoins?</a>
+      </div>
+      <div class="coinBlock tfcContainer" id="predictPriceBlock">
+        <div style="color:white;">
+          Supported Coins
+          <br>
+          Predicted 24-Hour Price Change
+        </div>
+        {% for COIN_NAME, COIN in SUPPORTED_COINS %}
+            <button class="coinButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this, 'Y')">
+              {{COIN_NAME}}
+              <br>
+              {% if COIN_STATS[COIN]['change_direction'] == 'up' %} <i class='fas fa-caret-up'></i> {% else %} <i class='fas fa-caret-down'></i> {% endif %}
+              {{COIN_STATS[COIN]['expected_change_pct']}}
+            </button>
+        {% endfor %}
+      </div>
+      <br>
+      <div style="text-align:center;">
+        <h4>Share:</h4>
+        <div>
+          <a class="socialLink" title="Share on Twitter" href="https://twitter.com/intent/tweet?text=AI-powered cryptocurrency price forecasts!%0D%0A&url=https://TwentyFourCoins.com%0D%0A%0D%0A&hashtags=bitcoin,litecoin,bitcoincash,ethereum,basicattentiontoken" target="_blank">
+            <img alt="Share on Twitter" class="socialIcon" src='Twitter.svg'>
+          </a>
+          <a class="socialLink" href="https://www.facebook.com/sharer/sharer.php?u=https://TwentyFourCoins.com&quote=AI-powered cryptocurrency price forecasts!%0D%0A" title="Share on Facebook" target="_blank">
+            <img alt="Share on Facebook" class="socialIcon" src="Facebook.svg" />
+          </a>
+          <a class="socialLink" href="http://www.linkedin.com/shareArticle?mini=true&url=https://TwentyFourCoins.com" target="_blank" title="Share on LinkedIn">
+            <img alt="Share on LinkedIn" class="socialIcon" src="LinkedIn.svg" />
+          </a>
+        </div>
+      </div>
+      <br>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <i class="fas fa-sync"></i>
+        <span>The page will automatically refresh every five minutes to provide current prices and predictions.</span>
+      </div>
     </div>
-    <div class="coinBlock tfcContainer" id="predictPriceBlock">
-      <div style="color:white;">
-        Supported Coins
+    <div class="tfcContainer">
+      <!-- PREDICTION BOX -->
+      <div id="pricePredictionBox" class="predictionBox" style="display:none;">
+        <div id="predict_coin" class="coinTitle"></div>
         <br>
-        Predicted 24-Hour Price Change
-      </div>
-      {% for COIN_NAME, COIN in SUPPORTED_COINS %}
-          <button class="coinButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this, 'Y')">
-            {{COIN_NAME}}
-            <br>
-            {% if COIN_STATS[COIN]['change_direction'] == 'up' %} <i class='fas fa-caret-up'></i> {% else %} <i class='fas fa-caret-down'></i> {% endif %}
-            {{COIN_STATS[COIN]['expected_change_pct']}}
-          </button>
-      {% endfor %}
-    </div>
-    <br>
-    <div style="text-align:center;">
-      <h4>Share:</h4>
-      <div>
-        <a class="socialLink" title="Share on Twitter" href="https://twitter.com/intent/tweet?text=AI-powered cryptocurrency price forecasts!%0D%0A&url=https://TwentyFourCoins.com%0D%0A%0D%0A&hashtags=bitcoin,litecoin,bitcoincash,ethereum,basicattentiontoken" target="_blank">
-          <img alt="Share on Twitter" class="socialIcon" src='Twitter.svg'>
-        </a>
-        <a class="socialLink" href="https://www.facebook.com/sharer/sharer.php?u=https://TwentyFourCoins.com&quote=AI-powered cryptocurrency price forecasts!%0D%0A" title="Share on Facebook" target="_blank">
-          <img alt="Share on Facebook" class="socialIcon" src="Facebook.svg" />
-        </a>
-        <a class="socialLink" href="http://www.linkedin.com/shareArticle?mini=true&url=https://TwentyFourCoins.com" target="_blank" title="Share on LinkedIn">
-          <img alt="Share on LinkedIn" class="socialIcon" src="LinkedIn.svg" />
-        </a>
-      </div>
-    </div>
-  </div>
-  <div class="tfcContainer">
-    <!-- PREDICTION BOX -->
-    <div id="pricePredictionBox" class="predictionBox" style="display:none;">
-      <div id="predict_coin" class="coinTitle"></div>
-      <br>
-      <div>
-        <span>24-Hour Price Forecast:</span>
-        <span id="predict_prediction" class="predAttribute"></span>
-      </div>
-      <div>
-        <span>24-Hour Price Change:</span>
-        <span id="predict_change" class="predAttribute"></span>
-        <span id="predict_change_pct" class="predAttribute"></span>
-      </div>
-      <br>
-      <div>
-        <span>Latest Actual Price:</span>
-        <span id="actual_close" class="predAttribute"></span>
-      </div>
-      <div>
-        <span>Latest Actual Price Time:</span>
-        <span id="actual_time" class="predAttribute"></span>
-      </div>
-      <br>
-      <div id="mainChart"></div>
-      <br>
-      <div>Model Performance Metrics</div>
-      <div>
         <div>
-          <span>MAE:</span>
-          <span id="stats_mae" class="predAttribute"></span>
+          <span>24-Hour Price Forecast:</span>
+          <span id="predict_prediction" class="predAttribute"></span>
         </div>
         <div>
-          <span>MAPE:</span>
-          <span id="stats_mape" class="predAttribute"></span>
+          <span>24-Hour Price Change:</span>
+          <span id="predict_change" class="predAttribute"></span>
+          <span id="predict_change_pct" class="predAttribute"></span>
+        </div>
+        <br>
+        <div>
+          <span>Latest Actual Price:</span>
+          <span id="actual_close" class="predAttribute"></span>
         </div>
         <div>
-          <span>Training Time:</span>
-          <span id="stats_training_time" class="predAttribute"></span>
+          <span>Latest Actual Price Time:</span>
+          <span id="actual_time" class="predAttribute"></span>
+        </div>
+        <br>
+        <div id="mainChart"></div>
+        <br>
+        <div>Model Performance Metrics</div>
+        <div>
+          <div>
+            <span>MAE:</span>
+            <span id="stats_mae" class="predAttribute"></span>
+          </div>
+          <div>
+            <span>MAPE:</span>
+            <span id="stats_mape" class="predAttribute"></span>
+          </div>
+          <div>
+            <span>Training Time:</span>
+            <span id="stats_training_time" class="predAttribute"></span>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  <div style="display:flex;flex-direction:column;align-items:center;margin-top:50px;height:200px;">
+    <h4>TwentyFourCoins Uses State-of-the-Art Technology:</h4>
+    <div>
+      <img style="width:150px;" alt="AWS Logo" src="amazon-web-services-logo.png"/>
+      <img style="width:150px;" alt="TensorFlow Logo" src="tensorflow.png"/>
+    </div>
+  </div>
 </div>
-<div style="position:absolute;top:800px;height:300px;">
-  <h4>TwentyFourCoins Uses State-of-the-Art Technology:</h4>
-  <img style="background:black;padding:5px;border-radius:5px;width:150px;" alt="AWS Logo" src="amazon-web-services-logo.png"/>
-</div>
+
+
 {% endblock %}

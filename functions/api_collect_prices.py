@@ -77,7 +77,7 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
         time_purge = df.loc[df['UTC_DAY'].isin(day_list)]['time'].astype(str).to_list()
         if len(time_purge) > 0:
             if len(time_purge) == 1:
-                time_purge = '(' + time_purge + ')'
+                time_purge = "('" + str(time_purge[0]) + "')"
             else:
                 time_purge = tuple(time_purge)
             statement = 'DELETE FROM prices WHERE coin = "%s" AND time IN %s' % (COIN, time_purge)
