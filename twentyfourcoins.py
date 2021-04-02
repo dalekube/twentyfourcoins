@@ -13,6 +13,8 @@ from flask_fontawesome import FontAwesome
 from bokeh.plotting import figure
 from bokeh.embed import json_item
 from bokeh.models import NumeralTickFormatter, Legend
+
+from datetime import datetime
 import pandas as pd
 
 ## DEVELOPMENT ONLY
@@ -63,6 +65,8 @@ def index():
         with open(JSON_PATH) as f:
             COIN_STATS[COIN] = json.load(f)
     
+    UPDATE_TIME = datetime.now().astimezone().strftime('%Y-%m-%d %I:%M:%S %p %Z')
+    
     # Log the user activity
     # A01 = User visit
     log_activity("A01", "/")
@@ -71,7 +75,8 @@ def index():
             'index.html',
             SUPPORTED_COINS = SUPPORTED_COINS,
             COIN_STATS = COIN_STATS,
-            PREMIUM_COINS = config['PREMIUM_COINS']
+            PREMIUM_COINS = config['PREMIUM_COINS'],
+            UPDATE_TIME = UPDATE_TIME
             )
     
 # About

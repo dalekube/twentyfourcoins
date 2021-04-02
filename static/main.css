@@ -9,7 +9,8 @@
   display:flex;
   align-items:center;
   height:100px;
-  width:100%;
+  width:100vw;
+  max-width:100%;
   border-bottom: thin solid var(--secondary_color);
   color:white;
   background: var(--primary_color);
