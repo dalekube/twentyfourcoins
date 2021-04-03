@@ -4,7 +4,7 @@
 <meta http-equiv="Refresh" content="300">
 <div style="display:flex;flex-direction:column;align-items:center;">
   <div style="display:flex;align-items:top;float:left;">
-    <div style="max-width:300px;">
+    <div style="max-width:300px;margin-right:15px;">
       <div class="coinBlock tfcContainer">
         <a href='/about' style="color:white;text-decoration:underline;">What is TwentyFourCoins?</a>
       </div>
@@ -15,12 +15,21 @@
           Predicted 24-Hour Price Change
         </div>
         {% for COIN_NAME, COIN in SUPPORTED_COINS %}
-            <button class="coinButton" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this, 'Y')">
+          {% if COIN_STATS[COIN]['change_direction'] == 'up' %} 
+            <button class="coinButton buttonGreen" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this, 'Y')">
               {{COIN_NAME}}
               <br>
-              {% if COIN_STATS[COIN]['change_direction'] == 'up' %} <i class='fas fa-caret-up'></i> {% else %} <i class='fas fa-caret-down'></i> {% endif %}
+              <i class='fas fa-caret-up'></i> 
               {{COIN_STATS[COIN]['expected_change_pct']}}
             </button>
+            {% else %}
+              <button class="coinButton buttonRed" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this, 'Y')">
+              {{COIN_NAME}}
+              <br>
+              <i class='fas fa-caret-down'></i> 
+              {{COIN_STATS[COIN]['expected_change_pct']}}
+            </button>
+          {% endif %}
         {% endfor %}
       </div>
       <br>

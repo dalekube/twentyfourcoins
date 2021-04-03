@@ -1,24 +1,20 @@
 
 :root {
   --primary_color: #4488EE;
-  --secondary_color: #FF5C39;
+  --secondary_color: black;
   --tertiary_color: #e7f0f7;
 }
 
 .headerBar {
   display:flex;
   align-items:center;
-  height:100px;
+  height:10vh;
   width:100vw;
   max-width:100%;
   border-bottom: thin solid var(--secondary_color);
   color:white;
   background: var(--primary_color);
   white-space:nowrap;
-}
-
-.headerBar > div {
-  padding:10px;
 }
 
 .headerLink, .headerLink:hover {
@@ -81,27 +77,31 @@ i {
 }
 
 button {
-  border:none !important;
-  outline:none !important;
-  border-radius: 5px !important;
-  padding:5px;
   cursor:pointer;
-}
-
-button:active {
-  transform: translateY(2px);
-}
-
-.coinButton {
-  background: var(--tertiary_color);
-  box-shadow: 0 3px var(--secondary_color);
+  outline:none !important;
+  background: var(--tertiary_color) !important;
   height:60px;
   margin-top:10px;
   color:black;
 }
 
-.coinButton:active {
+.coinButton {
+  background: var(--tertiary_color);
+  height:60px;
+  margin-top:10px;
+  color:black;
+}
+
+.coinButton:active, button:active {
   transform: translateY(2px);
+}
+
+.buttonRed {
+  box-shadow: 0 3px red;
+}
+
+.buttonGreen {
+  box-shadow: 0 3px green;
 }
 
 .navButton {

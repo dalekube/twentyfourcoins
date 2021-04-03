@@ -147,7 +147,7 @@ def price_prediction():
         fig = figure(x_axis_type='datetime')
         fig.add_layout(Legend(location=(50, 0), orientation="horizontal"), "above")
         fig.line(df_actuals['time'], df_actuals['values'], color='#4488EE', line_width=2, legend_label='Actuals')
-        fig.line(df_preds['time'], df_preds['values'], color='#FF5C39', line_width=2, legend_label='Predictions')
+        fig.line(df_preds['time'], df_preds['values'], color='black', line_width=2, legend_label='Predictions')
         fig.width = 450
         fig.height = 300
         fig.toolbar.logo = None
