@@ -73,7 +73,7 @@ i {
 .coinTitle {
   font-size:30px;
   font-weight:bold;
-  color:#4488EE;
+  color:black;
 }
 
 button {
@@ -160,4 +160,8 @@ button {
   font-size:12px;
   padding:50px;
   text-align:center;
+}
+
+.techLogo {
+  width:150px;
 }

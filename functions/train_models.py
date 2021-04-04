@@ -73,7 +73,7 @@ for COIN in config['SUPPORTED_COINS'].values():
     
     # Use the simple moving average as an option
     # Evaluate multiple moving averages to find the best performing range
-    avgs_range = range(10, int(config['NUM_MOV_AVG']), 10)
+    avgs_range = range(int(config['MIN_MOV_AVG']), int(config['MAX_MOV_AVG']), int(config['INTERVAL_MOV_AVG']))
     avgs_mae = [np.mean(abs(x_test['MA_close_'+str(g)] - y_test)) for g in avgs_range]
     best_mov_avg = avgs_range[avgs_mae.index(min(avgs_mae))]
     mov_avg_col = 'MA_close_'+str(best_mov_avg)

@@ -12,7 +12,7 @@ from flask import Flask, render_template, jsonify, request, redirect
 from flask_fontawesome import FontAwesome
 from bokeh.plotting import figure
 from bokeh.embed import json_item
-from bokeh.models import NumeralTickFormatter, Legend
+from bokeh.models import NumeralTickFormatter, Legend, HoverTool
 
 from datetime import datetime
 import pandas as pd
@@ -75,7 +75,6 @@ def index():
             'index.html',
             SUPPORTED_COINS = SUPPORTED_COINS,
             COIN_STATS = COIN_STATS,
-            PREMIUM_COINS = config['PREMIUM_COINS'],
             UPDATE_TIME = UPDATE_TIME
             )
     
@@ -144,22 +143,26 @@ def price_prediction():
         df_preds['time'] = pd.to_datetime(df_preds['time'])
         
         # Define the chart figure
-        fig = figure(x_axis_type='datetime')
+        fig = figure(x_axis_type='datetime', tools="pan,box_select,reset,wheel_zoom", active_drag="pan")
         fig.add_layout(Legend(location=(50, 0), orientation="horizontal"), "above")
         fig.line(df_actuals['time'], df_actuals['values'], color='#4488EE', line_width=2, legend_label='Actuals')
         fig.line(df_preds['time'], df_preds['values'], color='black', line_width=2, legend_label='Predictions')
-        fig.width = 450
+        fig.width = 475
         fig.height = 300
         fig.toolbar.logo = None
-        fig.toolbar_location = None
         fig.background_fill_color = None
         fig.border_fill_color = None
         fig.legend.background_fill_color = None
+        fig.legend.border_line_color = None
         fig.legend.padding = 0
         fig.legend.margin = 0
         fig.legend.spacing = 10
-        fig.toolbar.active_drag = None
+        fig.legend.label_text_font_size = '16pt'
+        fig.legend.label_text_font = 'Calibri'
+        fig.legend.label_text_color = 'black'
         fig.yaxis[0].formatter = NumeralTickFormatter(format="$0,.00")
+        hover = HoverTool(tooltips=[("Date", "$x{%F %T %Z}"),("Price", "$y{$0.0000}")], formatters={"$x": 'datetime'})
+        fig.add_tools(hover)
     
     except:
         return jsonify(success=False), 500

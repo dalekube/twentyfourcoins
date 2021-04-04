@@ -1,15 +1,11 @@
 {
-  "MASTER_PASSCODE":"24CP1$",
-  "TEMPORARY_PASSCODES":["TRIALJAN21"],
   "SUPPORTED_COINS":{
     "Basic Attention Token":"BAT-USDC",
     "Bitcoin":"BTC-USD",
     "Litecoin":"LTC-USD",
     "Ethereum":"ETH-USD"
     },
-  "PREMIUM_COINS":["ETH-USD","BCH-USD"],
-  "MODEL_CORRELATIONS":{
-    "LTC-USD":["BTC-USD"]
-  },
-  "NUM_MOV_AVG":"600"
+  "MIN_MOV_AVG":"200",
+  "MAX_MOV_AVG":"1000",
+  "INTERVAL_MOV_AVG":"50"
 }
