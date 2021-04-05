@@ -27,10 +27,7 @@ with open('config.json') as f:
 # Define the Flask application object
 app = Flask(__name__, static_url_path='')
 fa = FontAwesome(app)
-master_passcode = config['MASTER_PASSCODE']
-access_passcodes = config['TEMPORARY_PASSCODES']
-access_passcodes.append(master_passcode)
-app.secret_key = master_passcode
+app.secret_key = config['MASTER_PASSCODE']
 
 # Session management cookie configuration
 app.config['SESSION_COOKIE_NAME'] = 'tfc-tmp-session-mgmt'

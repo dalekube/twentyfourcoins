@@ -1,4 +1,5 @@
 {
+  "MASTER_PASSCODE": "dale123!",
   "SUPPORTED_COINS":{
     "Basic Attention Token":"BAT-USDC",
     "Bitcoin":"BTC-USD",
