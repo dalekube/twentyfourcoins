@@ -37,7 +37,8 @@ def training_data(con, config, COIN, inference=False):
     # Calculate rolling average features
     df.sort_values(by=['time'], inplace=True)
     for i in range(int(config['MIN_MOV_AVG']), int(config['MAX_MOV_AVG']), int(config['INTERVAL_MOV_AVG'])):
-        df['MA_close_'+str(i)] = df['close'].rolling(window=i, min_periods=1, center=False).mean()
+        rolling_close = df['close'].rolling(window=i, min_periods=1, center=False)
+        df['MovingAverage_close_'+str(i)] = rolling_close.mean() 
     
     # Drop rows with na values and convert to float32
     df.fillna(0, inplace=True)
