@@ -70,12 +70,6 @@ i {
   width:525px;
 }
 
-.coinTitle {
-  font-size:30px;
-  font-weight:bold;
-  color:black;
-}
-
 button {
   cursor:pointer;
   outline:none !important;
