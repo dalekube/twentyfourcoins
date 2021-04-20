@@ -6,7 +6,7 @@
     "Litecoin":"LTC-USD",
     "Ethereum":"ETH-USD"
     },
-  "MIN_MOV_AVG":"200",
-  "MAX_MOV_AVG":"1000",
+  "MIN_MOV_AVG":"500",
+  "MAX_MOV_AVG":"5000",
   "INTERVAL_MOV_AVG":"50"
 }
