@@ -78,7 +78,7 @@ function pricePrediction(coin, userclick){
 
 // Load an initial coin
 $(window).on('load', function(){
-  pricePrediction({value:"Basic Attention Token:BAT-USDC"}, 'N');
+  pricePrediction({value:"Bitcoin:BTC-USD"}, 'N');
 });
 
 

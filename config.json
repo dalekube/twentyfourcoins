@@ -1,9 +1,10 @@
 {
+  "MASTER_PASSCODE":"XYZ77765",
   "SUPPORTED_COINS":{
-    "Basic Attention Token":"BAT-USDC",
     "Bitcoin":"BTC-USD",
     "Litecoin":"LTC-USD",
-    "Ethereum":"ETH-USD"
+    "Ethereum":"ETH-USD",
+    "Basic Attention Token":"BAT-USDC"
     },
   "MIN_MOV_AVG":"500",
   "MAX_MOV_AVG":"5000",
