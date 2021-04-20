@@ -33,7 +33,7 @@ with open('../config.json') as f:
 for COIN in config['SUPPORTED_COINS'].values():
     
     ## DEVELOPMENT ONLY
-    ## COIN = 'BAT-USDC'
+    ## COIN = 'BTC-USD'
     
     print('[INFO] Starting the iteration for', COIN)
     df = training_data(con, config, COIN)

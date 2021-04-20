@@ -1,2 +1,0 @@
-
-scp -i /home/dale/Downloads/twentyfourcoins.pem ubuntu@ec2-18-191-29-151.us-east-2.compute.amazonaws.com:/home/ubuntu/TwentyFourCoins/data/db.sqlite ~/TwentyFourCoins/data
