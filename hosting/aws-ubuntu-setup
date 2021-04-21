@@ -9,10 +9,12 @@ SSL Port 22
 HTTP Port 80
 HTTPS Port 443
 
+## Enable the static IP
+
 ## Using a downloaded PEM file for a SSH connection
 ## IMPORTANT: first, increase the security for the .pem file
 chmod 0600 /home/dale/Downloads/LightsailDefaultKey-us-east-2.pem
-ssh -i /home/dale/Downloads/LightsailDefaultKey-us-east-2.pem ubuntu@18.216.36.184
+ssh -i /home/dale/Downloads/LightsailDefaultKey-us-east-2.pem ubuntu@18.116.96.129
 
 ## Update the new instance's package
 sudo apt update
@@ -25,6 +27,7 @@ git clone https://dalekube@github.com/dalekube/TwentyFourCoins
 
 ## Install new linux and python packages
 sudo apt install python3-pip nginx gunicorn certbot python3-certbot-nginx sqlite3
+sudo apt clean
 sudo pip3 install -r TwentyFourCoins/requirements.txt
 
 ## Create a symbolic link to the repo for easy navigation
@@ -35,18 +38,17 @@ ln -s TwentyFourCoins /home/ubuntu/TwentyFourCoins
 
 ## Migrate an existing SQLite database to avoid recollecting data
 ## Do not touch the file while being saved to avoid corruption
-scp -i /home/dale/Downloads/LightsailDefaultKey-us-east-2.pem ~/TwentyFourCoins/data/db.sqlite ubuntu@18.216.36.184:/home/ubuntu/TwentyFourCoins/data
-sqlite TwentyFourCoins/data/db.sqlite
+scp -i /home/dale/Downloads/LightsailDefaultKey-us-east-2.pem ~/TwentyFourCoins/data/db.sqlite ubuntu@18.116.96.129:/home/ubuntu/TwentyFourCoins/data
+cd TwentyFourCoins/data
+sqlite3 db.sqlite
+DELETE FROM logs;
 vacuum;
 
 ## Execute initial scripts to collect data, train models, and save price predictions
-cd TwentyFourCoins/functions
+cd ../functions
 python3 api_collect_prices.py
 python3 train_models.py
 python3 predict_prices.py
-
-## Consider deleting the logs if starting from scratch
-python3 TwentyFourCoins/functions/db_delete_logs.py
 
 ## Gunicorn and Nginx instance
 # https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04

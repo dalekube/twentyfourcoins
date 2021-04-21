@@ -130,7 +130,10 @@ for COIN in config['SUPPORTED_COINS'].values():
         con.commit()
         
         # Create the model directory if it doesn't already exist
-        MODEL_DIR = '../models/' + COIN + '/' + str(WINDOW)
+        MODEL_DIR_COIN = '../models/' + COIN
+        MODEL_DIR =  MODEL_DIR_COIN + '/' + str(WINDOW)
+        if not os.path.exists(MODEL_DIR_COIN):
+            os.mkdir(MODEL_DIR_COIN)
         if not os.path.exists(MODEL_DIR):
             os.mkdir(MODEL_DIR)
         
