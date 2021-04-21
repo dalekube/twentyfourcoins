@@ -1,22 +1,54 @@
 
+## Scale up an instance in AWS
+EC2 Instance: Ubuntu t2.medium (2 CPU, 4 GB) (about $30/month)
+Lightsail Instance: Ubuntu 20.01, 4 GB RAM, 2 vCPUs, 80 GB SSD (about $20/month)
 
-Ubuntu t2.medium (2 CPU, 4 GB)
-twentyfourcoins security group
+## Enable rules for networking
+## IMPORTANT: Port 443 is disabled by default in Lightsail instances
+SSL Port 22
+HTTP Port 80
+HTTPS Port 443
 
-chmod 0600 /home/dale/Downloads/twentyfourcoins.pem
-ssh -i /home/dale/Downloads/twentyfourcoins.pem ubuntu@ec2-18-191-29-151.us-east-2.compute.amazonaws.com
+## Using a downloaded PEM file for a SSH connection
+## IMPORTANT: first, increase the security for the .pem file
+chmod 0600 /home/dale/Downloads/LightsailDefaultKey-us-east-2.pem
+ssh -i /home/dale/Downloads/LightsailDefaultKey-us-east-2.pem ubuntu@18.216.36.184
 
+## Update the new instance's package
 sudo apt update
 sudo apt upgrade
+sudo apt autoremove
+sudo reboot
 
+## Clone the TwentyFourCoins GitHub repo
 git clone https://dalekube@github.com/dalekube/TwentyFourCoins
-sudo apt install python3-pip nginx gunicorn certbot python3-certbot-nginx
+
+## Install new linux and python packages
+sudo apt install python3-pip nginx gunicorn certbot python3-certbot-nginx sqlite3
 sudo pip3 install -r TwentyFourCoins/requirements.txt
 
-crontab -e
-*/3 * * * * cd /home/ubuntu/TwentyFourCoins/functions;/usr/bin/python3 api_collect_prices.py
-*/5 * * * * cd /home/ubuntu/TwentyFourCoins/functions;/usr/bin/python3 predict_prices.py
+## Create a symbolic link to the repo for easy navigation
+ln -s TwentyFourCoins /home/ubuntu/TwentyFourCoins
 
+## Edit the Google Domains configuration so it aligns to the new IP address for the server host
+## The site needs to be responsive before the TLS certificate can be generated (validated)
+
+## Migrate an existing SQLite database to avoid recollecting data
+## Do not touch the file while being saved to avoid corruption
+scp -i /home/dale/Downloads/LightsailDefaultKey-us-east-2.pem ~/TwentyFourCoins/data/db.sqlite ubuntu@18.216.36.184:/home/ubuntu/TwentyFourCoins/data
+sqlite TwentyFourCoins/data/db.sqlite
+vacuum;
+
+## Execute initial scripts to collect data, train models, and save price predictions
+cd TwentyFourCoins/functions
+python3 api_collect_prices.py
+python3 train_models.py
+python3 predict_prices.py
+
+## Consider deleting the logs if starting from scratch
+python3 TwentyFourCoins/functions/db_delete_logs.py
+
+## Gunicorn and Nginx instance
 # https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04
 sudo vi /etc/systemd/system/twentyfourcoins.service
 
@@ -29,12 +61,19 @@ User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/TwentyFourCoins
 Environment="PATH=/usr/bin"
-ExecStart=/usr/bin/gunicorn --workers 2 --bind unix:/tmp/twentyfourcoins.sock -m 007 wsgi:app
+ExecStart=/usr/bin/gunicorn --workers 1 --bind unix:/tmp/twentyfourcoins.sock -m 007 wsgi:app
 
 [Install]
 WantedBy=multi-user.target
 
+# Start and confirm the new systemd service
+sudo systemctl enable twentyfourcoins
+sudo systemctl start twentyfourcoins
+sudo systemctl status twentyfourcoins
 
+## Edit the Nginx site configuration
+## Consider this great article for help with Nginx and SSL configuration:
+## https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uswgi-and-nginx-on-ubuntu-18-04#step-7-%E2%80%94-securing-the-application
 sudo vi /etc/nginx/sites-available/twentyfourcoins
 
 server {
@@ -54,4 +93,24 @@ sudo ln -s /etc/nginx/sites-available/twentyfourcoins /etc/nginx/sites-enabled
 sudo nginx -t
 sudo systemctl restart nginx
 sudo ufw allow 'Nginx Full'
+
+## Create a TLS certificate for HTTPS encryption
+## Choose #2 to force HTTP redirects
 sudo certbot --nginx -d twentyfourcoins.com -d www.twentyfourcoins.com
+
+## Set up the backend cron job schedules
+crontab -e
+*/3 * * * * cd /home/ubuntu/TwentyFourCoins/functions;/usr/bin/python3 api_collect_prices.py
+*/5 * * * * cd /home/ubuntu/TwentyFourCoins/functions;/usr/bin/python3 predict_prices.py
+0 10 * * * cd /home/ubuntu/TwentyFourCoins/functions;/usr/bin/python3 train_models.py
+
+## If running into issues, check the logs here:
+# Nginx error logs
+sudo less /var/log/nginx/error.log
+# Nginx access logs
+sudo less /var/log/nginx/access.log: checks the Nginx access logs.
+# Nginx process logs
+sudo journalctl -u nginx
+# Flask app's uWSGI logs
+sudo journalctl -u twentyfourcoins
+
