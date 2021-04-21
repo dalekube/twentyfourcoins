@@ -13,7 +13,7 @@ from features.stock_spy import features_stock_spy
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
-def training_data(con, config, COIN, inference=False):
+def training_data(con, config, COIN, WINDOW, inference=False):
     
     # Load the data for the coin
     # Print the row count when finished
@@ -50,8 +50,8 @@ def training_data(con, config, COIN, inference=False):
         df.sort_values(by=['time'], inplace=True)
     else:
         df.sort_values(by=['time'], inplace=True, ascending=False)
-        df['PRICE_24'] = df['close'].shift(288)
-        df = df[~pd.isnull(df['PRICE_24'])]
+        df['Y_PRICE'] = df['close'].shift(WINDOW)
+        df = df[~pd.isnull(df['Y_PRICE'])]
         del df['time']
     
     return df

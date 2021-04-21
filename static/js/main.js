@@ -1,27 +1,29 @@
 
 // main JavaScript file for the web platform
 
-function pricePrediction(coin, userclick){
+function pricePrediction(coin){
     
     var coin_split = coin.value.split(":");
     const coin_name = coin_split[0];
     const coin_code = coin_split[1];
+    const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
     
     //Execute the function to update prices in the database
     $.ajax({
       url: "/price_prediction",
       type: "POST",
-      data: JSON.stringify({COIN: coin_code, CLICK:userclick}),
+      data: JSON.stringify({COIN: coin_code, WINDOW:window_int}),
       contentType:"application/json",
       error: function(){
-        msg = "Failed to retrieve the forecast data for " + coin_name + " (" + coin_code + ")";
-        window.location.replace("/error?msg=" + msg);
+        msg = "Failed to retrieve the forecast data for " + coin_name + " (" + coin_code + ")" + " for the " + window_int + " window";
+        //window.location.replace("/error?msg=" + msg);
       },
       success: function(data){
         
         // Parse the incoming data
         stats = data.stats;
         charts = data.charts;
+        $("#mainChart").empty();
         
         // Parse the prediction timestamps and present in locale
         var actual_time = JSON.parse(JSON.stringify(stats.actual_time));
@@ -38,6 +40,7 @@ function pricePrediction(coin, userclick){
         
         // Display the price prediction details
         $("#predict_coin").html(coin_name + " (" + coin_code + ")");
+        $("#predict_coin").attr("active-coin", coin.value);
         $("#actual_time").html(actual_time);
         $("#actual_close").html(JSON.parse(JSON.stringify(stats.actual_close)));
         
@@ -78,7 +81,19 @@ function pricePrediction(coin, userclick){
 
 // Load an initial coin
 $(window).on('load', function(){
-  pricePrediction({value:"Bitcoin:BTC-USD"}, 'N');
+  pricePrediction({value:"Bitcoin:BTC-USD"});
 });
+
+$(document).ready(function(){
+  
+  // Handle changes to the time window radio group
+  $("input:radio[name='windowRadioButtons']").on('click', function(){
+    const coin = $("#predict_coin").attr("active-coin");
+    pricePrediction({value:coin});
+  })
+  
+})
+
+
 
 

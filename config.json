@@ -6,6 +6,7 @@
     "Ethereum":"ETH-USD",
     "Basic Attention Token":"BAT-USDC"
     },
+  "SUPPORTED_WINDOWS":["288","8640"],
   "MIN_MOV_AVG":"500",
   "MAX_MOV_AVG":"5000",
   "INTERVAL_MOV_AVG":"50"

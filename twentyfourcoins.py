@@ -38,17 +38,6 @@ app.config['SESSION_PERMANENT'] = False
 # Establish database connection
 from functions.db_connect import db_connect
 
-# Save user activity in logs
-def log_activity(activity, route, coin=None):
-    cnx = db_connect('./data/db.sqlite')
-    cursorx = cnx.cursor()
-    statement = 'INSERT INTO logs \
-    VALUES (strftime("%%Y-%%m-%%d %%H:%%M:%%S", datetime("now")), \
-    "%s", NULL, NULL, NULL, "%s", "%s")' % (activity, route, coin)
-    cursorx.execute(statement)    
-    cursorx.close()
-    cnx.commit()
-
 # Home
 @app.route('/', methods=['GET'])
 def index():
@@ -57,16 +46,12 @@ def index():
     SUPPORTED_COINS = config['SUPPORTED_COINS'].items()
     COIN_STATS = {}
     for COIN in config['SUPPORTED_COINS'].values():
-        JSON_PATH = 'models/' + COIN + '/' + 'latest.json'
+        JSON_PATH = 'models/' + COIN + '/288/' + 'latest.json'
         assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN
         with open(JSON_PATH) as f:
             COIN_STATS[COIN] = json.load(f)
     
     UPDATE_TIME = datetime.now().astimezone().strftime('%Y-%m-%d %I:%M:%S %p %Z')
-    
-    # Log the user activity
-    # A01 = User visit
-    log_activity("A01", "/")
     
     return render_template(
             'index.html',
@@ -79,10 +64,6 @@ def index():
 @app.route('/about', methods=['GET'])
 def about():
     
-    # Log the user activity
-    # A01 = User visit
-    log_activity("A01", "/about")
-    
     return render_template('about.html')
 
 # Error route for redirects
@@ -91,10 +72,6 @@ def error_page():
     msg = request.args.get('msg')
     if msg is None:
         msg = ''
-    
-    # Log the user activity
-    # A01 = User visit
-    log_activity("A01", "/error")
     
     return render_template('error.html', ERROR = msg)
 
@@ -105,25 +82,19 @@ def price_prediction():
     '''
     response = request.get_json()
     COIN = response['COIN']
-    CLICK = response['CLICK']
-    
-    # Avoid the logging for the view of the default coin
-    if CLICK == 'Y':
-        # Log the user activity
-        # A02 = Viewed price prediction
-        log_activity("A02", "/price_prediction", COIN)
+    WINDOW = response['WINDOW']
     
     try:
         
         # Load the latest predictions and performance statistics
-        JSON_PATH = 'models/' + COIN + '/' + 'latest.json'
-        assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN
+        JSON_PATH = 'models/' + COIN + '/' + WINDOW + '/latest.json'
+        assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist at' + JSON_PATH
         with open(JSON_PATH) as f:
             latest_json = json.load(f)
         
         # Retrieve the data for the charts
-        JSON_PATH = 'models/' + COIN + '/' + 'charts.json'
-        assert os.path.exists(JSON_PATH), '[ERROR] The charts.json file does not exist for ' + COIN
+        JSON_PATH = 'models/' + COIN + '/' + WINDOW + '/charts.json'
+        assert os.path.exists(JSON_PATH), '[ERROR] The charts.json file does not exist at' + JSON_PATH
         with open(JSON_PATH) as f:
             chart_data = json.load(f)
         

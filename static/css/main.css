@@ -34,28 +34,35 @@
   text-decoration:none !important;
 }
 
-.coinBlock {
+.tfcDivBlueBackground {
   border-radius:5px;
   padding:10px;
   border:thin darkgrey solid;
   background: var(--primary_color);
-  width:250px;
+  width:300px;
   text-align:center;
-  white-space:nowrap;
   display:flex;
   flex-direction:column;
   box-shadow: 2px 2px darkgrey;
   color:white;
+  margin-bottom:10px;
+}
+
+.tfcDivWhiteBackground {
+  border-radius:5px;
+  padding:10px;
+  border:thin darkgrey solid;
+  width:300px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  box-shadow: 2px 2px darkgrey;
+  margin-bottom:10px;
 }
 
 i {
   margin:10px;
   font-size:30px;
-}
-
-.tfcContainer {
-  margin:10px;
-  color:white;
 }
 
 .predictionBox {
