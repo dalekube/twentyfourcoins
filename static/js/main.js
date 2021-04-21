@@ -89,7 +89,10 @@ $(document).ready(function(){
   // Handle changes to the time window radio group
   $("input:radio[name='windowRadioButtons']").on('click', function(){
     const coin = $("#predict_coin").attr("active-coin");
+    const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
     pricePrediction({value:coin});
+    $(".coinButton").hide();
+    $(".coinButton[data-window='" + window_int + "']").show();
   })
   
 })

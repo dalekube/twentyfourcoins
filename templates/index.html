@@ -34,21 +34,28 @@
           Price Forecasts
         </div>
         {% for COIN_NAME, COIN in SUPPORTED_COINS %}
-          {% if COIN_STATS[COIN]['change_direction'] == 'up' %} 
-            <button class="coinButton buttonGreen" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">
-              {{COIN_NAME}}
-              <br>
-              <i class='fas fa-caret-up'></i> 
-              {{COIN_STATS[COIN]['expected_change_pct']}}
-            </button>
-            {% else %}
-              <button class="coinButton buttonRed" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" onclick="pricePrediction(this)">
-              {{COIN_NAME}}
-              <br>
-              <i class='fas fa-caret-down'></i> 
-              {{COIN_STATS[COIN]['expected_change_pct']}}
-            </button>
-          {% endif %}
+          {% for WINDOW in SUPPORTED_WINDOWS %}
+            {% set INSTANCE = COIN + '-' + WINDOW %}
+            {% if COIN_STATS[INSTANCE]['change_direction'] == 'up' %} 
+              <button class="coinButton buttonGreen" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
+              onclick="pricePrediction(this)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
+              data-window={{WINDOW}}>
+                {{COIN_NAME}}
+                <br>
+                <i class='fas fa-caret-up'></i> 
+                {{COIN_STATS[INSTANCE]['expected_change_pct']}}
+              </button>
+              {% else %}
+                <button class="coinButton buttonRed" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
+                onclick="pricePrediction(this)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
+                data-window={{WINDOW}}>
+                {{COIN_NAME}}
+                <br>
+                <i class='fas fa-caret-down'></i> 
+                {{COIN_STATS[INSTANCE]['expected_change_pct']}}
+              </button>
+            {% endif %}
+          {% endfor %}
         {% endfor %}
       </div>
       <div class="tfcDivWhiteBackground">

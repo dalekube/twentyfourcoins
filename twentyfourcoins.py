@@ -35,27 +35,28 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_PERMANENT'] = False 
 
-# Establish database connection
-from functions.db_connect import db_connect
-
 # Home
 @app.route('/', methods=['GET'])
 def index():
     
     # Retrieve the latest predictions for all supported coins
     SUPPORTED_COINS = config['SUPPORTED_COINS'].items()
+    SUPPORTED_WINDOWS = config['SUPPORTED_WINDOWS']
     COIN_STATS = {}
     for COIN in config['SUPPORTED_COINS'].values():
-        JSON_PATH = 'models/' + COIN + '/288/' + 'latest.json'
-        assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN
-        with open(JSON_PATH) as f:
-            COIN_STATS[COIN] = json.load(f)
+        for WINDOW in config['SUPPORTED_WINDOWS']:
+            INSTANCE = COIN + '-' + WINDOW
+            JSON_PATH = 'models/' + COIN + '/' + WINDOW + '/' + 'latest.json'
+            assert os.path.exists(JSON_PATH), '[ERROR] The latest.json file does not exist for ' + COIN
+            with open(JSON_PATH) as f:
+                COIN_STATS[INSTANCE] = json.load(f)
     
     UPDATE_TIME = datetime.now().astimezone().strftime('%Y-%m-%d %I:%M:%S %p %Z')
     
     return render_template(
             'index.html',
             SUPPORTED_COINS = SUPPORTED_COINS,
+            SUPPORTED_WINDOWS = SUPPORTED_WINDOWS,
             COIN_STATS = COIN_STATS,
             UPDATE_TIME = UPDATE_TIME
             )
