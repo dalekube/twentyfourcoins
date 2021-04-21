@@ -29,13 +29,15 @@ with open('../config.json') as f:
 for COIN in config['SUPPORTED_COINS'].values():
     
     ## DEVELOPMENT ONLY
-    ## COIN = 'BAT-USDC'
+    ## COIN = 'BTC-USD'
     
     for w in config['SUPPORTED_WINDOWS']:
     
         # Load the data for the coin
         # Print the row count when finished
         WINDOW = int(w)
+        TIME_INTERVAL = 288
+        
         print('[INFO] Starting the iteration for', COIN)
         print('[INFO] Time window (5 minute bundles) =', WINDOW)
         df = training_data(con, config, COIN, WINDOW, inference=True)
@@ -62,7 +64,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         df_predict = df.tail(1)
         actual_time = str(df_predict['time'].iloc[0])
         actual_close = float(df_predict['close'].iloc[0])
-        predict_time = str(df_predict['time'].iloc[0] + pd.DateOffset(1))
+        predict_time = str(df_predict['time'].iloc[0] + pd.DateOffset(WINDOW/TIME_INTERVAL))
         del df_predict['time']
         
         # Random forest prediction
