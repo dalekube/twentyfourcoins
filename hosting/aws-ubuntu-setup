@@ -27,7 +27,9 @@ sudo apt autoremove
 sudo reboot
 
 ## Clone the TwentyFourCoins GitHub repo
+## Cache the password for one month
 git clone https://dalekube@github.com/dalekube/TwentyFourCoins
+git config --global credential.helper 'cache --timeout=2628000'
 
 ## Install new linux and python packages
 sudo apt install python3-pip nginx gunicorn certbot python3-certbot-nginx sqlite3
