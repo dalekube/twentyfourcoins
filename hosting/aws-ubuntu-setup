@@ -1,4 +1,8 @@
 
+## WARNING BEFORE REGENERATING SERVER
+## BACKUP AND REUSE TLS CERTS TO AVOID RATE LIMITS
+/etc/letsencrypt
+
 ## Scale up an instance in AWS
 EC2 Instance: Ubuntu t2.medium (2 CPU, 4 GB) (about $30/month)
 Lightsail Instance: Ubuntu 20.01, 4 GB RAM, 2 vCPUs, 80 GB SSD (about $20/month)

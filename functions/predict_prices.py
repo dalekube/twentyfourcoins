@@ -163,7 +163,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         
         # Collect predictions for the predictive performance chart
         # Limit to the past 12 months
-        YEAR_DT = pd.to_datetime('now') - pd.DateOffset(months=12)
+        YEAR_DT = pd.to_datetime('now') - pd.DateOffset(months=3)
         
         statement = 'SELECT PREDICTION_TIME, PREDICTION FROM predictions \
         WHERE COIN = "%s" AND WINDOW = %s' % (COIN, WINDOW)
@@ -179,7 +179,6 @@ for COIN in config['SUPPORTED_COINS'].values():
         df_actuals = pd.read_sql(statement, con)
         df_actuals['time'] = pd.to_datetime(df_actuals['time'])
         df_actuals = df_actuals[df_actuals['time'] > YEAR_DT]
-        df_actuals = df_actuals[df_actuals['time'] >= min(df_preds['time']) - pd.DateOffset(7)]
         df_actuals = df_actuals.sort_values(by=['time'])
         assert len(df_actuals) > 0, '[ERROR] Collected zero actual prices'
         print('[INFO] Collected', '{:,}'.format(len(df_actuals)), 'actual prices for the charts')
