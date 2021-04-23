@@ -166,3 +166,7 @@ button {
 .techLogo {
   width:150px;
 }
+
+.emojiButton {
+  border:none;
+}

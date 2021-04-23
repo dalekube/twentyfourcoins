@@ -75,13 +75,36 @@ function pricePrediction(coin){
             
           } // end of success
           
-        }); // end of AJAX call
+      }); // end of AJAX call
+      
+    $.ajax({
+      url: "/emoji_load?window=" + window_int + "&coin=" + coin_code,
+      type: "GET",
+      contentType:"application/json",
+      success: function(data){
+        $("#emojiRocketValue").text(data.totals[0]);
+        $("#emojiDeathValue").text(data.totals[1]);
+      }
+    });
     
 }
 
 // Load an initial coin
 $(window).on('load', function(){
+  
   pricePrediction({value:"Bitcoin:BTC-USD"});
+  
+  $.ajax({
+    url: "/emoji_load?window=288&coin=BTC-USD",
+    type: "GET",
+    contentType:"application/json",
+    success: function(data){
+      $("#emojiRocketValue").text(data.totals[0]);
+      $("#emojiDeathValue").text(data.totals[1]);
+    }
+    
+  });
+  
 });
 
 $(document).ready(function(){
@@ -93,6 +116,19 @@ $(document).ready(function(){
     pricePrediction({value:coin});
     $(".coinButton").hide();
     $(".coinButton[data-window='" + window_int + "']").show();
+  })
+  
+  $(".emojiButton").on('click', function(){
+    
+    const current_value = parseInt($(this).children('span').text());
+    var current_coin = $("#predict_coin").attr("active-coin");
+    const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
+    
+    current_coin = current_coin.split(":");
+    const coin_code = current_coin[1];
+    $.get("/emoji_pump?id=" + this.id + "&window=" + window_int + "&coin=" + coin_code);
+    $(this).children('span').text(current_value + 1);
+    
   })
   
 })

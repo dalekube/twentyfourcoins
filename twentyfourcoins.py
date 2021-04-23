@@ -35,6 +35,9 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_PERMANENT'] = False 
 
+from functions.db_connect import db_connect
+emoji_map = {"emojiRocket":"E01", "emojiDeath":"E02"}
+
 # Home
 @app.route('/', methods=['GET'])
 def index():
@@ -137,6 +140,52 @@ def price_prediction():
         return jsonify(success=False), 500
     
     return jsonify(stats=latest_json, charts=json_item(fig, 'mainChart'))
+
+@app.route('/emoji_load', methods=['GET'])
+def emoji_load():
+    '''Load the existing values for a coin
+    '''
+    
+    COIN = request.args.get('coin')
+    WINDOW = int(request.args.get('window'))
+    con = db_connect('./data/db.sqlite')
+    
+    statement = 'SELECT UTC_TIME, ACTIVITY FROM logs \
+    WHERE ACTIVITY IN ("E01","E02") AND VALUE1 = %s AND META1="%s"' % (WINDOW, COIN)
+    df = pd.read_sql(statement, con)
+    emoji_cnts = df['ACTIVITY'].value_counts()
+    for v in emoji_map.values():
+        if not v in emoji_cnts.index:
+            emoji_cnts[v] = 0
+    
+    ROCKET_TOTAL = int(emoji_cnts['E01'])
+    DEATH_TOTAL = int(emoji_cnts['E02'])
+    con.close()
+    
+    return jsonify(totals=[ROCKET_TOTAL, DEATH_TOTAL], success=True)
+
+@app.route('/emoji_pump', methods=['GET'])
+def emoji_pump():
+    '''Increase the value of the corresponding emoji
+    '''
+    
+    pump_id = request.args.get('id')
+    COIN = request.args.get('coin')
+    WINDOW = int(request.args.get('window'))
+    ACTIVITY = emoji_map[pump_id]
+    
+    con = db_connect('./data/db.sqlite')
+    cursor = con.cursor()
+    statement = 'INSERT INTO logs \
+    VALUES (strftime("%%Y-%%m-%%d %%H:%%M:%%S", datetime("now")), \
+    "%s", %s, NULL, NULL, "%s", NULL)' % (ACTIVITY, WINDOW, COIN)
+    cursor.execute(statement)    
+    cursor.close()
+    con.commit()
+    con.close()
+    
+    return jsonify(success=True), 200
+    
 
 # Error handling
 @app.errorhandler(400)
