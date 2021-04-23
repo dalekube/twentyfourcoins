@@ -169,4 +169,6 @@ button {
 
 .emojiButton {
   border:none;
+  margin-right:5px;
+  height:30px;
 }
