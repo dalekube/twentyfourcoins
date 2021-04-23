@@ -1,4 +1,5 @@
 {
+  "APPLICATION_VERSION":"v1.1.1 (Released 2021-04-22)",
   "MASTER_PASSCODE":"XYZ77765",
   "SUPPORTED_COINS":{
     "Bitcoin":"BTC-USD",

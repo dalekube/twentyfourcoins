@@ -23,6 +23,7 @@ import pandas as pd
 # Load the platform configuration
 with open('config.json') as f:
     config = json.load(f)
+APPLICATION_VERSION = config['APPLICATION_VERSION']
 
 # Define the Flask application object
 app = Flask(__name__, static_url_path='')
@@ -56,19 +57,24 @@ def index():
     
     UPDATE_TIME = datetime.now().astimezone().strftime('%Y-%m-%d %I:%M:%S %p %Z')
     
+    
     return render_template(
             'index.html',
             SUPPORTED_COINS = SUPPORTED_COINS,
             SUPPORTED_WINDOWS = SUPPORTED_WINDOWS,
             COIN_STATS = COIN_STATS,
-            UPDATE_TIME = UPDATE_TIME
+            UPDATE_TIME = UPDATE_TIME,
+            APPLICATION_VERSION = APPLICATION_VERSION
             )
     
 # About
 @app.route('/about', methods=['GET'])
 def about():
     
-    return render_template('about.html')
+    return render_template(
+            'about.html', 
+            APPLICATION_VERSION = APPLICATION_VERSION
+            )
 
 # Error route for redirects
 @app.route('/error', methods=['GET'])
@@ -77,7 +83,11 @@ def error_page():
     if msg is None:
         msg = ''
     
-    return render_template('error.html', ERROR = msg)
+    return render_template(
+            'error.html', 
+            ERROR = msg,
+            APPLICATION_VERSION = APPLICATION_VERSION
+            )
 
 # Collect price prediction
 @app.route('/price_prediction', methods=['POST'])

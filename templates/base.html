@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <script type=text/javascript src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}"></script>
   <script type=text/javascript src="{{ url_for('static', filename='js/bokeh-2.2.3.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4MW95L9F9S"></script>
@@ -40,7 +39,9 @@
     {% block content %}{% endblock %}
   </div>
   <div class="disclaimer">
-    TwentyFourCoins does not save personal user data. The prices and forecasts are for general informational purposes only and do not serve as investment advice. TwentyFourCoins does not recommend buying or selling cryptocurrencies or any other financial instruments.
+    {{APPLICATION_VERSION}}
+    <br><br>
+    TwentyFourCoins does not save or retain personal user data. The prices and forecasts are for general informational purposes only and do not serve as investment advice. TwentyFourCoins does not recommend buying or selling cryptocurrencies or any other investment products. TwentyFourCoins is not a registered investment broker. All forecasts are generated from historical data using artificial intelligence algorithms. Past performance isn ot a guarantee of future return, nor is it necessarily indicative of future performance.
   </div>
 </body>
 </html>

@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% set active_page = "index" %}
 {% block content %}
+
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <meta http-equiv="Refresh" content="300">
 <div style="display:flex;flex-direction:column;align-items:center;">
   <div>
