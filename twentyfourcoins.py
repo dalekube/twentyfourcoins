@@ -10,6 +10,7 @@ import os
 import json
 from flask import Flask, render_template, jsonify, request, redirect
 from flask_fontawesome import FontAwesome
+
 from bokeh.plotting import figure
 from bokeh.embed import json_item
 from bokeh.models import NumeralTickFormatter, Legend, HoverTool

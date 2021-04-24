@@ -3,6 +3,7 @@
   --primary_color: #4488EE;
   --secondary_color: black;
   --tertiary_color: #e7f0f7;
+  --fourth_color:#FFBD59;
 }
 
 .headerBar {
@@ -48,7 +49,7 @@
   margin-bottom:10px;
 }
 
-.tfcDivWhiteBackground {
+.tfcDivGreyBackground {
   border-radius:5px;
   padding:10px;
   border:thin darkgrey solid;
@@ -58,6 +59,7 @@
   flex-direction:column;
   box-shadow: 2px 2px darkgrey;
   margin-bottom:10px;
+  background:var(--tertiary_color);
 }
 
 i {
@@ -177,4 +179,18 @@ button {
   border:none;
   margin-right:5px;
   height:30px;
+}
+
+.techBanner {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  margin-top:100px;
+  padding:50px;
+  width:100vw;
+  background: var(--tertiary_color);
+  border-top: thin solid black;
+  border-bottom: thin solid black;
+  vertical-align:middle;
 }

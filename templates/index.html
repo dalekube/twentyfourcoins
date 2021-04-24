@@ -5,13 +5,9 @@
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <meta http-equiv="Refresh" content="300">
 <div style="display:flex;flex-direction:column;align-items:center;">
-  <div>
-    <h1>Cryptocurrency Price Forecasts</h1>
-  </div>
-  <br>
   <div style="display:flex;align-items:top;float:left;">
     <div style="max-width:300px;margin-right:25px;">
-      <div class="tfcDivWhiteBackground">
+      <div class="tfcDivGreyBackground">
         <div>Time Windows</div>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="windowRadioButtons" id="radio24Hours" value="288" checked>
@@ -57,18 +53,18 @@
           {% endfor %}
         {% endfor %}
       </div>
-      <div class="tfcDivWhiteBackground">
+      <div class="tfcDivGreyBackground">
         <a href='/about' style="text-decoration:underline;">What is TwentyFourCoins?</a>
         <br>
         <div style="text-align:center;">
           <div>
-            <a class="socialLink" title="Share on Twitter" href="https://twitter.com/intent/tweet?text=AI-powered cryptocurrency price forecasts!%0D%0A&url=https://TwentyFourCoins.com%0D%0A%0D%0A&hashtags=bitcoin,litecoin,ethereum,basicattentiontoken" target="_blank">
+            <a class="socialLink" title="Share on Twitter" href="https://twitter.com/intent/tweet?text=AI-powered cryptocurrency price forecasts.%0D%0A&url=https://twentyfourcoins.com%0D%0A%0D%0A&hashtags=bitcoin,litecoin,ethereum,basicattentiontoken" target="_blank">
               <img alt="Share on Twitter" class="socialIcon" src='icons/Twitter.svg'>
             </a>
-            <a class="socialLink" href="https://www.facebook.com/sharer/sharer.php?u=https://TwentyFourCoins.com&quote=AI-powered cryptocurrency price forecasts!%0D%0A" title="Share on Facebook" target="_blank">
+            <a class="socialLink" href="https://www.facebook.com/sharer/sharer.php?u=https://twentyfourcoins.com&quote=AI-powered cryptocurrency price forecasts.%0D%0A" title="Share on Facebook" target="_blank">
               <img alt="Share on Facebook" class="socialIcon" src="icons/Facebook.svg" />
             </a>
-            <a class="socialLink" href="http://www.linkedin.com/shareArticle?mini=true&url=https://TwentyFourCoins.com" target="_blank" title="Share on LinkedIn">
+            <a class="socialLink" href="http://www.linkedin.com/shareArticle?mini=true&url=https://twentyfourcoins.com" target="_blank" title="Share on LinkedIn">
               <img alt="Share on LinkedIn" class="socialIcon" src="icons/LinkedIn.svg" />
             </a>
           </div>
@@ -129,7 +125,7 @@
     </div>
   </div>
 </div>
-<div style="display:flex;flex-direction:column;align-items:center;margin-top:100px;height:100px;width:100vw;">
+<div class="techBanner">
   <h4>TwentyFourCoins Uses State-of-the-Art Technology:</h4>
   <div>
     <img class="techLogo" alt="AWS Logo" src="images/amazon-web-services-logo.png"/>
