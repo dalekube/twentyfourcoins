@@ -14,6 +14,11 @@ from features.stock_spy import features_stock_spy
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
 def training_data(con, config, COIN, WINDOW, inference=False):
+    '''Prepare the training data for model training and inference
+    
+    Collect the historical prices and merge the prices with additional
+    data sources for feature engineering.
+    '''
     
     # Load the data for the coin
     # Print the row count when finished
