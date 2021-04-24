@@ -1,0 +1,15 @@
+
+## Development Priorities ##
+
+1. backup process for price data collection
+2. separate SQLite tables; simplify the logs table
+3. dedicated job for data validation and proactive alerts
+4. admin page for alert monitoring and security handling
+5. show local timezone for Bokeh plots
+6. improved training data handling in the pipeline
+7. script to compile other coin data for model features
+8. script for feature selection to improve linear regression and other models
+9. user session timeouts
+10. GDPR cookie policy consent acknowledgement
+11. dedicated API for repetitive actions
+12. shell script for automated AWS deployments
