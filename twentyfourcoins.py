@@ -161,10 +161,10 @@ def emoji_load():
     WINDOW = int(request.args.get('window'))
     con = db_connect('./data/db.sqlite')
     
-    statement = 'SELECT UTC_TIME, ACTIVITY FROM logs \
-    WHERE ACTIVITY IN ("E01","E02") AND VALUE1 = %s AND META1="%s"' % (WINDOW, COIN)
+    statement = 'SELECT UTC_TIME, EMOJI FROM emojis \
+    WHERE WINDOW = %s AND COIN="%s"' % (WINDOW, COIN)
     df = pd.read_sql(statement, con)
-    emoji_cnts = df['ACTIVITY'].value_counts()
+    emoji_cnts = df['EMOJI'].value_counts()
     for v in emoji_map.values():
         if not v in emoji_cnts.index:
             emoji_cnts[v] = 0
@@ -183,13 +183,13 @@ def emoji_pump():
     pump_id = request.args.get('id')
     COIN = request.args.get('coin')
     WINDOW = int(request.args.get('window'))
-    ACTIVITY = emoji_map[pump_id]
+    EMOJI = emoji_map[pump_id]
     
     con = db_connect('./data/db.sqlite')
     cursor = con.cursor()
-    statement = 'INSERT INTO logs \
+    statement = 'INSERT INTO emojis \
     VALUES (strftime("%%Y-%%m-%%d %%H:%%M:%%S", datetime("now")), \
-    "%s", %s, NULL, NULL, "%s", NULL)' % (ACTIVITY, WINDOW, COIN)
+    "%s", %s, "%s")' % (EMOJI, WINDOW, COIN)
     cursor.execute(statement)    
     cursor.close()
     con.commit()

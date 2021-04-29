@@ -130,8 +130,8 @@ for COIN in config['SUPPORTED_COINS'].values():
         print('[INFO] The price is expected to change by', str(expected_change), 'dollars in the next 24 hours')
         
         # Query the database for the logged performance statistics
-        statement = 'SELECT * FROM logs \
-        WHERE ACTIVITY="M01" AND VALUE1=%s AND META1="%s" AND META2=%s' % (model_min_error, COIN, WINDOW)
+        statement = 'SELECT * FROM model_performance \
+        WHERE MAE=%s AND COIN="%s" AND WINDOW=%s' % (model_min_error, COIN, WINDOW)
         model_stats = pd.read_sql(statement, con)
         
         assert len(model_stats) > 0, '[ERROR] Did not identify any statistics in the logs'
@@ -139,7 +139,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         model_stats = model_stats.sort_values(by=['UTC_TIME'], ascending=False)
         model_stats = model_stats.head(1) 
         training_time = str(model_stats['UTC_TIME'].iloc[0])
-        MAPE = model_stats['VALUE2'].iloc[0]
+        MAPE = model_stats['MAPE'].iloc[0]
         
         # Print the performance statistics
         print('[INFO] Model trained at', training_time)

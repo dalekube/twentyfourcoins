@@ -15,19 +15,6 @@ from db_connect import db_connect
 con = db_connect('../data/db.sqlite')
 cursor = con.cursor()
 
-# Create the master 'logs' table
-statement = '\
-CREATE TABLE IF NOT EXISTS logs (\
-UTC_TIME INT NOT NULL,\
-ACTIVITY VARCHAR(3) NOT NULL,\
-VALUE1 FLOAT,\
-VALUE2 FLOAT,\
-VALUE3 FLOAT,\
-META1 TEXT\
-)\
-'
-cursor.execute(statement)
-
 # Create the 'prices' table
 statement = '\
 CREATE TABLE IF NOT EXISTS prices (\
