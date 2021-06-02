@@ -54,7 +54,6 @@
         {% endfor %}
       </div>
       <div class="tfcDivGreyBackground">
-        <a href='/about' style="text-decoration:underline;">What is TwentyFourCoins?</a>
         <br>
         <div style="text-align:center;">
           <div>
@@ -74,6 +73,7 @@
           <i class="fas fa-sync"></i>
           <div>The page will automatically refresh every five minutes to provide current prices and predictions. The last update was at {{UPDATE_TIME}}</div>
         </div>
+        <br>
       </div>
     </div>
     <div>
@@ -124,15 +124,24 @@
       </div>
     </div>
   </div>
+  <br>
+  <div class="tfcDivGreyBackground" style="width:850px;">
+    <h2><a href='/about' style="text-decoration:underline;">What is TwentyFourCoins?</a></h2>
+  </div>
 </div>
-<div class="techBanner">
-  <h4>TwentyFourCoins Uses State-of-the-Art Technology:</h4>
+<div class="banner techBanner">
+  <h4>TwentyFourCoins Uses State-of-the-Art Technology</h4>
   <div>
     <img class="techLogo" alt="AWS Logo" src="images/amazon-web-services-logo.png"/>
     <img class="techLogo" alt="TensorFlow Logo" src="images/tensorflow.png"/>
     <img class="techLogo" alt="Flask Logo" src="images/flask.png"/>
     <img class="techLogo" alt="Python Logo" src="images/python.png"/>
   </div>
+</div>
+<div class="banner">
+  <h4>Support the project by making a donation</h4>
+  <br>
+  <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="twentyfourcoins" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy the project a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff"></script>
 </div>
 
 {% endblock %}

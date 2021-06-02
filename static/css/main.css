@@ -8,6 +8,7 @@
 
 .headerBar {
   display:flex;
+  flex-direction:column;
   align-items:center;
   height:10vh;
   width:100vw;
@@ -181,16 +182,18 @@ button {
   height:30px;
 }
 
-.techBanner {
+.banner {
+  padding:50px;
+  width:100vw;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  margin-top:100px;
-  padding:50px;
-  width:100vw;
-  background: var(--tertiary_color);
   border-top: thin solid black;
   border-bottom: thin solid black;
-  vertical-align:middle;
+}
+
+.techBanner {
+  margin-top:100px;
+  background: var(--tertiary_color);
 }
