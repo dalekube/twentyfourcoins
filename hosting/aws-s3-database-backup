@@ -1,0 +1,4 @@
+
+# Download the SQLite database from the hosted server in AWS
+# to the local machine to be uploaded into the AWS S3 bucket for storage/backup
+scp -i /home/dale/Downloads/LightsailDefaultKey-us-east-2.pem ubuntu@18.116.96.129:/home/ubuntu/TwentyFourCoins/data/db.sqlite ~/Downloads
