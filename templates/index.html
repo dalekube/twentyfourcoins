@@ -78,47 +78,56 @@
     </div>
     <div>
       <!-- PREDICTION BOX -->
-      <div id="pricePredictionBox" class="predictionBox" style="display:none;">
-        <h3 id="predict_coin"></h3>
-        <div>
-          <button id="emojiRocket" class="emojiButton" title="Send it to moon!">&#128640 <span id="emojiRocketValue">{{ROCKET_TOTAL}}</span></button>
-          <button id="emojiDeath" class="emojiButton" title="Sink the ship!">&#9760 <span id="emojiDeathValue">{{DEATH_TOTAL}}</span></button>
+      <div id="pricePredictionBox" class="predictionBox">
+        <div id="coinLoadingIcon" style="display:none;">
+          <div style="display:flex;align-items:center;">
+            <i class="fas fa-spinner fa-spin" style="font-size:50px;"></i>
+            <span>Loading forecast and model data...</span>
+          </div>
+          <div id="coinLoadingWarning" style="display:none;color:red;margin-top:10px;">Please wait until the previous coin is finished loading.</div>
         </div>
-        <br>
-        <div>
-          <span>Price Forecast:</span>
-          <span id="predict_prediction" class="predAttribute"></span>
-        </div>
-        <div>
-          <span>Price Change:</span>
-          <span id="predict_change" class="predAttribute"></span>
-          <span id="predict_change_pct" class="predAttribute"></span>
-        </div>
-        <br>
-        <div>
-          <span>Latest Actual Price:</span>
-          <span id="actual_price" class="predAttribute"></span>
-        </div>
-        <div>
-          <span>Latest Actual Price Time:</span>
-          <span id="actual_time" class="predAttribute"></span>
-        </div>
-        <br>
-        <div id="mainChart"></div>
-        <br>
-        <div>Model Performance Metrics</div>
-        <div>
+        <div id="coinDetails" style="display:none;">
+          <h3 id="predict_coin"></h3>
           <div>
-            <span>MAE:</span>
-            <span id="stats_mae" class="predAttribute"></span>
+            <button id="emojiRocket" class="emojiButton" title="Send it to moon!">&#128640 <span id="emojiRocketValue">{{ROCKET_TOTAL}}</span></button>
+            <button id="emojiDeath" class="emojiButton" title="Sink the ship!">&#9760 <span id="emojiDeathValue">{{DEATH_TOTAL}}</span></button>
+          </div>
+          <br>
+          <div>
+            <span>Price Forecast:</span>
+            <span id="predict_prediction" class="predAttribute"></span>
           </div>
           <div>
-            <span>MAPE:</span>
-            <span id="stats_mape" class="predAttribute"></span>
+            <span>Price Change:</span>
+            <span id="predict_change" class="predAttribute"></span>
+            <span id="predict_change_pct" class="predAttribute"></span>
+          </div>
+          <br>
+          <div>
+            <span>Latest Actual Price:</span>
+            <span id="actual_price" class="predAttribute"></span>
           </div>
           <div>
-            <span>Training Time:</span>
-            <span id="stats_training_time" class="predAttribute"></span>
+            <span>Latest Actual Price Time:</span>
+            <span id="actual_time" class="predAttribute"></span>
+          </div>
+          <br>
+          <div id="mainChart"></div>
+          <br>
+          <div>Model Performance Metrics</div>
+          <div>
+            <div>
+              <span>MAE:</span>
+              <span id="stats_mae" class="predAttribute"></span>
+            </div>
+            <div>
+              <span>MAPE:</span>
+              <span id="stats_mape" class="predAttribute"></span>
+            </div>
+            <div>
+              <span>Training Time:</span>
+              <span id="stats_training_time" class="predAttribute"></span>
+            </div>
           </div>
         </div>
       </div>

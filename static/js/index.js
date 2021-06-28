@@ -7,6 +7,17 @@ function pricePrediction(coin){
     const coin_name = coin_split[0];
     const coin_code = coin_split[1];
     const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
+    $("#mainChart").empty();
+    $("#coinDetails").hide();
+    
+    //Stop early if details are already being loaded
+    if ($("#coinLoadingIcon").is(":visible")){
+      
+      $("#coinLoadingWarning").show();
+      return;
+    
+    }
+    $("#coinLoadingIcon").show();
     
     //Execute the function to update prices in the database
     $.ajax({
@@ -23,7 +34,6 @@ function pricePrediction(coin){
         // Parse the incoming data
         stats = data.stats;
         charts = data.charts;
-        $("#mainChart").empty();
         
         // Parse the prediction timestamps and present in locale
         var actual_time = JSON.parse(JSON.stringify(stats.actual_time));
@@ -71,7 +81,9 @@ function pricePrediction(coin){
         $("#stats_mape").html(JSON.parse(JSON.stringify(stats.stats_mape)));
         
         $("#mainChart").html(Bokeh.embed.embed_item(charts));
-        $("#pricePredictionBox").show();
+        $("#coinLoadingIcon").hide();
+        $("#coinLoadingWarning").hide();
+        $("#coinDetails").show();
             
           } // end of success
           

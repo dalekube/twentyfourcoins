@@ -8,6 +8,7 @@ Web application for TwentyFourCoins
 
 import os
 import json
+import time
 from flask import Flask, render_template, jsonify, request, redirect
 from flask_fontawesome import FontAwesome
 
@@ -149,6 +150,7 @@ def price_prediction():
     except:
         return jsonify(success=False), 500
     
+    time.sleep(3)
     return jsonify(stats=latest_json, charts=json_item(fig, 'mainChart'))
 
 @app.route('/emoji_load', methods=['GET'])
