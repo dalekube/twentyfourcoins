@@ -63,7 +63,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         # Make prediction with the latest observation closest to NOW()
         df_predict = df.tail(1)
         actual_time = str(df_predict['time'].iloc[0])
-        actual_close = float(df_predict['close'].iloc[0])
+        actual_price = float(df_predict['price'].iloc[0])
         predict_time = str(df_predict['time'].iloc[0] + pd.DateOffset(WINDOW/TIME_INTERVAL))
         del df_predict['time']
         
@@ -109,22 +109,22 @@ for COIN in config['SUPPORTED_COINS'].values():
             prediction = float((avg_pred+lr_pred)/2.0)
         
         # Log the latest actual price and corresponding prediction details
-        actual_close = round(actual_close,8)
+        actual_price = round(actual_price,8)
         prediction = round(prediction,8)
-        expected_change_pct = round((prediction/actual_close)-1,8)
-        expected_change = prediction-actual_close
+        expected_change_pct = round((prediction/actual_price)-1,8)
+        expected_change = prediction-actual_price
         expected_change = round(expected_change,8)
         change_direction = 'up' if expected_change > 0 else 'down'
         
         cursor = con.cursor()
         statement = 'INSERT INTO predictions \
-        VALUES ("%s", "%s", %s, "%s", %s, %s)' % (COIN, actual_time, actual_close, predict_time, prediction, WINDOW)
+        VALUES ("%s", "%s", %s, "%s", %s, %s)' % (COIN, actual_time, actual_price, predict_time, prediction, WINDOW)
         cursor.execute(statement)    
         cursor.close()
         con.commit()
         
         print('[INFO] Making forward-looking prediction from', actual_time)
-        print('[INFO] Latest actual price =', '{:,}'.format(actual_close))
+        print('[INFO] Latest actual price =', '{:,}'.format(actual_price))
         print('[INFO] Prediction time =', predict_time)  
         print('[INFO] Predicted price =', '{:,}'.format(prediction))
         print('[INFO] The price is expected to change by', str(expected_change), 'dollars in the next 24 hours')
@@ -151,7 +151,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         with open(JSON_DUMP, 'w') as f:
             json.dump({
                 'actual_time':actual_time,
-                'actual_close':'$ {:,.4f}'.format(actual_close),
+                'actual_price':'$ {:,.4f}'.format(actual_price),
                 'prediction':'$ {:,.4f}'.format(prediction),
                 'expected_change':'$ {:,.4f}'.format(expected_change),
                 'expected_change_pct':'{:.2%}'.format(expected_change_pct),
@@ -175,7 +175,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         assert len(df_preds) > 0, '[ERROR] Collected zero predicted prices'
         print('[INFO] Collected', '{:,}'.format(len(df_preds)), 'predicted prices for the charts')
         
-        statement = 'SELECT time, close FROM prices WHERE coin="%s"' % COIN
+        statement = 'SELECT time, price FROM prices_coinbase WHERE coin="%s"' % COIN
         df_actuals = pd.read_sql(statement, con)
         df_actuals['time'] = pd.to_datetime(df_actuals['time'])
         df_actuals = df_actuals[df_actuals['time'] > YEAR_DT]

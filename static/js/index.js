@@ -42,7 +42,7 @@ function pricePrediction(coin){
         $("#predict_coin").html(coin_name + " (" + coin_code + ")");
         $("#predict_coin").attr("active-coin", coin.value);
         $("#actual_time").html(actual_time);
-        $("#actual_close").html(JSON.parse(JSON.stringify(stats.actual_close)));
+        $("#actual_price").html(JSON.parse(JSON.stringify(stats.actual_price)));
         
         const change_direction = JSON.parse(JSON.stringify(stats.change_direction));
         var indicator = "<i class='fas fa-caret-down'></i>";

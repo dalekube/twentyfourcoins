@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Collect historical prices for supported coins.
+Collect historical prices for supported coins from the Coinbase API
+https://docs.pro.coinbase.com/#get-historic-rates
 
 @author: Dale Kube (dkube@uwalumni.com)
 """
@@ -49,7 +50,7 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
     
     # Retreive the existing data for the coin
     con = db_connect('../data/db.sqlite')
-    statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
+    statement = 'SELECT * FROM prices_coinbase WHERE coin = "%s"' % (COIN)
     df = pd.read_sql(statement, con)
     df['time'] = pd.to_datetime(df['time'])
     
@@ -80,7 +81,7 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
                 time_purge = "('" + str(time_purge[0]) + "')"
             else:
                 time_purge = tuple(time_purge)
-            statement = 'DELETE FROM prices WHERE coin = "%s" AND time IN %s' % (COIN, time_purge)
+            statement = 'DELETE FROM prices_coinbase WHERE coin = "%s" AND time IN %s' % (COIN, time_purge)
             cursor = con.cursor()
             cursor.execute(statement)
             cursor.close()
@@ -108,9 +109,10 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
             d_end = d + ' 23:55:00'
             
             # Collect the historical prices in five minute intervals
-            # https://docs.pro.COINbase.com/#get-historic-rates
+            # Keep the timestamp and closing price
             hist = public_client.get_product_historic_rates(COIN, start=d_start, end=d_end, granularity=300)
-            hist = pd.DataFrame(hist, columns=df.columns[1:])
+            hist = pd.DataFrame(hist).iloc[:,[0,4]]
+            hist.columns = df.columns[1:]
             hist.insert(loc=0, column='coin', value=COIN)
             N_HIST = len(hist)
             print('[INFO] Gathered', N_HIST, 'new price candles for', d)
@@ -126,7 +128,7 @@ for COIN_NAME, COIN in config['SUPPORTED_COINS'].items():
             assert N_INCOMPLETE < 5, '[ERROR] Five consecutive empty API responses'
             
             # Save the new candles to the database
-            hist.to_sql('prices', con, if_exists='append', index=False)
+            hist.to_sql('prices_coinbase', con, if_exists='append', index=False)
             
             # Sleep for one second to respect the API limits and avoid errors
             time.sleep(1)

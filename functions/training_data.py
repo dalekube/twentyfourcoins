@@ -22,7 +22,7 @@ def training_data(con, config, COIN, WINDOW, inference=False):
     
     # Load the data for the coin
     # Print the row count when finished
-    statement = 'SELECT * FROM prices WHERE coin = "%s"' % (COIN)
+    statement = 'SELECT * FROM prices_coinbase WHERE coin = "%s"' % (COIN)
     df = pd.read_sql(statement, con)
     df['time'] = pd.to_datetime(df['time'])
     del df['coin']
@@ -42,8 +42,8 @@ def training_data(con, config, COIN, WINDOW, inference=False):
     # Calculate rolling average features
     df.sort_values(by=['time'], inplace=True)
     for i in range(int(config['MIN_MOV_AVG']), int(config['MAX_MOV_AVG']), int(config['INTERVAL_MOV_AVG'])):
-        rolling_close = df['close'].rolling(window=i, min_periods=1, center=False)
-        df['MovingAverage_close_'+str(i)] = rolling_close.mean() 
+        rolling_price = df['price'].rolling(window=i, min_periods=1, center=False)
+        df['MovingAverage_price_'+str(i)] = rolling_price.mean() 
     
     # Drop rows with na values and convert to float32
     df.fillna(0, inplace=True)
@@ -55,7 +55,7 @@ def training_data(con, config, COIN, WINDOW, inference=False):
         df.sort_values(by=['time'], inplace=True)
     else:
         df.sort_values(by=['time'], inplace=True, ascending=False)
-        df['Y_PRICE'] = df['close'].shift(WINDOW)
+        df['Y_PRICE'] = df['price'].shift(WINDOW)
         df = df[~pd.isnull(df['Y_PRICE'])]
         del df['time']
     

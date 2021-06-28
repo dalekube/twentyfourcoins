@@ -12,7 +12,7 @@ import requests
 from datetime import datetime
 from db_connect import db_connect
 
-TABLE_NAME = 'prices_current'
+TABLE_NAME = 'prices_nomics'
 
 # Load the platform configuration
 with open('../config.json') as f:
