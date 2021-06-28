@@ -58,7 +58,6 @@ def index():
     
     UPDATE_TIME = datetime.now().astimezone().strftime('%Y-%m-%d %I:%M:%S %p %Z')
     
-    
     return render_template(
             'index.html',
             SUPPORTED_COINS = SUPPORTED_COINS,
@@ -115,7 +114,7 @@ def price_prediction():
         
         actuals = json.loads(chart_data['actuals'])
         actuals_time = list(actuals['time'].values())
-        actuals_values = list(actuals['close'].values())
+        actuals_values = list(actuals['price'].values())
         df_actuals = pd.DataFrame({'time':actuals_time, 'values':actuals_values})
         df_actuals['time'] = pd.to_datetime(df_actuals['time'])
         
