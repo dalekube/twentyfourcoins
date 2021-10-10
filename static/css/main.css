@@ -68,7 +68,7 @@ i {
 
 button {
   cursor:pointer;
-  outline:none;
+  outline:none !important;
   background: var(--tertiary_color);
   height:60px;
   margin-top:10px;
