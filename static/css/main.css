@@ -49,19 +49,6 @@
   margin-bottom:10px;
 }
 
-.tfcDivGreyBackground {
-  border-radius:5px;
-  padding:10px;
-  border:thin darkgrey solid;
-  width:300px;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  box-shadow: 2px 2px darkgrey;
-  margin-bottom:10px;
-  background:var(--tertiary_color);
-}
-
 i {
   margin:10px;
   font-size:30px;
@@ -88,7 +75,7 @@ button {
   color:black;
 }
 
-.coinButton {
+.coinButton, .windowButton {
   background: var(--tertiary_color);
   height:60px;
   margin-top:10px;
@@ -97,6 +84,12 @@ button {
 
 .coinButton:active, button:active {
   transform: translateY(2px);
+}
+
+.windowButton > div {
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .buttonRed {
@@ -188,11 +181,9 @@ button {
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  border-top: thin solid black;
-  border-bottom: thin solid black;
+  border-bottom: thin solid darkgrey;
 }
 
 .techBanner {
-  margin-top:100px;
   background: var(--tertiary_color);
 }

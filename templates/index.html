@@ -7,34 +7,32 @@
 <div style="display:flex;flex-direction:column;align-items:center;">
   <div style="display:flex;align-items:top;float:left;">
     <div style="max-width:300px;margin-right:25px;">
-      <div class="tfcDivGreyBackground">
+      <div class="tfcDivBlueBackground">
         <div>Time Windows</div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="windowRadioButtons" id="radio24Hours" value="288" checked>
-          <label class="form-check-label" for="radio24Hours">
+        <button class="windowButton" id="window24Hours" value="288">
+          <div>
+            <i class="fas fa-calendar-alt"></i>
             24 Hours
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="windowRadioButtons" id="radio30Days" value="8640">
-          <label class="form-check-label" for="radio30Days">
+          </div>
+        </button>
+        <button class="windowButton" id="window30Days" value="8640">
+          <div>
+            <i class="fas fa-calendar-alt"></i>
             30 Days
-          </label>
-        </div>
+          </div>
+        </button>
       </div>
       <div class="tfcDivBlueBackground" id="predictPriceBlock">
         <div>
           Supported Coins
-          <br>
-          Price Forecasts
         </div>
         {% for COIN_NAME, COIN in SUPPORTED_COINS %}
           {% for WINDOW in SUPPORTED_WINDOWS %}
             {% set INSTANCE = COIN + '-' + WINDOW %}
             {% if COIN_STATS[INSTANCE]['change_direction'] == 'up' %} 
               <button class="coinButton buttonGreen" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
-              onclick="pricePrediction(this)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
-              data-window={{WINDOW}}>
+              onclick="pricePrediction(this,`{{WINDOW}}`)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
+              data-window="{{WINDOW}}">
                 {{COIN_NAME}}
                 <br>
                 <i class='fas fa-caret-up'></i> 
@@ -42,8 +40,8 @@
               </button>
               {% else %}
                 <button class="coinButton buttonRed" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
-                onclick="pricePrediction(this)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
-                data-window={{WINDOW}}>
+                onclick="pricePrediction(this,`{{WINDOW}}`)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
+                data-window="{{WINDOW}}">
                 {{COIN_NAME}}
                 <br>
                 <i class='fas fa-caret-down'></i> 
@@ -88,6 +86,7 @@
         </div>
         <div id="coinDetails" style="display:none;">
           <h3 id="predict_coin"></h3>
+          <div id="windowSelection"></div>
           <div>
             <button id="emojiRocket" class="emojiButton" title="Send it to moon!">&#128640 <span id="emojiRocketValue">{{ROCKET_TOTAL}}</span></button>
             <button id="emojiDeath" class="emojiButton" title="Sink the ship!">&#9760 <span id="emojiDeathValue">{{DEATH_TOTAL}}</span></button>
@@ -133,10 +132,9 @@
       </div>
     </div>
   </div>
-  <br>
-  <div class="tfcDivGreyBackground" style="width:850px;">
-    <h2><a href='/about' style="text-decoration:underline;">What is TwentyFourCoins?</a></h2>
-  </div>
+</div>
+<div class="banner">
+  <h2><a href='/about' style="text-decoration:underline;">What is TwentyFourCoins?</a></h2>
 </div>
 <div class="banner techBanner">
   <h4>TwentyFourCoins Uses State-of-the-Art Technology</h4>
