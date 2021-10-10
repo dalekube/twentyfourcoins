@@ -68,8 +68,8 @@ i {
 
 button {
   cursor:pointer;
-  outline:none !important;
-  background: var(--tertiary_color) !important;
+  outline:none;
+  background: var(--tertiary_color);
   height:60px;
   margin-top:10px;
   color:black;
@@ -90,6 +90,12 @@ button {
   display:flex;
   align-items:center;
   justify-content:center;
+}
+
+.selectedButton, 
+.coinButton:focus, .coinButton:active, .coinButton:hover,
+.windowButton:focus, .windowButton:active, .windowButton:hover {
+  background: var(--fourth_color);
 }
 
 .buttonRed {
@@ -170,6 +176,7 @@ button {
 
 .emojiButton {
   border:none;
+  outline:none !important;
   margin-right:5px;
   height:30px;
 }

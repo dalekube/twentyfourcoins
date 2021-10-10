@@ -100,29 +100,10 @@ function pricePrediction(coin, window_int){
       success: function(data){
         $("#emojiRocketValue").text(data.totals[0]);
         $("#emojiDeathValue").text(data.totals[1]);
-        $("#windowSelection").text("24 Hour Forecast")
       }
     });
     
 }
-
-// Load an initial coin
-$(window).on('load', function(){
-  
-  pricePrediction({value:"Bitcoin:BTC-USD"},"288");
-  
-  $.ajax({
-    url: "/emoji_load?window=288&coin=BTC-USD",
-    type: "GET",
-    contentType:"application/json",
-    success: function(data){
-      $("#emojiRocketValue").text(data.totals[0]);
-      $("#emojiDeathValue").text(data.totals[1]);
-    }
-    
-  });
-  
-});
 
 $(document).ready(function(){
   
@@ -135,7 +116,7 @@ $(document).ready(function(){
     $(".coinButton[data-window='" + window_int + "']").show();
   })
   
-    $("#window30Days").on('click', function(){
+  $("#window30Days").on('click', function(){
     const coin = $("#predict_coin").attr("active-coin");
     const window_int = "8640";
     pricePrediction({value:coin},window_int);
@@ -143,6 +124,7 @@ $(document).ready(function(){
     $(".coinButton[data-window='" + window_int + "']").show();
   })
   
+  // Emoji button clicks
   $(".emojiButton").on('click', function(){
     
     const current_value = parseInt($(this).children('span').text());
@@ -155,6 +137,37 @@ $(document).ready(function(){
     $(this).children('span').text(current_value + 1);
     
   })
+  
+  // Add active button coloring to selected buttons
+  $(".windowButton").on('click', function(){
+    
+    $(".windowButton").removeClass("selectedButton");
+    $(this).addClass("selectedButton");
+    
+  })
+  
+  $(".coinButton").on('click', function(){
+    
+    $(".coinButton").removeClass("selectedButton");
+    var selected_coin = $(this).attr('data-coin');
+    $("*[data-coin='"+selected_coin+"']").addClass("selectedButton");
+    
+  })
+  
+  $.ajax({
+    url: "/emoji_load?window=288&coin=BTC-USD",
+    type: "GET",
+    contentType:"application/json",
+    success: function(data){
+      $("#emojiRocketValue").text(data.totals[0]);
+      $("#emojiDeathValue").text(data.totals[1]);
+    }
+    
+  });
+  
+  // Default to the 24 Hour forecast for BTC-USD
+  $("#window24Hours").addClass("selectedButton");
+  $('button[data-coin="BTC-USD"]').click();
   
 })
 

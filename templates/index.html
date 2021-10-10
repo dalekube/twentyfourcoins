@@ -30,7 +30,7 @@
           {% for WINDOW in SUPPORTED_WINDOWS %}
             {% set INSTANCE = COIN + '-' + WINDOW %}
             {% if COIN_STATS[INSTANCE]['change_direction'] == 'up' %} 
-              <button class="coinButton buttonGreen" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
+              <button class="coinButton buttonGreen" data-coin="{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
               onclick="pricePrediction(this,`{{WINDOW}}`)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
               data-window="{{WINDOW}}">
                 {{COIN_NAME}}
@@ -39,7 +39,7 @@
                 {{COIN_STATS[INSTANCE]['expected_change_pct']}}
               </button>
               {% else %}
-                <button class="coinButton buttonRed" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
+                <button class="coinButton buttonRed" data-coin="{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
                 onclick="pricePrediction(this,`{{WINDOW}}`)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
                 data-window="{{WINDOW}}">
                 {{COIN_NAME}}
