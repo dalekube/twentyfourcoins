@@ -1,12 +1,11 @@
 
 // main JavaScript file for the web platform
 
-function pricePrediction(coin){
+function pricePrediction(coin, window_int){
     
     var coin_split = coin.value.split(":");
     const coin_name = coin_split[0];
     const coin_code = coin_split[1];
-    const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
     $("#mainChart").empty();
     $("#coinDetails").hide();
     
@@ -51,6 +50,11 @@ function pricePrediction(coin){
         // Display the price prediction details
         $("#predict_coin").html(coin_name + " (" + coin_code + ")");
         $("#predict_coin").attr("active-coin", coin.value);
+        if (window_int=="288"){
+          $("#windowSelection").text("24 Hour Forecast");
+        }else{
+          $("#windowSelection").text("30 Day Forecast");
+        };
         $("#actual_time").html(actual_time);
         $("#actual_price").html(JSON.parse(JSON.stringify(stats.actual_price)));
         
@@ -96,6 +100,7 @@ function pricePrediction(coin){
       success: function(data){
         $("#emojiRocketValue").text(data.totals[0]);
         $("#emojiDeathValue").text(data.totals[1]);
+        $("#windowSelection").text("24 Hour Forecast")
       }
     });
     
@@ -104,7 +109,7 @@ function pricePrediction(coin){
 // Load an initial coin
 $(window).on('load', function(){
   
-  pricePrediction({value:"Bitcoin:BTC-USD"});
+  pricePrediction({value:"Bitcoin:BTC-USD"},"288");
   
   $.ajax({
     url: "/emoji_load?window=288&coin=BTC-USD",
@@ -121,11 +126,19 @@ $(window).on('load', function(){
 
 $(document).ready(function(){
   
-  // Handle changes to the time window radio group
-  $("input:radio[name='windowRadioButtons']").on('click', function(){
+  // Account for clicks on the time window buttons
+  $("#window24Hours").on('click', function(){
     const coin = $("#predict_coin").attr("active-coin");
-    const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
-    pricePrediction({value:coin});
+    const window_int = "288";
+    pricePrediction({value:coin},window_int);
+    $(".coinButton").hide();
+    $(".coinButton[data-window='" + window_int + "']").show();
+  })
+  
+    $("#window30Days").on('click', function(){
+    const coin = $("#predict_coin").attr("active-coin");
+    const window_int = "8640";
+    pricePrediction({value:coin},window_int);
     $(".coinButton").hide();
     $(".coinButton[data-window='" + window_int + "']").show();
   })
@@ -134,7 +147,7 @@ $(document).ready(function(){
     
     const current_value = parseInt($(this).children('span').text());
     var current_coin = $("#predict_coin").attr("active-coin");
-    const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
+    const window_int = "288";
     
     current_coin = current_coin.split(":");
     const coin_code = current_coin[1];

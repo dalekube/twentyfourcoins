@@ -30,7 +30,6 @@ APPLICATION_VERSION = config['APPLICATION_VERSION']
 # Define the Flask application object
 app = Flask(__name__, static_url_path='')
 fa = FontAwesome(app)
-app.secret_key = config['MASTER_PASSCODE']
 
 # Session management cookie configuration
 app.config['SESSION_COOKIE_NAME'] = 'tfc-tmp-session-mgmt'
@@ -150,7 +149,7 @@ def price_prediction():
     except:
         return jsonify(success=False), 500
     
-    time.sleep(3)
+    time.sleep(1)
     return jsonify(stats=latest_json, charts=json_item(fig, 'mainChart'))
 
 @app.route('/emoji_load', methods=['GET'])
