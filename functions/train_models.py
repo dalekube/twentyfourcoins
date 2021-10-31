@@ -7,6 +7,7 @@ Train the models for supported coins.
 """
 
 import os
+import gc
 import json
 import pandas as pd
 import numpy as np
@@ -21,6 +22,7 @@ import _pickle as cPickle
 ## DEVELOPMENT ONLY
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
 
+gc.enable()
 from training_data import training_data
 from db_connect import db_connect
 con = db_connect('../data/db.sqlite')
@@ -54,7 +56,9 @@ for COIN in config['SUPPORTED_COINS'].values():
         y_train = y_price[N_TEST_RECENT:].reset_index(drop=True)
         
         x_test_recent = df[:N_TEST_RECENT]
-        y_test_recent = y_price[:N_TEST_RECENT] 
+        y_test_recent = y_price[:N_TEST_RECENT]
+        gc.enable()
+        del df
         
         # Random sample from the rest of the training data
         random.seed(1000)
@@ -69,7 +73,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         y_train.drop(idx, inplace=True)
         
         # Train  and evaluate the random forest model
-        rfr = RangerForestRegressor(n_estimators=71, oob_error=False, sample_fraction=[0.25])
+        rfr = RangerForestRegressor(n_estimators=31, oob_error=False, sample_fraction=[0.25])
         rfr.fit(x_train, y_train)
         rf_preds = rfr.predict(x_test)
         
