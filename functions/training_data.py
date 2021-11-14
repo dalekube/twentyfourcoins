@@ -8,12 +8,8 @@ the secondary features.
 """
 
 import pandas as pd
-from features.stock_spy import features_stock_spy
 
-## DEVELOPMENT ONLY
-## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
-
-def training_data(con, config, COIN, WINDOW, inference=False):
+def training_data(con, config, COIN, WINDOW, prices_spy, prices_btc, inference=False):
     '''Prepare the training data for model training and inference
     
     Collect the historical prices and merge the prices with additional
@@ -22,7 +18,7 @@ def training_data(con, config, COIN, WINDOW, inference=False):
     
     # Load the data for the coin
     # Print the row count when finished
-    statement = 'SELECT * FROM prices_coinbase WHERE coin = "%s"' % (COIN)
+    statement = 'SELECT * FROM prices_coinbase WHERE coin = "%s"' % COIN
     df = pd.read_sql(statement, con)
     df['time'] = pd.to_datetime(df['time'])
     del df['coin']
@@ -31,13 +27,18 @@ def training_data(con, config, COIN, WINDOW, inference=False):
     assert N_DF > 0, '[ERROR] Zero rows in the collected data for ' + COIN
     print("[INFO] Successfully read", '{:,}'.format(N_DF), "rows from the database")
     
-    # Add stock market features
-    prices_spy = features_stock_spy(con)
-    prices_spy.rename(columns={'time':'time_merge'}, inplace=True)
     df['time_merge'] = df['time'].dt.strftime('%Y-%m-%d')
     df['time_merge'] = pd.to_datetime(df['time_merge'])
+    
+    # Add stock market features
     df = df.merge(prices_spy, on=['time_merge'], how='left')
-    del df['time_merge'], df['stock_spy_time']
+    
+    # Add the historical Bitcoin prices
+    if COIN != 'BTC-USD':
+        df = df.merge(prices_btc, on=['time_merge'], how='left')
+    
+    # Finish up adding features
+    del df['time_merge']
     
     # Calculate rolling average features
     df.sort_values(by=['time'], inplace=True)

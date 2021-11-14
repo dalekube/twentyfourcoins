@@ -7,6 +7,7 @@ https://nomics.com/docs/#operation/getCurrenciesTicker
 @author: Dale Kube (dkube@uwalumni.com)
 """
 
+import os
 import json
 import requests
 from datetime import datetime
@@ -15,6 +16,7 @@ from db_connect import db_connect
 TABLE_NAME = 'prices_nomics'
 
 # Load the platform configuration
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 with open('../config.json') as f:
     config = json.load(f)
 

@@ -23,6 +23,7 @@ import pandas as pd
 ## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/')
 
 # Load the platform configuration
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 with open('config.json') as f:
     config = json.load(f)
 APPLICATION_VERSION = config['APPLICATION_VERSION']
