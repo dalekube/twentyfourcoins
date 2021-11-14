@@ -14,9 +14,7 @@ import pandas as pd
 import bz2
 import _pickle as cPickle
 
-## DEVELOPMENT ONLY
-## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
-
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 from training_data import training_data
 from db_connect import db_connect
 con = db_connect('../data/db.sqlite')

@@ -7,6 +7,7 @@ https://docs.pro.coinbase.com/#get-historic-rates
 @author: Dale Kube (dkube@uwalumni.com)
 """
 
+import os
 import json
 import time
 import pandas as pd
@@ -16,6 +17,7 @@ import cbpro
 from db_connect import db_connect
 
 # Load the platform configuration
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 with open('../config.json') as f:
     config = json.load(f)
 
