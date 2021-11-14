@@ -19,15 +19,18 @@ from training_data import training_data
 from db_connect import db_connect
 con = db_connect('../data/db.sqlite')
 
+# Load the historical prices for important features
+from features.stock_spy import features_stock_spy
+from features.bitcoin import features_bitcoin
+prices_spy = features_stock_spy(con)
+prices_btc = features_bitcoin(con)
+
 # Load the configurations
 with open('../config.json') as f:
     config = json.load(f)
 
 # Iterate over every supported coin
 for COIN in config['SUPPORTED_COINS'].values():
-    
-    ## DEVELOPMENT ONLY
-    ## COIN = 'BTC-USD'
     
     for w in config['SUPPORTED_WINDOWS']:
     
@@ -38,7 +41,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         
         print('[INFO] Starting the iteration for', COIN)
         print('[INFO] Time window (5 minute bundles) =', WINDOW)
-        df = training_data(con, config, COIN, WINDOW, inference=True)
+        df = training_data(con, config, COIN, WINDOW, prices_spy, prices_btc, inference=True)
         
         # Load the best model
         MODEL_DIR = '../models/' + COIN + '/' + str(WINDOW) + '/'
@@ -160,7 +163,7 @@ for COIN in config['SUPPORTED_COINS'].values():
                 }, f)
         
         # Collect predictions for the predictive performance chart
-        # Limit to the past 12 months
+        # Limit to the past N months
         YEAR_DT = pd.to_datetime('now') - pd.DateOffset(months=3)
         
         statement = 'SELECT PREDICTION_TIME, PREDICTION FROM predictions \
