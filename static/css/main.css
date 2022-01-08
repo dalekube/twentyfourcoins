@@ -92,9 +92,7 @@ button {
   justify-content:center;
 }
 
-.selectedButton, 
-.coinButton:focus, .coinButton:active, .coinButton:hover,
-.windowButton:focus, .windowButton:active, .windowButton:hover {
+.selectedButton, .coinButton:hover, .windowButton:hover {
   background: var(--fourth_color);
 }
 
