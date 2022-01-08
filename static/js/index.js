@@ -9,8 +9,14 @@ function pricePrediction(coin, window_int){
     $("#mainChart").empty();
     $("#coinDetails").hide();
     
+    var notFirstTime = localStorage.getItem("first_time");
+    if(!notFirstTime) {
+        // first time loaded
+        localStorage.setItem("first_time","1");
+    }
+    
     //Stop early if details are already being loaded
-    if ($("#coinLoadingIcon").is(":visible")){
+    if ($("#coinLoadingIcon").is(":visible") && notFirstTime){
       
       $("#coinLoadingWarning").show();
       return;
