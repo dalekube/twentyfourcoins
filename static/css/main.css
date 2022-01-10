@@ -64,6 +64,7 @@ i {
   font-size:18px;
   box-shadow: 2px 2px darkgrey;
   width:525px;
+  height:fit-content;
 }
 
 button {
