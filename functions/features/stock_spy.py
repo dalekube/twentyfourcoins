@@ -40,7 +40,7 @@ def features_stock_spy(con):
         prices = yf.download('SPY', period='max', interval='1d', progress=False)
         prices = reshape_stock_spy(prices)
         
-        statement = 'SELECT time FROM prices'
+        statement = 'SELECT time FROM prices_coinbase'
         crypto_times = pd.read_sql(statement, con)
         crypto_times['time'] = pd.to_datetime(crypto_times['time']).dt.strftime('%Y-%m-%d')
         crypto_times['time'] = pd.to_datetime(crypto_times['time'])
@@ -60,13 +60,14 @@ def features_stock_spy(con):
         max_date = pd.read_sql(statement, con)['MAX_TIME'].iloc[0]
         max_date = pd.to_datetime(max_date)
         
-        if max_date < dt.utcnow():
-            max_date_plus1 = max_date + pd.DateOffset(1)
-            today = dt.utcnow().strftime("%Y-%m-%d")
+    if max_date < dt.utcnow():
+        max_date_plus1 = max_date + pd.DateOffset(1)
+        max_date_plus1 = max_date_plus1.strftime("%Y-%m-%d")
+        today = dt.utcnow().strftime("%Y-%m-%d")
+        if max_date_plus1 != today:
             prices = yf.download('SPY', start=max_date_plus1, end=today, interval='1d', progress=False)
             prices = reshape_stock_spy(prices)
             prices = prices[prices['stock_spy_time'] > max_date]
-            
             if len(prices) > 0:
                 prices.to_sql(TABLE_NAME, con, if_exists='append', index=False)
     
