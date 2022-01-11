@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   {{ fontawesome_html() }}
-  <title>TwentyFourCoins</title>
+  <title>twentyfourcoins</title>
   <!-- Generated with https://gauger.io/fonticon/ -->
   <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
@@ -17,7 +17,6 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-  
     gtag('config', 'G-4MW95L9F9S');
   </script>
 </head>
@@ -25,7 +24,7 @@
   <div class="headerBar">
     <br>
     <div>
-      <h2><a class="headerLink" href="/"><i class="fas fa-coins"></i>TwentyFourCoins</a></h2>
+      <h2><a class="headerLink" href="/"></i>twentyfourcoins</a></h2>
     </div>
     <div>cryptocurrency price forecasts using artificial intelligence</div>
     <br>
@@ -37,6 +36,11 @@
   </div>
   <div>
     {% block content %}{% endblock %}
+    <div style="padding:1rem;text-align:center;">
+      <a class="footerLink" href='/'>Home</a>
+      <span>|</span>
+      <a class="footerLink" href='/about'>About</a>
+    </div>
   </div>
   <div class="disclaimer">
     {{APPLICATION_VERSION}}

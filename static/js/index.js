@@ -1,33 +1,47 @@
 
 // main JavaScript file for the web platform
 
-function pricePrediction(coin){
+var page_loaded = 0;
+
+// Retrieve the price prediction for a given coin and time window
+function pricePrediction(coin, window_int){
     
     var coin_split = coin.value.split(":");
     const coin_name = coin_split[0];
     const coin_code = coin_split[1];
-    const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
+    
+    // Hide the main chart and coin details while the next coin predictions
+    // and prices are being loaded
     $("#mainChart").empty();
     $("#coinDetails").hide();
     
     //Stop early if details are already being loaded
-    if ($("#coinLoadingIcon").is(":visible")){
+    if ($("#coinLoadingIcon").is(":visible") && page_loaded > 0){
       
       $("#coinLoadingWarning").show();
       return;
     
+    }else{
+      
+      $("#coinLoadingIcon").show();
+      
     }
-    $("#coinLoadingIcon").show();
+    
+    // color the buttons to reflect the active selection
+    $(".coinButton").removeClass("selectedButton");
+    $(".windowButton").removeClass("selectedButton");
+    $("*[data-coin='"+coin_code+"']").addClass("selectedButton");
+    $("button[value='"+window_int+"']").addClass("selectedButton");
     
     //Execute the function to update prices in the database
     $.ajax({
       url: "/price_prediction",
       type: "POST",
+      aysnc: true,
       data: JSON.stringify({COIN: coin_code, WINDOW:window_int}),
       contentType:"application/json",
       error: function(){
         msg = "Failed to retrieve the forecast data for " + coin_name + " (" + coin_code + ")" + " for the " + window_int + " window";
-        //window.location.replace("/error?msg=" + msg);
       },
       success: function(data){
         
@@ -51,6 +65,11 @@ function pricePrediction(coin){
         // Display the price prediction details
         $("#predict_coin").html(coin_name + " (" + coin_code + ")");
         $("#predict_coin").attr("active-coin", coin.value);
+        if (window_int=="288"){
+          $("#windowSelection").text("24 Hour Forecast");
+        }else{
+          $("#windowSelection").text("30 Day Forecast");
+        };
         $("#actual_time").html(actual_time);
         $("#actual_price").html(JSON.parse(JSON.stringify(stats.actual_price)));
         
@@ -85,13 +104,14 @@ function pricePrediction(coin){
         $("#coinLoadingWarning").hide();
         $("#coinDetails").show();
             
-          } // end of success
+      } // end of success
           
-      }); // end of AJAX call
+    }); // end of AJAX call
       
     $.ajax({
       url: "/emoji_load?window=" + window_int + "&coin=" + coin_code,
       type: "GET",
+      aysnc: true,
       contentType:"application/json",
       success: function(data){
         $("#emojiRocketValue").text(data.totals[0]);
@@ -101,40 +121,31 @@ function pricePrediction(coin){
     
 }
 
-// Load an initial coin
-$(window).on('load', function(){
-  
-  pricePrediction({value:"Bitcoin:BTC-USD"});
-  
-  $.ajax({
-    url: "/emoji_load?window=288&coin=BTC-USD",
-    type: "GET",
-    contentType:"application/json",
-    success: function(data){
-      $("#emojiRocketValue").text(data.totals[0]);
-      $("#emojiDeathValue").text(data.totals[1]);
-    }
-    
-  });
-  
-});
-
 $(document).ready(function(){
   
-  // Handle changes to the time window radio group
-  $("input:radio[name='windowRadioButtons']").on('click', function(){
+  // Account for clicks on the time window buttons
+  $("#window24Hours").on('click', function(){
     const coin = $("#predict_coin").attr("active-coin");
-    const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
-    pricePrediction({value:coin});
+    const window_int = "288";
+    pricePrediction({value:coin},window_int);
     $(".coinButton").hide();
     $(".coinButton[data-window='" + window_int + "']").show();
   })
   
+  $("#window30Days").on('click', function(){
+    const coin = $("#predict_coin").attr("active-coin");
+    const window_int = "8640";
+    pricePrediction({value:coin},window_int);
+    $(".coinButton").hide();
+    $(".coinButton[data-window='" + window_int + "']").show();
+  })
+  
+  // Emoji button clicks
   $(".emojiButton").on('click', function(){
     
     const current_value = parseInt($(this).children('span').text());
     var current_coin = $("#predict_coin").attr("active-coin");
-    const window_int = $("input:radio[name='windowRadioButtons']:checked").val();
+    const window_int = "288";
     
     current_coin = current_coin.split(":");
     const coin_code = current_coin[1];
@@ -143,7 +154,12 @@ $(document).ready(function(){
     
   })
   
+  // Default to the 24 Hour forecast for BTC-USD
+  $('button[data-coin="BTC-USD"][data-window="288"]').click();
+  page_loaded += 1;
+  
 })
+
 
 
 

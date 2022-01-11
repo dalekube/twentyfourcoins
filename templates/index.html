@@ -3,47 +3,45 @@
 {% block content %}
 
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<meta http-equiv="Refresh" content="300">
-<div style="display:flex;flex-direction:column;align-items:center;">
+<div style="display:flex;flex-direction:column;align-items:center;height:50rem;">
   <div style="display:flex;align-items:top;float:left;">
+    <!-- BUTTON SIDEBAR -->
     <div style="max-width:300px;margin-right:25px;">
-      <div class="tfcDivGreyBackground">
+      <div class="tfcDivBlueBackground">
         <div>Time Windows</div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="windowRadioButtons" id="radio24Hours" value="288" checked>
-          <label class="form-check-label" for="radio24Hours">
+        <button class="windowButton selectedButton" id="window24Hours" value="288">
+          <div>
+            <i class="fas fa-calendar-alt"></i>
             24 Hours
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="windowRadioButtons" id="radio30Days" value="8640">
-          <label class="form-check-label" for="radio30Days">
+          </div>
+        </button>
+        <button class="windowButton" id="window30Days" value="8640">
+          <div>
+            <i class="fas fa-calendar-alt"></i>
             30 Days
-          </label>
-        </div>
+          </div>
+        </button>
       </div>
       <div class="tfcDivBlueBackground" id="predictPriceBlock">
         <div>
           Supported Coins
-          <br>
-          Price Forecasts
         </div>
         {% for COIN_NAME, COIN in SUPPORTED_COINS %}
           {% for WINDOW in SUPPORTED_WINDOWS %}
             {% set INSTANCE = COIN + '-' + WINDOW %}
             {% if COIN_STATS[INSTANCE]['change_direction'] == 'up' %} 
-              <button class="coinButton buttonGreen" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
-              onclick="pricePrediction(this)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
-              data-window={{WINDOW}}>
+              <button class="coinButton buttonGreen" data-coin="{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
+              onclick="pricePrediction(this,`{{WINDOW}}`)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
+              data-window="{{WINDOW}}">
                 {{COIN_NAME}}
                 <br>
                 <i class='fas fa-caret-up'></i> 
                 {{COIN_STATS[INSTANCE]['expected_change_pct']}}
               </button>
               {% else %}
-                <button class="coinButton buttonRed" id="getPrice{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
-                onclick="pricePrediction(this)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
-                data-window={{WINDOW}}>
+                <button class="coinButton buttonRed" data-coin="{{COIN}}" value="{{COIN_NAME}}:{{COIN}}" 
+                onclick="pricePrediction(this,`{{WINDOW}}`)" {% if WINDOW != "288" %} style="display:none;" {% endif %}
+                data-window="{{WINDOW}}">
                 {{COIN_NAME}}
                 <br>
                 <i class='fas fa-caret-down'></i> 
@@ -69,86 +67,79 @@
           </div>
         </div>
         <br>
-        <div style="display:flex;flex-direction:column;align-items:center;">
-          <i class="fas fa-sync"></i>
-          <div>The page will automatically refresh every five minutes to provide current prices and predictions. The last update was at {{UPDATE_TIME}}</div>
+      </div>
+    </div>
+    <!-- PREDICTION BOX -->
+    <div id="pricePredictionBox" class="predictionBox">
+      <div id="coinLoadingIcon" style="display:none;">
+        <div style="display:flex;align-items:center;">
+          <i class="fas fa-spinner fa-spin" style="font-size:50px;"></i>
+          <span>Loading forecast and model data...</span>
+        </div>
+        <div id="coinLoadingWarning" style="display:none;color:red;margin-top:10px;">Please wait until the previous coin is finished loading.</div>
+      </div>
+      <div id="coinDetails" style="display:none;">
+        <h3 id="predict_coin"></h3>
+        <div id="windowSelection"></div>
+        <div>
+          <button id="emojiRocket" class="emojiButton" title="Send it to moon!">&#128640 <span id="emojiRocketValue">{{ROCKET_TOTAL}}</span></button>
+          <button id="emojiDeath" class="emojiButton" title="Sink the ship!">&#9760 <span id="emojiDeathValue">{{DEATH_TOTAL}}</span></button>
         </div>
         <br>
-      </div>
-    </div>
-    <div>
-      <!-- PREDICTION BOX -->
-      <div id="pricePredictionBox" class="predictionBox">
-        <div id="coinLoadingIcon" style="display:none;">
-          <div style="display:flex;align-items:center;">
-            <i class="fas fa-spinner fa-spin" style="font-size:50px;"></i>
-            <span>Loading forecast and model data...</span>
-          </div>
-          <div id="coinLoadingWarning" style="display:none;color:red;margin-top:10px;">Please wait until the previous coin is finished loading.</div>
+        <div>
+          <span>Price Forecast:</span>
+          <span id="predict_prediction" class="predAttribute"></span>
         </div>
-        <div id="coinDetails" style="display:none;">
-          <h3 id="predict_coin"></h3>
+        <div>
+          <span>Price Change:</span>
+          <span id="predict_change" class="predAttribute"></span>
+          <span id="predict_change_pct" class="predAttribute"></span>
+        </div>
+        <br>
+        <div>
+          <span>Latest Actual Price:</span>
+          <span id="actual_price" class="predAttribute"></span>
+        </div>
+        <div>
+          <span>Latest Actual Price Time:</span>
+          <span id="actual_time" class="predAttribute"></span>
+        </div>
+        <br>
+        <div id="mainChart"></div>
+        <br>
+        <div>Model Performance Metrics</div>
+        <div>
           <div>
-            <button id="emojiRocket" class="emojiButton" title="Send it to moon!">&#128640 <span id="emojiRocketValue">{{ROCKET_TOTAL}}</span></button>
-            <button id="emojiDeath" class="emojiButton" title="Sink the ship!">&#9760 <span id="emojiDeathValue">{{DEATH_TOTAL}}</span></button>
+            <span>MAE:</span>
+            <span id="stats_mae" class="predAttribute"></span>
           </div>
-          <br>
           <div>
-            <span>Price Forecast:</span>
-            <span id="predict_prediction" class="predAttribute"></span>
+            <span>MAPE:</span>
+            <span id="stats_mape" class="predAttribute"></span>
           </div>
           <div>
-            <span>Price Change:</span>
-            <span id="predict_change" class="predAttribute"></span>
-            <span id="predict_change_pct" class="predAttribute"></span>
-          </div>
-          <br>
-          <div>
-            <span>Latest Actual Price:</span>
-            <span id="actual_price" class="predAttribute"></span>
-          </div>
-          <div>
-            <span>Latest Actual Price Time:</span>
-            <span id="actual_time" class="predAttribute"></span>
-          </div>
-          <br>
-          <div id="mainChart"></div>
-          <br>
-          <div>Model Performance Metrics</div>
-          <div>
-            <div>
-              <span>MAE:</span>
-              <span id="stats_mae" class="predAttribute"></span>
-            </div>
-            <div>
-              <span>MAPE:</span>
-              <span id="stats_mape" class="predAttribute"></span>
-            </div>
-            <div>
-              <span>Training Time:</span>
-              <span id="stats_training_time" class="predAttribute"></span>
-            </div>
+            <span>Training Time:</span>
+            <span id="stats_training_time" class="predAttribute"></span>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <br>
-  <div class="tfcDivGreyBackground" style="width:850px;">
-    <h2><a href='/about' style="text-decoration:underline;">What is TwentyFourCoins?</a></h2>
-  </div>
-</div>
-<div class="banner techBanner">
-  <h4>TwentyFourCoins Uses State-of-the-Art Technology</h4>
-  <div>
-    <img class="techLogo" alt="AWS Logo" src="images/amazon-web-services-logo.png"/>
-    <img class="techLogo" alt="TensorFlow Logo" src="images/tensorflow.png"/>
-    <img class="techLogo" alt="Flask Logo" src="images/flask.png"/>
-    <img class="techLogo" alt="Python Logo" src="images/python.png"/>
   </div>
 </div>
 <div class="banner">
-  <h4>Support the project by making a donation</h4>
+  <img alt="Banner-Forecasts" src="images/banner-forecasts.png"/>
+  <img alt="Banner-Privacy" src="images/banner-privacy.png"/>
+</div>
+<div class="banner techBanner">
+  <h4>The platform uses state-of-the-art technology to provide the best forecasts.</h4>
+  <div>
+    <img class="techLogo" alt="AWS Logo" src="images/aws.png"/>
+    <img class="techLogo" alt="TensorFlow Logo" src="images/tensorflow.png"/>
+    <img class="techLogo" alt="Flask Logo" src="images/flask.png"/>
+  </div>
+</div>
+<div class="banner">
+  <h4>Make a donation to support the project.</h4>
   <br>
   <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="twentyfourcoins" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy the project a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff"></script>
 </div>

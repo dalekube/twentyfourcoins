@@ -45,6 +45,7 @@ def features_stock_spy(con):
         crypto_times['time'] = pd.to_datetime(crypto_times['time']).dt.strftime('%Y-%m-%d')
         crypto_times['time'] = pd.to_datetime(crypto_times['time'])
         crypto_times.drop_duplicates(inplace=True)
+        
         prices = prices[prices['stock_spy_time'] >= min(crypto_times['time']) - pd.DateOffset(365)]
         crypto_times = crypto_times['time'].to_list()
         
@@ -74,8 +75,9 @@ def features_stock_spy(con):
     # Gather all of the stock prices
     statement = 'SELECT * FROM %s' % TABLE_NAME
     all_prices = pd.read_sql(statement, con)
-    all_prices['stock_spy_time'] = pd.to_datetime(all_prices['stock_spy_time'])
     all_prices['time'] = pd.to_datetime(all_prices['time'])
+    all_prices.rename(columns={'time':'time_merge'}, inplace=True)
+    del all_prices['stock_spy_time']
     
     print('[INFO] Finished gathering stock market data for SPY')
     return all_prices

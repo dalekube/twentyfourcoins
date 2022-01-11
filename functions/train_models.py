@@ -7,6 +7,7 @@ Train the models for supported coins.
 """
 
 import os
+import gc
 import json
 import pandas as pd
 import numpy as np
@@ -18,12 +19,17 @@ from sklearn.linear_model import LinearRegression
 import bz2
 import _pickle as cPickle
 
-## DEVELOPMENT ONLY
-## os.chdir('/home/dale/Downloads/GitHub/TwentyFourCoins/functions')
-
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+gc.enable()
 from training_data import training_data
 from db_connect import db_connect
 con = db_connect('../data/db.sqlite')
+
+# Load the historical prices for important features
+from features.stock_spy import features_stock_spy
+from features.bitcoin import features_bitcoin
+prices_spy = features_stock_spy(con)
+prices_btc = features_bitcoin(con)
 
 # Load the configurations
 with open('../config.json') as f:
@@ -32,15 +38,12 @@ with open('../config.json') as f:
 # Iterate over the supported coins
 for COIN in config['SUPPORTED_COINS'].values():
     
-    ## DEVELOPMENT ONLY
-    ## COIN = 'BTC-USD'
-    
     for w in config['SUPPORTED_WINDOWS']:
         
         WINDOW = int(w)
         print('[INFO] Starting the iteration for', COIN)
         print('[INFO] Time window (5 minute bundles) =', WINDOW)
-        df = training_data(con, config, COIN, WINDOW)
+        df = training_data(con, config, COIN, WINDOW, prices_spy, prices_btc)
         
         # Split the training and testing data
         # Use a combinatorial approach, with samples from recent days and random days across history
@@ -54,7 +57,9 @@ for COIN in config['SUPPORTED_COINS'].values():
         y_train = y_price[N_TEST_RECENT:].reset_index(drop=True)
         
         x_test_recent = df[:N_TEST_RECENT]
-        y_test_recent = y_price[:N_TEST_RECENT] 
+        y_test_recent = y_price[:N_TEST_RECENT]
+        gc.enable()
+        del df
         
         # Random sample from the rest of the training data
         random.seed(1000)
@@ -69,7 +74,7 @@ for COIN in config['SUPPORTED_COINS'].values():
         y_train.drop(idx, inplace=True)
         
         # Train  and evaluate the random forest model
-        rfr = RangerForestRegressor(n_estimators=71, oob_error=False, sample_fraction=[0.25])
+        rfr = RangerForestRegressor(n_estimators=31, oob_error=False, sample_fraction=[0.25])
         rfr.fit(x_train, y_train)
         rf_preds = rfr.predict(x_test)
         

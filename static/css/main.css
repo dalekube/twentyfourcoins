@@ -49,19 +49,6 @@
   margin-bottom:10px;
 }
 
-.tfcDivGreyBackground {
-  border-radius:5px;
-  padding:10px;
-  border:thin darkgrey solid;
-  width:300px;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  box-shadow: 2px 2px darkgrey;
-  margin-bottom:10px;
-  background:var(--tertiary_color);
-}
-
 i {
   margin:10px;
   font-size:30px;
@@ -77,18 +64,19 @@ i {
   font-size:18px;
   box-shadow: 2px 2px darkgrey;
   width:525px;
+  height:fit-content;
 }
 
 button {
   cursor:pointer;
   outline:none !important;
-  background: var(--tertiary_color) !important;
+  background: var(--tertiary_color);
   height:60px;
   margin-top:10px;
   color:black;
 }
 
-.coinButton {
+.coinButton, .windowButton {
   background: var(--tertiary_color);
   height:60px;
   margin-top:10px;
@@ -97,6 +85,16 @@ button {
 
 .coinButton:active, button:active {
   transform: translateY(2px);
+}
+
+.windowButton > div {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.selectedButton, .coinButton:hover, .windowButton:hover {
+  background: var(--fourth_color);
 }
 
 .buttonRed {
@@ -161,7 +159,7 @@ button {
 
 .disclaimer {
   font-size:12px;
-  padding:50px;
+  padding:1rem;
   text-align:center;
   max-width:1000px;
   position:absolute;
@@ -177,6 +175,7 @@ button {
 
 .emojiButton {
   border:none;
+  outline:none !important;
   margin-right:5px;
   height:30px;
 }
@@ -188,11 +187,16 @@ button {
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  border-top: thin solid black;
-  border-bottom: thin solid black;
+  border-bottom: thin solid darkgrey;
+  text-align:center;
 }
 
 .techBanner {
-  margin-top:100px;
   background: var(--tertiary_color);
+}
+
+.footerLink {
+  text-decoration:underline;
+  margin-left:0.25rem;
+  margin-right:0.25rem;
 }
