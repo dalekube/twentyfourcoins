@@ -17,6 +17,7 @@
     --tertiary_color: #181818;
     --fourth_color: #404040;
     --body_color: #121212;
+    --header_font_color:white;
     --primary_font_color:white;
     --secondary_font_color: #B3B3B3;
   }
@@ -135,7 +136,8 @@ button {
   background:none;
   border:thin solid black !important;
   padding:10px;
-}
+  background-color: var(--fourth_color)
+} 
 
 .navLink {
   text-decoration:none !important;
@@ -219,6 +221,10 @@ button {
 .techBanner {
   background: var(--tertiary_color);
   color: var(--primary_font_color);
+}
+
+.container {
+  color: var(--primary_font_color)
 }
 
 .footerLink {
