@@ -1,9 +1,33 @@
 
 :root {
-  --primary_color: #4488EE;
+  --primary_color: #4488ee;
   --secondary_color: black;
   --tertiary_color: #e7f0f7;
-  --fourth_color:#FFBD59;
+  --fourth_color:  #FFBD59;
+  --body_color: white;
+  --header_font_color: white;
+  --primary_font_color: black;
+  --secondary_font_color: black;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary_color: #4488ee;
+    --secondary_color: #e7f0f7;
+    --tertiary_color: #181818;
+    --fourth_color: #404040;
+    --body_color: #121212;
+    --primary_font_color:white;
+    --secondary_font_color: #B3B3B3;
+  }
+}
+
+.body {
+  background-color: var(--body_color);
+}
+
+.headerBanner {
+  color: var(--secondary_font_color);
 }
 
 .headerBar {
@@ -13,13 +37,13 @@
   width:100vw;
   max-width:100%;
   border-bottom: thin solid var(--secondary_color);
-  color:white;
+  color: var(--header_font_color);
   background: var(--primary_color);
   white-space:nowrap;
 }
 
 .headerLink, .headerLink:hover {
-  color:white;
+  color: var(--header_font_color);
   text-decoration:none !important;
 }
 
@@ -45,7 +69,7 @@
   display:flex;
   flex-direction:column;
   box-shadow: 2px 2px darkgrey;
-  color:white;
+  color: var(--secondary_font_color);
   margin-bottom:10px;
 }
 
@@ -56,7 +80,7 @@ i {
 
 .predictionBox {
   background: var(--tertiary_color);
-  color: black;
+  color: var(--primary_font_color);
   padding:20px;
   border-radius:5px;
   white-space:nowrap;
@@ -73,14 +97,14 @@ button {
   background: var(--tertiary_color);
   height:60px;
   margin-top:10px;
-  color:black;
+  color: var(--primary_font_color);
 }
 
 .coinButton, .windowButton {
   background: var(--tertiary_color);
   height:60px;
   margin-top:10px;
-  color:black;
+  color: var(--primary_font_color);
 }
 
 .coinButton:active, button:active {
@@ -189,10 +213,12 @@ button {
   justify-content:center;
   border-bottom: thin solid darkgrey;
   text-align:center;
+  color: var(--secondary_font_color);
 }
 
 .techBanner {
   background: var(--tertiary_color);
+  color: var(--primary_font_color);
 }
 
 .footerLink {
