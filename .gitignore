@@ -3,3 +3,4 @@
 *.pkl
 *charts.json
 *latest.json
+.DS_Store
