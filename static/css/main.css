@@ -1,9 +1,34 @@
 
 :root {
-  --primary_color: #4488EE;
+  --primary_color: #4488ee;
   --secondary_color: black;
   --tertiary_color: #e7f0f7;
-  --fourth_color:#FFBD59;
+  --fourth_color:  #FFBD59;
+  --body_color: white;
+  --header_font_color: white;
+  --primary_font_color: black;
+  --secondary_font_color: black;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary_color: #4488ee;
+    --secondary_color: #e7f0f7;
+    --tertiary_color: #242424;
+    --fourth_color: #404040;
+    --body_color: #121212;
+    --header_font_color:white;
+    --primary_font_color:white;
+    --secondary_font_color: #B3B3B3;
+  }
+}
+
+.body {
+  background-color: var(--body_color);
+}
+
+.headerBanner {
+  color: var(--primary_font_color);
 }
 
 .headerBar {
@@ -12,14 +37,14 @@
   align-items:center;
   width:100vw;
   max-width:100%;
-  border-bottom: thin solid var(--secondary_color);
-  color:white;
+  border-bottom: thin solid var(--secondary_font_color);
+  color: var(--header_font_color);
   background: var(--primary_color);
   white-space:nowrap;
 }
 
 .headerLink, .headerLink:hover {
-  color:white;
+  color: var(--header_font_color);
   text-decoration:none !important;
 }
 
@@ -45,7 +70,7 @@
   display:flex;
   flex-direction:column;
   box-shadow: 2px 2px darkgrey;
-  color:white;
+  color: var(--primary_font_color);
   margin-bottom:10px;
 }
 
@@ -56,7 +81,7 @@ i {
 
 .predictionBox {
   background: var(--tertiary_color);
-  color: black;
+  color: var(--primary_font_color);
   padding:20px;
   border-radius:5px;
   white-space:nowrap;
@@ -73,14 +98,14 @@ button {
   background: var(--tertiary_color);
   height:60px;
   margin-top:10px;
-  color:black;
+  color: var(--primary_font_color);
 }
 
 .coinButton, .windowButton {
   background: var(--tertiary_color);
   height:60px;
   margin-top:10px;
-  color:black;
+  color: var(--secondary_font_color);
 }
 
 .coinButton:active, button:active {
@@ -93,7 +118,7 @@ button {
   justify-content:center;
 }
 
-.selectedButton, .coinButton:hover, .windowButton:hover {
+.selectedButton, .coinButton:hover, .windowButton:hover, .navButton:hover {
   background: var(--fourth_color);
 }
 
@@ -108,9 +133,10 @@ button {
 .navButton {
   display:inline-flex;
   align-items:center;
-  background:none;
+  background: var(--tertiary_color);
   border:thin solid black !important;
   padding:10px;
+  color: var(--secondary_font_color);
 }
 
 .navLink {
@@ -167,6 +193,7 @@ button {
   left:0;
   margin-right:auto;
   margin-left:auto;
+  color: var(--secondary_font_color);
 }
 
 .techLogo {
@@ -180,6 +207,28 @@ button {
   height:30px;
 }
 
+.forecastsBanner {
+  padding:25px;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color: var(--secondary_font_color);
+}
+
+.privacyBanner {
+  padding:25px;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  border-bottom: thin solid var(--secondary_font_color);
+  text-align:center;
+  color: var(--secondary_font_color);
+  border-bottom: thin solid var(--secondary_font_color);
+}
+
 .banner {
   padding:50px;
   width:100vw;
@@ -187,12 +236,22 @@ button {
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  border-bottom: thin solid darkgrey;
+  border-bottom: thin solid var(--secondary_font_color);
   text-align:center;
+  color: var(--primary_font_color);
 }
 
 .techBanner {
   background: var(--tertiary_color);
+  color: var(--primary_font_color);
+}
+
+.container h3 {
+  color: var(--primary_font_color)
+}
+
+.container {
+  color: var(--secondary_font_color)
 }
 
 .footerLink {
