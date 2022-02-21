@@ -207,42 +207,20 @@ button {
   height:30px;
 }
 
-.forecastsBanner {
-  padding:25px;
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  justify-content:center;
+.marketingBanner {
   text-align:center;
   color: var(--secondary_font_color);
-}
-
-.privacyBanner {
-  padding:25px;
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  justify-content:center;
-  border-bottom: thin solid var(--secondary_font_color);
-  text-align:center;
-  color: var(--secondary_font_color);
-  border-bottom: thin solid var(--secondary_font_color);
+  padding:1rem;
 }
 
 .banner {
-  padding:50px;
+  padding:4rem;
   width:100vw;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  border-bottom: thin solid var(--secondary_font_color);
   text-align:center;
-  color: var(--primary_font_color);
-}
-
-.techBanner {
-  background: var(--tertiary_color);
   color: var(--primary_font_color);
 }
 
