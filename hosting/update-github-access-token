@@ -1,0 +1,9 @@
+
+
+# Retrieve new personal access key in GitHub
+https://github.com/settings/tokens
+
+# Execute commands on the server to update the stored credentials
+git config --global --unset credential.helper
+git config --global credential.helper store
+git pull

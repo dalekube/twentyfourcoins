@@ -50,11 +50,8 @@ sqlite3 db.sqlite
 DELETE FROM logs;
 vacuum;
 
-## Execute initial scripts to collect data, train models, and save price predictions
-cd ../functions
-python3 api_collect_prices.py
-python3 train_models.py
-python3 predict_prices.py
+## Run the initialization script in the repo parent directory
+python3 init.py
 
 ## Gunicorn and Nginx instance
 # https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04

@@ -3,7 +3,7 @@
 {% block content %}
 
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<div style="display:flex;flex-direction:column;align-items:center;height:50rem;">
+<div style="display:flex;flex-direction:column;align-items:center;">
   <div style="display:flex;align-items:top;float:left;">
     <!-- BUTTON SIDEBAR -->
     <div style="max-width:300px;margin-right:25px;">
@@ -126,21 +126,20 @@
     </div>
   </div>
 </div>
-<div class="forecastsprivacyBannerContainer">
-  <div class="forecastsBanner">
-    <picture>
-      <source srcset="images/graph-white-transparent.png" media="(prefers-color-scheme: dark)" />
-      <img class="forecastsLogo" alt="Forecasts Logo" src="images/graph-black-transparent.png"/>
-    </picture>
-    <p>Price forecasts for smarter<br>cryptocurrency trades</p>
-  </div>
-  <div class ="privacyBanner">
-      <img class="privacyLogo" alt="Privacy Logo" src="images/lock-transparent.png"/>
-    <p>Privacy is a top priority.<br>Every session is private.<br>User data is never shared.</p>
-  </div>
+<br>
+<div class="banner">
+  <h3>Price forecasts for smarter<br>cryptocurrency trades.</h3>
+  <picture>
+    <source srcset="images/graph-white-transparent.png" media="(prefers-color-scheme: dark)" />
+    <img class="forecastsLogo" alt="Forecasts Logo" src="images/graph-black-transparent.png"/>
+  </picture>
 </div>
-<div class="banner techBanner">
-  <h4>The platform uses state-of-the-art technology to provide the best forecasts.</h4>
+<div class ="banner">
+    <h3>Privacy is a top priority.<br>Every session is private.<br>User data is never shared.</h3>
+    <img class="privacyLogo" alt="Privacy Logo" src="images/lock-transparent.png"/>
+</div>
+<div class="banner">
+  <h3>The platform uses state-of-the-art technology to provide the best forecasts.</h3>
   <div>
     <picture>
       <source srcset="images/aws-white-transparent.png" media="(prefers-color-scheme: dark)" />
@@ -155,9 +154,10 @@
 </div>
 </div>
 <div class="banner">
-  <h4>Make a donation to support the project.</h4>
+  <h3>Make a donation to support the project.</h3>
   <br>
   <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="twentyfourcoins" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy the project a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff"></script>
 </div>
+<br>
 
 {% endblock %}
